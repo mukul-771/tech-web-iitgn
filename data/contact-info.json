@@ -1,0 +1,19 @@
+{
+  "address": {
+    "street": "323, Acad Block 4, IIT Gandhinagar",
+    "city": "Palaj, Gandhinagar",
+    "state": "Gujarat",
+    "postalCode": "382355",
+    "country": "India"
+  },
+  "phone": "+91-79-2395-2001",
+  "email": "technical.secretary@iitgn.ac.in",
+  "socialMedia": {
+    "instagram": "https://www.instagram.com/tech_iitgn?utm_source=ig_web_button_share_sheet&igsh=ZDNlZDc0MzIxNw==",
+    "youtube": "https://www.youtube.com/@tech_iitgn",
+    "linkedin": "https://www.linkedin.com/school/tech-council-iitgn/",
+    "facebook": "https://www.facebook.com/tech.iitgn"
+  },
+  "lastModified": "2025-06-07T22:41:50.158Z",
+  "modifiedBy": "System"
+}

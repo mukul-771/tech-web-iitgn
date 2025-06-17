@@ -1,0 +1,417 @@
+{
+  "metis": {
+    "id": "metis",
+    "name": "Metis, Development Club",
+    "description": "Focuses on software development and coding, where members work on real-world projects, contribute to open-source, and hone their programming skills.",
+    "longDescription": "Metis, the Development Club, is dedicated to fostering software development skills among students. We focus on real-world project development, open-source contributions, and modern programming practices. Our members work with various technologies including web development, mobile apps, and system programming to create innovative solutions.",
+    "type": "club",
+    "category": "Software Development",
+    "members": "60+",
+    "established": "2018",
+    "email": "metis@iitgn.ac.in",
+    "achievements": [
+      "Contributed to 50+ open-source projects",
+      "Developed campus management applications",
+      "Winner - National Coding Competition 2023",
+      "Published multiple software libraries"
+    ],
+    "projects": [
+      "Campus Event Management System",
+      "Student Collaboration Platform",
+      "Open Source Library Development",
+      "Mobile App for Campus Services"
+    ],
+    "team": [
+      {
+        "name": "Advait",
+        "role": "Secretary",
+        "email": "advait@iitgn.ac.in"
+      }
+    ],
+    "createdAt": "2023-01-01T00:00:00Z",
+    "updatedAt": "2025-06-05T17:10:52.702Z",
+    "logoPath": ""
+  },
+  "digis": {
+    "id": "digis",
+    "name": "Digis, Digital Sports Club",
+    "description": "Combines technology with gaming, offering a platform for students interested in game development, e-sports, and the study of digital sports ecosystems.",
+    "longDescription": "Digis, the Digital Sports Club, bridges the gap between technology and gaming. We focus on game development, e-sports competitions, and understanding digital sports ecosystems. Our members explore game design, competitive gaming strategies, and the technological aspects of modern sports.",
+    "type": "club",
+    "category": "Gaming & Sports Technology",
+    "members": "45+",
+    "established": "2019",
+    "email": "digis@iitgn.ac.in",
+    "achievements": [
+      "Organized inter-college e-sports tournaments",
+      "Developed mobile gaming applications",
+      "Winner - National Game Development Contest",
+      "Partnership with gaming industry leaders"
+    ],
+    "projects": [
+      "Campus E-sports Platform",
+      "Game Development Framework",
+      "Sports Analytics Dashboard",
+      "Virtual Reality Gaming Experience"
+    ],
+    "team": [
+      {
+        "name": "Siddhesh Umarjee",
+        "role": "Secretary",
+        "email": "siddhesh.umarjee@iitgn.ac.in"
+      },
+      {
+        "name": "Divyansh Sharma",
+        "role": "Secretary",
+        "email": "divyansh.sharma@iitgn.ac.in"
+      }
+    ],
+    "createdAt": "2023-01-01T00:00:00Z",
+    "updatedAt": "2025-06-01T20:49:07.782Z",
+    "logoPath": ""
+  },
+  "mean-mechanics": {
+    "id": "mean-mechanics",
+    "name": "Mean Mechanics, Robotics Club",
+    "description": "Specialises in designing and building robots, providing hands-on experience in robotics, automation, and mechatronics.",
+    "longDescription": "Mean Mechanics, the Robotics Club, is dedicated to advancing robotics and automation technologies. We provide hands-on experience in robot design, construction, and programming. Our members work on cutting-edge projects involving autonomous systems, industrial automation, and innovative mechatronic solutions.",
+    "type": "club",
+    "category": "Robotics & Automation",
+    "members": "55+",
+    "established": "2017",
+    "email": "meanmechanics@iitgn.ac.in",
+    "achievements": [
+      "Winner - National Robotics Championship 2023",
+      "Developed autonomous campus delivery system",
+      "Best Innovation Award - National Robotics Meet",
+      "Published research in robotics journals"
+    ],
+    "projects": [
+      "Autonomous Navigation Robot",
+      "Industrial Automation System",
+      "Swarm Robotics Research",
+      "Robotic Arm for Manufacturing"
+    ],
+    "team": [
+      {
+        "name": "Harshada",
+        "role": "Secretary",
+        "email": "harshada@iitgn.ac.in"
+      }
+    ],
+    "createdAt": "2023-01-01T00:00:00Z",
+    "updatedAt": "2025-06-01T20:51:42.385Z",
+    "logoPath": ""
+  },
+  "odyssey": {
+    "id": "odyssey",
+    "name": "Odyssey, Astronomy Club",
+    "description": "Explores the wonders of the universe, with activities ranging from stargazing sessions to discussions on astrophysics and space technology.",
+    "longDescription": "Odyssey, the Astronomy Club, is dedicated to exploring the cosmos and advancing our understanding of the universe. We organize stargazing sessions, astrophysics discussions, and space technology workshops. Our members engage in astronomical observations, space mission simulations, and collaborative research projects.",
+    "type": "club",
+    "category": "Astronomy & Space",
+    "members": "40+",
+    "established": "2019",
+    "email": "odyssey@iitgn.ac.in",
+    "achievements": [
+      "Organized successful stargazing events",
+      "Built campus observatory telescope",
+      "Collaboration with ISRO for student projects",
+      "Published astronomical research papers"
+    ],
+    "projects": [
+      "Campus Observatory Development",
+      "Asteroid Discovery Program",
+      "Space Mission Simulation",
+      "Astrophotography Documentation"
+    ],
+    "team": [
+      {
+        "name": "Raj Bahadur",
+        "role": "Secretary",
+        "email": "raj.bahadur@iitgn.ac.in"
+      }
+    ],
+    "createdAt": "2023-01-01T00:00:00Z",
+    "updatedAt": "2025-06-01T20:51:56.534Z",
+    "logoPath": ""
+  },
+  "grasp": {
+    "id": "grasp",
+    "name": "GRASP, CP Club",
+    "description": "Dedicated to competitive programming, where members regularly participate in coding contests and work on improving their problem-solving abilities.",
+    "longDescription": "GRASP, the Competitive Programming Club, focuses on developing algorithmic thinking and problem-solving skills. We prepare students for coding competitions, organize practice sessions, and provide mentorship for programming contests. Our members regularly participate in national and international coding competitions.",
+    "type": "club",
+    "category": "Competitive Programming",
+    "members": "80+",
+    "established": "2017",
+    "email": "grasp@iitgn.ac.in",
+    "achievements": [
+      "Multiple ICPC regional qualifications",
+      "Winners in national coding competitions",
+      "Organized inter-college programming contests",
+      "Top performers in major coding contests"
+    ],
+    "projects": [
+      "Online Judge Platform Development",
+      "Algorithm Visualization Tools",
+      "Contest Management System",
+      "Competitive Programming Training Portal"
+    ],
+    "team": [
+      {
+        "name": "Anurag Singh",
+        "role": "Secretary",
+        "email": "anurag.singh@iitgn.ac.in"
+      }
+    ],
+    "createdAt": "2023-01-01T00:00:00Z",
+    "updatedAt": "2025-06-01T20:52:06.800Z",
+    "logoPath": ""
+  },
+  "machine-learning": {
+    "id": "machine-learning",
+    "name": "Machine Learning Club",
+    "description": "Focuses on machine learning and AI, offering a space for students to experiment with algorithms, data science projects, and cutting-edge research.",
+    "longDescription": "The Machine Learning Club is dedicated to advancing artificial intelligence and machine learning technologies. We provide hands-on experience with ML algorithms, data science projects, and cutting-edge AI research. Our members work on real-world applications and contribute to the growing field of artificial intelligence.",
+    "type": "club",
+    "category": "Artificial Intelligence",
+    "members": "70+",
+    "established": "2018",
+    "email": "mlclub@iitgn.ac.in",
+    "achievements": [
+      "Published research in top AI conferences",
+      "Winner - National AI Challenge 2023",
+      "Collaboration with industry AI labs",
+      "Developed AI solutions for social good"
+    ],
+    "projects": [
+      "Computer Vision for Healthcare",
+      "Natural Language Processing Research",
+      "Reinforcement Learning Applications",
+      "AI Ethics and Fairness Studies"
+    ],
+    "team": [
+      {
+        "name": "Romit",
+        "role": "Secretary",
+        "email": "romit@iitgn.ac.in"
+      }
+    ],
+    "createdAt": "2023-01-01T00:00:00Z",
+    "updatedAt": "2025-06-01T20:52:16.422Z",
+    "logoPath": ""
+  },
+  "tinkerers-lab": {
+    "id": "tinkerers-lab",
+    "name": "TINKERER'S LAB",
+    "description": "A hands-on innovation space where students experiment with hardware, prototyping, and creative engineering solutions to bring ideas to life.",
+    "longDescription": "TINKERER'S LAB is a hands-on innovation space dedicated to hardware experimentation, prototyping, and creative engineering solutions. We provide access to tools, equipment, and mentorship for students to bring their ideas to life through practical implementation and iterative design.",
+    "type": "technical-council-group",
+    "category": "Innovation & Prototyping",
+    "members": "50+",
+    "established": "2020",
+    "email": "tinkererslab@iitgn.ac.in",
+    "achievements": [
+      "Built innovative hardware prototypes",
+      "Winner - National Innovation Challenge",
+      "Developed IoT solutions for campus",
+      "Mentored 100+ student projects"
+    ],
+    "projects": [
+      "Smart Campus IoT Network",
+      "Sustainable Energy Solutions",
+      "Assistive Technology Development",
+      "Maker Space Equipment Design"
+    ],
+    "team": [
+      {
+        "name": "Rajesh Kumar",
+        "role": "Secretary",
+        "email": "rajesh.kumar@iitgn.ac.in"
+      },
+      {
+        "name": "Sneha Agarwal",
+        "role": "General Member",
+        "email": "sneha.agarwal@iitgn.ac.in"
+      },
+      {
+        "name": "Vikram Singh",
+        "role": "General Member",
+        "email": "vikram.singh@iitgn.ac.in"
+      },
+      {
+        "name": "Priya Sharma",
+        "role": "General Member",
+        "email": "priya.sharma@iitgn.ac.in"
+      }
+    ],
+    "createdAt": "2023-01-01T00:00:00Z",
+    "updatedAt": "2025-01-27T00:00:00Z"
+  },
+  "systems": {
+    "id": "systems",
+    "name": "Systems Club",
+    "description": "Explores computer systems, networking, and hardware-software integration.",
+    "longDescription": "The Systems Club focuses on computer systems, networking technologies, and hardware-software integration. We explore system architecture, network protocols, and the intersection of hardware and software in modern computing systems.",
+    "type": "hobby-group",
+    "category": "Systems & Networking",
+    "members": "25+",
+    "established": "2020",
+    "email": "systems@iitgn.ac.in",
+    "achievements": [
+      "Built campus network monitoring tools",
+      "Organized system administration workshops",
+      "Contributed to open-source system tools",
+      "Network security research projects"
+    ],
+    "projects": [
+      "Campus Network Monitoring",
+      "System Performance Analysis",
+      "Network Security Tools",
+      "Distributed Systems Research"
+    ],
+    "team": [
+      {
+        "name": "Aashmun Gupta",
+        "role": "Secretary",
+        "email": "aashmun.gupta@iitgn.ac.in"
+      }
+    ],
+    "createdAt": "2023-01-01T00:00:00Z",
+    "updatedAt": "2025-06-01T20:52:49.632Z",
+    "logoPath": ""
+  },
+  "embed": {
+    "id": "embed",
+    "name": "Embed Club",
+    "description": "Focuses on embedded systems and microcontroller-based IoT projects.",
+    "longDescription": "The Embed Club specializes in embedded systems development and microcontroller-based IoT projects. We work with various microcontrollers, sensors, and embedded platforms to create innovative IoT solutions and embedded applications.",
+    "type": "hobby-group",
+    "category": "Embedded Systems",
+    "members": "30+",
+    "established": "2019",
+    "email": "embed@iitgn.ac.in",
+    "achievements": [
+      "Developed IoT solutions for campus",
+      "Winner - National Embedded Systems Contest",
+      "Built smart home automation systems",
+      "Contributed to open-source embedded projects"
+    ],
+    "projects": [
+      "Smart Campus Monitoring System",
+      "IoT-based Environmental Sensors",
+      "Embedded System Prototypes",
+      "Microcontroller Programming Workshops"
+    ],
+    "team": [
+      {
+        "name": "Siya Patil",
+        "role": "Secretary",
+        "email": "siya.patil@iitgn.ac.in"
+      }
+    ],
+    "createdAt": "2023-01-01T00:00:00Z",
+    "updatedAt": "2025-06-01T20:57:24.955Z",
+    "logoPath": ""
+  },
+  "twist-theory": {
+    "id": "twist-theory",
+    "name": "Twist Theory, Speed Cubing Hobby Group",
+    "description": "Competitive speedcubing with advanced algorithms and official WCA competitions.",
+    "longDescription": "Twist Theory is the Speed Cubing Hobby Group dedicated to the art and sport of speedcubing. We practice advanced algorithms, participate in official WCA competitions, and promote the speedcubing community on campus through workshops and competitions.",
+    "type": "hobby-group",
+    "category": "Competitive Gaming",
+    "members": "20+",
+    "established": "2020",
+    "email": "twisttheory@iitgn.ac.in",
+    "achievements": [
+      "Organized campus speedcubing competitions",
+      "Multiple WCA competition participations",
+      "Achieved sub-15 second average times",
+      "Taught 100+ students to solve cubes"
+    ],
+    "projects": [
+      "Campus Speedcubing Championships",
+      "Algorithm Development and Optimization",
+      "Beginner Cubing Workshops",
+      "Advanced Method Training Sessions"
+    ],
+    "team": [
+      {
+        "name": "Tanish Yelgoe",
+        "role": "Secretary",
+        "email": "tanish.yelgoe@iitgn.ac.in"
+      }
+    ],
+    "createdAt": "2023-01-01T00:00:00Z",
+    "updatedAt": "2025-06-01T20:57:16.566Z",
+    "logoPath": ""
+  },
+  "cybersentinel": {
+    "id": "cybersentinel",
+    "name": "CyberSentinel",
+    "description": "Cybersecurity group focused on ethical hacking, digital forensics, and CTF challenges.",
+    "longDescription": "CyberSentinel is a cybersecurity hobby group focused on ethical hacking, digital forensics, and Capture The Flag (CTF) challenges. We promote cybersecurity awareness, conduct security research, and participate in national and international cybersecurity competitions.",
+    "type": "hobby-group",
+    "category": "Cybersecurity",
+    "members": "40+",
+    "established": "2019",
+    "email": "cybersentinel@iitgn.ac.in",
+    "achievements": [
+      "Top rankings in national CTF competitions",
+      "Conducted cybersecurity workshops",
+      "Identified and reported security vulnerabilities",
+      "Collaborated with industry on security research"
+    ],
+    "projects": [
+      "Campus Security Assessment",
+      "CTF Challenge Development",
+      "Digital Forensics Research",
+      "Ethical Hacking Training Programs"
+    ],
+    "team": [
+      {
+        "name": "Arjun Sekar",
+        "role": "Secretary",
+        "email": "arjun.sekar@iitgn.ac.in"
+      }
+    ],
+    "createdAt": "2023-01-01T00:00:00Z",
+    "updatedAt": "2025-06-01T20:57:08.240Z",
+    "logoPath": ""
+  },
+  "lambda": {
+    "id": "lambda",
+    "name": "Lambda",
+    "description": "Programming languages theory and implementation through research and hands-on projects.",
+    "longDescription": "Lambda is a hobby group dedicated to programming languages theory and implementation. We explore functional programming, compiler design, type systems, and language implementation through research projects and hands-on development.",
+    "type": "hobby-group",
+    "category": "Programming Languages",
+    "members": "15+",
+    "established": "2020",
+    "email": "lambda@iitgn.ac.in",
+    "achievements": [
+      "Developed experimental programming languages",
+      "Contributed to open-source compilers",
+      "Organized programming language workshops",
+      "Published research on type systems"
+    ],
+    "projects": [
+      "Functional Programming Language Design",
+      "Compiler Optimization Research",
+      "Type System Implementation",
+      "Language Interoperability Studies"
+    ],
+    "team": [
+      {
+        "name": "Aniket Mishra",
+        "role": "Secretary",
+        "email": "aniket.mishra@iitgn.ac.in"
+      }
+    ],
+    "createdAt": "2023-01-01T00:00:00Z",
+    "updatedAt": "2025-06-01T20:57:02.702Z",
+    "logoPath": ""
+  }
+}

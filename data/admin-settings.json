@@ -1,0 +1,15 @@
+{
+  "siteName": "Tech@IITGN",
+  "siteDescription": "Technical Council - IIT Gandhinagar",
+  "enableNotifications": true,
+  "autoBackup": true,
+  "maintenanceMode": false,
+  "maxFileSize": "10MB",
+  "allowedFileTypes": [
+    "jpg",
+    "jpeg",
+    "png",
+    "gif",
+    "webp"
+  ]
+}

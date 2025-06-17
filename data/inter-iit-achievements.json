@@ -1,0 +1,176 @@
+{
+  "robotics-bronze-2023": {
+    "id": "robotics-bronze-2023",
+    "achievementType": "bronze-medal",
+    "competitionName": "Autonomous Robotics Challenge",
+    "interIITEdition": "Inter-IIT Tech Meet 12.0",
+    "year": "2023",
+    "hostIIT": "IIT Madras",
+    "location": "Chennai, Tamil Nadu",
+    "ranking": 3,
+    "teamMembers": [
+      {
+        "name": "Sneha Agarwal",
+        "rollNumber": "21110178",
+        "branch": "Mechanical Engineering",
+        "year": "3rd Year",
+        "role": "Team Lead",
+        "email": "sneha.agarwal@iitgn.ac.in",
+        "achievements": [
+          "Team Lead for Bronze Medal in Robotics"
+        ]
+      },
+      {
+        "name": "Vikram Singh",
+        "rollNumber": "21110203",
+        "branch": "Electrical Engineering",
+        "year": "3rd Year",
+        "role": "Member",
+        "email": "vikram.singh@iitgn.ac.in",
+        "achievements": [
+          "Bronze Medal in Robotics Challenge"
+        ]
+      },
+      {
+        "name": "Priya Sharma",
+        "rollNumber": "21110134",
+        "branch": "Computer Science and Engineering",
+        "year": "3rd Year",
+        "role": "Member",
+        "email": "priya.sharma@iitgn.ac.in",
+        "achievements": [
+          "Bronze Medal in Robotics Challenge"
+        ]
+      },
+      {
+        "name": "Amit Kumar",
+        "rollNumber": "21110023",
+        "branch": "Mechanical Engineering",
+        "year": "2nd Year",
+        "role": "Member",
+        "email": "amit.kumar@iitgn.ac.in",
+        "achievements": [
+          "Bronze Medal in Robotics Challenge"
+        ]
+      }
+    ],
+    "achievementDescription": "Secured 3rd position in the Autonomous Robotics Challenge with excellent navigation and task completion capabilities.",
+    "significance": "This achievement demonstrates IIT Gandhinagar's strong capabilities in robotics and autonomous systems, showcasing our students' technical excellence in a highly competitive environment.",
+    "competitionCategory": "Robotics",
+    "supportingDocuments": [
+      {
+        "name": "Bronze Medal Certificate",
+        "type": "certificate",
+        "filePath": "/documents/robotics-bronze-2023.pdf",
+        "uploadDate": "2023-12-17",
+        "description": "Official certificate for bronze medal in robotics challenge"
+      },
+      {
+        "name": "Team Photo",
+        "type": "photo",
+        "filePath": "/images/robotics-team-2023.jpg",
+        "uploadDate": "2023-12-17",
+        "description": "Team photo with the bronze medal"
+      }
+    ],
+    "achievementDate": "2023-12-17",
+    "points": 95,
+    "status": "verified",
+    "createdAt": "2023-12-17T00:00:00Z",
+    "updatedAt": "2023-12-17T00:00:00Z"
+  },
+  "innovation-silver-2023": {
+    "id": "innovation-silver-2023",
+    "achievementType": "silver-medal",
+    "competitionName": "Innovation Challenge",
+    "interIITEdition": "Inter-IIT Tech Meet 12.0",
+    "year": "2023",
+    "hostIIT": "IIT Madras",
+    "location": "Chennai, Tamil Nadu",
+    "ranking": 2,
+    "teamMembers": [
+      {
+        "name": "Kavya Reddy",
+        "rollNumber": "21110087",
+        "branch": "Computer Science and Engineering",
+        "year": "3rd Year",
+        "role": "Team Lead",
+        "email": "kavya.reddy@iitgn.ac.in",
+        "achievements": [
+          "Team Lead for Silver Medal in Innovation Challenge"
+        ]
+      }
+    ],
+    "achievementDescription": "Secured 2nd position in the Innovation Challenge with an innovative IoT solution for smart campus management.",
+    "significance": "This silver medal highlights IIT Gandhinagar's innovation capabilities and our students' ability to develop practical solutions for real-world problems using cutting-edge technology.",
+    "competitionCategory": "Innovation Challenge",
+    "supportingDocuments": [],
+    "achievementDate": "2023-12-18",
+    "points": 98,
+    "status": "verified",
+    "createdAt": "2023-12-18T00:00:00Z",
+    "updatedAt": "2025-06-01T21:51:45.601Z"
+  },
+  "programming-ranking-2023": {
+    "id": "programming-ranking-2023",
+    "achievementType": "ranking",
+    "competitionName": "Programming Contest",
+    "interIITEdition": "Inter-IIT Tech Meet 12.0",
+    "year": "2023",
+    "hostIIT": "IIT Madras",
+    "location": "Chennai, Tamil Nadu",
+    "ranking": 5,
+    "teamMembers": [
+      {
+        "name": "Arjun Patel",
+        "rollNumber": "21110045",
+        "branch": "Computer Science and Engineering",
+        "year": "3rd Year",
+        "role": "Team Lead",
+        "email": "arjun.patel@iitgn.ac.in",
+        "achievements": [
+          "Team Lead for Programming Contest"
+        ]
+      },
+      {
+        "name": "Kavya Sharma",
+        "rollNumber": "21110089",
+        "branch": "Computer Science and Engineering",
+        "year": "3rd Year",
+        "role": "Member",
+        "email": "kavya.sharma@iitgn.ac.in",
+        "achievements": [
+          "Top 5 finish in Programming Contest"
+        ]
+      },
+      {
+        "name": "Rohit Gupta",
+        "rollNumber": "21110156",
+        "branch": "Mathematics and Computing",
+        "year": "3rd Year",
+        "role": "Member",
+        "email": "rohit.gupta@iitgn.ac.in",
+        "achievements": [
+          "Top 5 finish in Programming Contest"
+        ]
+      }
+    ],
+    "achievementDescription": "Achieved 5th position in the highly competitive Programming Contest, demonstrating strong algorithmic and problem-solving skills.",
+    "significance": "This achievement showcases the programming excellence of IIT Gandhinagar students and their ability to compete at the highest level in algorithmic challenges.",
+    "competitionCategory": "Programming",
+    "supportingDocuments": [
+      {
+        "name": "Participation Certificate",
+        "type": "certificate",
+        "filePath": "/documents/programming-contest-2023.pdf",
+        "uploadDate": "2023-12-16",
+        "description": "Certificate for participation and ranking in programming contest"
+      }
+    ],
+    "achievementDate": "2023-12-16",
+    "points": 85,
+    "status": "verified",
+    "createdAt": "2023-12-16T00:00:00Z",
+    "updatedAt": "2023-12-16T00:00:00Z"
+  }
+}

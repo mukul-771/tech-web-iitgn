@@ -1,0 +1,160 @@
+export interface EventImage {
+  id: string;
+  url: string;
+  caption?: string;
+  alt: string;
+}
+
+export interface Event {
+  id: string;
+  title: string;
+  description: string;
+  date: string;
+  location: string;
+  duration: string;
+  participants: string;
+  organizer: string;
+  category: string;
+  highlights: string[];
+  gallery: EventImage[];
+  createdAt: string;
+  updatedAt: string;
+}
+
+// Default events data - this will be moved to JSON files
+export const defaultEventsData: Record<string, Event> = {
+  "tech-symposium-2023": {
+    id: "tech-symposium-2023",
+    title: "Annual Tech Symposium 2023",
+    description: "A grand showcase of innovation featuring project exhibitions, tech talks, and networking sessions with industry leaders.",
+    date: "March 15-17, 2023",
+    location: "Main Auditorium, IITGN",
+    duration: "3 days",
+    participants: "500+",
+    organizer: "Technical Council",
+    category: "Symposium",
+    highlights: [
+      "Project Exhibitions from 50+ Teams",
+      "Keynote by Industry Leaders",
+      "Technical Workshops",
+      "Networking Sessions",
+      "Innovation Awards",
+      "Student Research Presentations"
+    ],
+    gallery: [
+      {
+        id: "1",
+        url: "/events/placeholder-1.svg",
+        alt: "Tech Symposium 2023 - Main Stage",
+        caption: "Opening ceremony at the main auditorium"
+      },
+      {
+        id: "2",
+        url: "/events/placeholder-2.svg",
+        alt: "Tech Symposium 2023 - Exhibition",
+        caption: "Project exhibition area"
+      },
+      {
+        id: "3",
+        url: "/events/placeholder-3.svg",
+        alt: "Tech Symposium 2023 - Workshop",
+        caption: "Technical workshop session"
+      }
+    ],
+    createdAt: "2023-03-01T00:00:00Z",
+    updatedAt: "2023-03-01T00:00:00Z"
+  },
+  "robotics-workshop-2023": {
+    id: "robotics-workshop-2023",
+    title: "Robotics Workshop Series",
+    description: "Hands-on workshop series covering autonomous navigation, computer vision, and machine learning in robotics.",
+    date: "September 10-12, 2023",
+    location: "Robotics Lab, IITGN",
+    duration: "3 days",
+    participants: "150+",
+    organizer: "Robotics Club",
+    category: "Workshop",
+    highlights: [
+      "Autonomous Navigation Programming",
+      "Computer Vision Implementation",
+      "Machine Learning in Robotics",
+      "Hands-on Robot Building",
+      "Competition and Showcase"
+    ],
+    gallery: [
+      {
+        id: "1",
+        url: "/events/placeholder-3.svg",
+        alt: "Robotics Workshop - Lab Session",
+        caption: "Students working on robot programming"
+      },
+      {
+        id: "2",
+        url: "/events/placeholder-1.svg",
+        alt: "Robotics Workshop - Competition",
+        caption: "Robot competition arena"
+      }
+    ],
+    createdAt: "2023-09-01T00:00:00Z",
+    updatedAt: "2023-09-01T00:00:00Z"
+  },
+  "hackathon-2023": {
+    id: "hackathon-2023",
+    title: "CodeFest Hackathon 2023",
+    description: "48-hour coding marathon bringing together the brightest minds to solve real-world problems through innovative technology solutions.",
+    date: "November 18-20, 2023",
+    location: "Computer Center, IITGN",
+    duration: "48 hours",
+    participants: "300+",
+    organizer: "Programming Club",
+    category: "Hackathon",
+    highlights: [
+      "48-Hour Coding Marathon",
+      "Real-world Problem Solving",
+      "Mentorship from Industry Experts",
+      "Prize Pool of ₹1,00,000",
+      "Networking and Learning"
+    ],
+    gallery: [
+      {
+        id: "1",
+        url: "/events/placeholder-2.svg",
+        alt: "CodeFest Hackathon - Coding Session",
+        caption: "Teams working on their projects"
+      },
+      {
+        id: "2",
+        url: "/events/placeholder-1.svg",
+        alt: "CodeFest Hackathon - Presentation",
+        caption: "Final project presentations"
+      }
+    ],
+    createdAt: "2023-11-01T00:00:00Z",
+    updatedAt: "2023-11-01T00:00:00Z"
+  }
+};
+
+// Event categories
+export const eventCategories = [
+  "Symposium",
+  "Workshop",
+  "Hackathon",
+  "Conference",
+  "Competition",
+  "Seminar",
+  "Exhibition",
+  "Other"
+];
+
+// Organizing bodies
+export const organizingBodies = [
+  "Technical Council",
+  "Robotics Club",
+  "Programming Club",
+  "AI/ML Club",
+  "Cybersecurity Club",
+  "Web Development Club",
+  "Electronics Club",
+  "Aero Club",
+  "Other"
+];

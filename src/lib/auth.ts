@@ -1,5 +1,6 @@
 import { NextAuthOptions } from "next-auth";
 import CredentialsProvider from "next-auth/providers/credentials";
+import GoogleProvider from "next-auth/providers/google";
 import { getAdminEmails } from "./admin-emails-storage";
 import { auth as adminAuth } from "./firebase-admin";
 
@@ -20,6 +21,15 @@ async function getAuthorizedEmails(): Promise<string[]> {
 
 export const authOptions: NextAuthOptions = {
   providers: [
+    GoogleProvider({
+      clientId: process.env.GOOGLE_CLIENT_ID!,
+      clientSecret: process.env.GOOGLE_CLIENT_SECRET!,
+      authorization: {
+        params: {
+          prompt: "select_account",
+        },
+      },
+    }),
     CredentialsProvider({
       name: "Firebase",
       credentials: {
@@ -58,6 +68,13 @@ export const authOptions: NextAuthOptions = {
     }),
   ],
   callbacks: {
+    async signIn({ user, account }) {
+      if (account?.provider === "google") {
+        const authorizedEmails = await getAuthorizedEmails();
+        return authorizedEmails.includes(user.email ?? "");
+      }
+      return true;
+    },
     async jwt({ token, user }) {
       if (user) {
         token.uid = user.id;
@@ -67,15 +84,14 @@ export const authOptions: NextAuthOptions = {
     },
     async session({ session, token }) {
       if (session.user) {
-        session.user.id = token.uid as string;
-        session.user.isAdmin = token.isAdmin as boolean;
+        session.user.id = token.sub ?? "";
       }
       return session;
     },
   },
   pages: {
     signIn: "/admin/login",
-    error: "/admin/error",
+    error: "/admin/login",
   },
   session: {
     strategy: "jwt",

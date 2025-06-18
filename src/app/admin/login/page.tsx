@@ -1,14 +1,23 @@
 "use client";
 
-import { getSession } from "next-auth/react";
+import { signIn } from "next-auth/react";
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
 import { ThemeAwareLogo } from "@/components/ui/theme-aware-logo";
-import { CustomFirebaseLogin } from "@/components/admin/custom-firebase-login";
+import { auth } from "@/lib/firebase-config";
+import { signInWithPopup, GoogleAuthProvider } from "firebase/auth";
 
 export default function AdminLoginPage() {
   const router = useRouter();
+  const [error, setError] = useState<string | null>(null);
+  const [loading, setLoading] = useState(false);
 
   useEffect(() => {
     const checkSession = async () => {
@@ -19,6 +28,45 @@ export default function AdminLoginPage() {
     };
     checkSession();
   }, [router]);
+
+  const handleGoogleSignIn = async () => {
+    try {
+      setLoading(true);
+      setError(null);
+      await signIn("google", { callbackUrl: "/admin" });
+    } catch (err) {
+      setError("Failed to sign in with Google");
+      console.error(err);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleFirebaseGoogleSignIn = async () => {
+    try {
+      setLoading(true);
+      setError(null);
+      const provider = new GoogleAuthProvider();
+      if (!auth) throw new Error('Firebase auth not initialized');
+      const result = await signInWithPopup(auth, provider);
+      const idToken = await result.user.getIdToken();
+
+      const response = await signIn("credentials", {
+        idToken,
+        callbackUrl: "/admin",
+        redirect: true,
+      });
+
+      if (response?.error) {
+        setError("Not authorized to access admin panel");
+      }
+    } catch (err) {
+      setError("Failed to sign in with Firebase");
+      console.error(err);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-50 to-purple-50 dark:from-gray-900 dark:to-gray-800 p-4">
@@ -44,7 +92,33 @@ export default function AdminLoginPage() {
           </CardHeader>
 
           <CardContent className="space-y-6">
-            <CustomFirebaseLogin />
+            {error && (
+              <div
+                className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative"
+                role="alert"
+              >
+                <span className="block sm:inline">{error}</span>
+              </div>
+            )}
+
+            <div className="mt-8 space-y-6">
+              <button
+                onClick={handleGoogleSignIn}
+                disabled={loading}
+                className="w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:opacity-50"
+              >
+                {loading ? "Signing in..." : "Sign in with Google (NextAuth)"}
+              </button>
+
+              <button
+                onClick={handleFirebaseGoogleSignIn}
+                disabled={loading}
+                className="w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-green-600 hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 disabled:opacity-50"
+              >
+                {loading ? "Signing in..." : "Sign in with Google (Firebase)"}
+              </button>
+            </div>
+
             <div className="text-center">
               <p className="text-xs text-gray-500 dark:text-gray-400">
                 Only authorized administrators can access this dashboard.

@@ -44,7 +44,12 @@ export function HeroSection() {
           {/* Main heading */}
           <div className="space-y-3 sm:space-y-4">
             <h1 className="responsive-text-3xl font-bold tracking-tighter font-space-grotesk leading-tight">
-              welcome to the official page of technical council IITGN
+              Welcome to the Official Page of<br />
+              <span className="block bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent mt-2">
+                Technical Council
+              </span>
+              <br />
+              <span className="block">IITGN</span>
             </h1>
             <p className="mx-auto max-w-[700px] responsive-text-base text-gray-600 dark:text-gray-400 leading-relaxed px-4 sm:px-0">
               Explore Our Clubs, Read Our Magazine, Join the Innovation

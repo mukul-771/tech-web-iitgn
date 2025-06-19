@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useRef } from "react";
+import { useEffect, useState, useRef } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Label } from "@/components/ui/label";
@@ -31,7 +31,18 @@ export function TeamPhotoUpload({
   const [previewUrl, setPreviewUrl] = useState<string | null>(currentPhotoUrl || null);
   const [uploadProgress, setUploadProgress] = useState<number | null>(null);
   const [uploadError, setUploadError] = useState<string | null>(null);
+  const [firebaseUser, setFirebaseUser] = useState<any>(null);
+  const [checkingAuth, setCheckingAuth] = useState(true);
   const fileInputRef = useRef<HTMLInputElement>(null);
+
+  useEffect(() => {
+    const auth = getAuth();
+    const unsubscribe = auth.onAuthStateChanged((user) => {
+      setFirebaseUser(user);
+      setCheckingAuth(false);
+    });
+    return () => unsubscribe();
+  }, []);
 
   const targetSize = isSecretary ? 300 : 200;
 
@@ -39,11 +50,11 @@ export function TeamPhotoUpload({
     if (!file) return;
     setUploadError(null);
 
-    // Log current Firebase Auth user
-    const auth = getAuth();
-    const user = auth.currentUser;
-    console.log("Firebase Auth user before upload:", user);
-    if (!user) {
+    if (checkingAuth) {
+      setUploadError("Checking authentication, please wait...");
+      return;
+    }
+    if (!firebaseUser) {
       setUploadError("You must be signed in to upload. Please log in as an admin.");
       setIsUploading(false);
       setUploadProgress(null);
@@ -152,7 +163,9 @@ export function TeamPhotoUpload({
   return (
     <div className="space-y-4">
       <Label>Profile Photo</Label>
-      {uploadError && (
+      {checkingAuth ? (
+        <div className="text-blue-500 text-sm">Checking authentication...</div>
+      ) : uploadError && (
         <div className="text-red-500 text-sm">Upload error: {uploadError}</div>
       )}
 

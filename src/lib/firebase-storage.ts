@@ -39,13 +39,14 @@ export async function uploadToFirebase(
   folder: string = 'uploads'
 ): Promise<UploadResult> {
   if (!bucket) {
+    console.error('Firebase Storage bucket is not initialized.');
     throw new Error('Firebase Storage is not configured. Please set up Firebase credentials.');
   }
 
   try {
     const filePath = `${folder}/${fileName}`;
     const file = bucket.file(filePath);
-
+    console.log('Uploading to Firebase:', { filePath, contentType, size: fileBuffer.length });
     // Upload file with metadata
     await file.save(fileBuffer, {
       metadata: {
@@ -53,13 +54,11 @@ export async function uploadToFirebase(
         cacheControl: 'public, max-age=31536000', // 1 year cache
       },
     });
-
     // Make file publicly accessible
     await file.makePublic();
-
     // Get public URL
     const publicUrl = `https://storage.googleapis.com/${bucket.name}/${filePath}`;
-
+    console.log('Upload successful:', publicUrl);
     return {
       url: publicUrl,
       filename: fileName,
@@ -86,10 +85,9 @@ export async function uploadImageToFirebase(
       quality = 85,
       format = 'jpeg'
     } = options;
-
+    console.log('Optimizing image:', { originalName, maxWidth, maxHeight, quality, format });
     // Optimize image using Sharp
     let sharpInstance = sharp(fileBuffer);
-
     // Resize if needed
     if (maxWidth || maxHeight) {
       sharpInstance = sharpInstance.resize(maxWidth, maxHeight, {
@@ -97,12 +95,10 @@ export async function uploadImageToFirebase(
         withoutEnlargement: true
       });
     }
-
     // Convert to specified format with quality
     let optimizedBuffer: Buffer;
     let contentType: string;
     let extension: string;
-
     switch (format) {
       case 'webp':
         optimizedBuffer = await sharpInstance.webp({ quality }).toBuffer();
@@ -119,10 +115,9 @@ export async function uploadImageToFirebase(
         contentType = 'image/jpeg';
         extension = 'jpg';
     }
-
+    console.log('Image optimized:', { size: optimizedBuffer.length, contentType, extension });
     // Generate filename with correct extension
     const fileName = generateFileName(originalName.replace(/\.[^/.]+$/, `.${extension}`));
-
     return await uploadToFirebase(optimizedBuffer, fileName, contentType, folder);
   } catch (error) {
     console.error('Error optimizing and uploading image:', error);

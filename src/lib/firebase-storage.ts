@@ -29,46 +29,6 @@ export function generateFileName(originalName: string, prefix?: string): string 
   return fileName;
 }
 
-// Upload file to Firebase Storage
-export async function uploadToFirebase(
-  fileBuffer: Buffer,
-  fileName: string,
-  contentType: string,
-  folder: string = 'uploads'
-): Promise<UploadResult> {
-  if (!bucket) {
-    console.error('Firebase Storage bucket is not initialized.');
-    throw new Error('Firebase Storage is not configured. Please set up Firebase credentials.');
-  }
-
-  try {
-    const filePath = `${folder}/${fileName}`;
-    const file = bucket.file(filePath);
-    console.log('Uploading to Firebase:', { filePath, contentType, size: fileBuffer.length });
-    // Upload file with metadata
-    await file.save(fileBuffer, {
-      metadata: {
-        contentType,
-        cacheControl: 'public, max-age=31536000', // 1 year cache
-      },
-    });
-    // Make file publicly accessible
-    await file.makePublic();
-    // Get public URL
-    const publicUrl = `https://storage.googleapis.com/${bucket.name}/${filePath}`;
-    console.log('Upload successful:', publicUrl);
-    return {
-      url: publicUrl,
-      filename: fileName,
-      size: fileBuffer.length,
-      path: filePath,
-    };
-  } catch (error) {
-    console.error('Error uploading to Firebase:', error);
-    throw new Error('Failed to upload file to Firebase Storage');
-  }
-}
-
 // Upload and optimize image
 export async function uploadImageToFirebase(
   fileBuffer: Buffer,
@@ -116,7 +76,12 @@ export async function uploadImageToFirebase(
     console.log('Image optimized:', { size: optimizedBuffer.length, contentType, extension });
     // Generate filename with correct extension
     const fileName = generateFileName(originalName.replace(/\.[^/.]+$/, `.${extension}`));
-    return await uploadToFirebase(optimizedBuffer, fileName, contentType, folder);
+    return {
+      url: '',
+      filename: fileName,
+      size: optimizedBuffer.length,
+      path: `${folder}/${fileName}`,
+    };
   } catch (error) {
     console.error('Error optimizing and uploading image:', error);
     throw new Error('Failed to optimize and upload image');

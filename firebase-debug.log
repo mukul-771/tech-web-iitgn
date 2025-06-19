@@ -1,0 +1,422 @@
+[debug] [2025-06-18T23:50:30.224Z] ----------------------------------------------------------------------
+[debug] [2025-06-18T23:50:30.226Z] Command:       /usr/local/bin/node /Users/mukul7711/.npm/_npx/ba4f1959e38407b5/node_modules/.bin/firebase init dataconnect
+[debug] [2025-06-18T23:50:30.226Z] CLI Version:   14.7.0
+[debug] [2025-06-18T23:50:30.226Z] Platform:      darwin
+[debug] [2025-06-18T23:50:30.226Z] Node Version:  v20.14.0
+[debug] [2025-06-18T23:50:30.227Z] Time:          Thu Jun 19 2025 05:20:30 GMT+0530 (India Standard Time)
+[debug] [2025-06-18T23:50:30.227Z] ----------------------------------------------------------------------
+[debug] 
+[debug] [2025-06-18T23:50:30.228Z] >>> [apiv2][query] GET https://firebase-public.firebaseio.com/cli.json [none]
+[debug] [2025-06-18T23:50:30.262Z] > command requires scopes: ["email","openid","https://www.googleapis.com/auth/cloudplatformprojects.readonly","https://www.googleapis.com/auth/firebase","https://www.googleapis.com/auth/cloud-platform"]
+[debug] [2025-06-18T23:50:30.262Z] > authorizing via signed-in user (mukul.meena@iitgn.ac.in)
+[info] 
+     ######## #### ########  ######## ########     ###     ######  ########
+     ##        ##  ##     ## ##       ##     ##  ##   ##  ##       ##
+     ######    ##  ########  ######   ########  #########  ######  ######
+     ##        ##  ##    ##  ##       ##     ## ##     ##       ## ##
+     ##       #### ##     ## ######## ########  ##     ##  ######  ########
+
+You're about to initialize a Firebase project in this directory:
+
+  /Users/mukul7711/Documents/webdev/tech-website
+
+[info] 
+=== Project Setup
+[info] 
+[info] First, let's associate this project directory with a Firebase project.
+[info] You can create multiple project aliases by running firebase use --add, 
+[info] but for now we'll just set up a default project.
+[info] 
+[debug] [2025-06-18T23:50:30.263Z] Using project from CLI flag: tech-website-prod
+[debug] [2025-06-18T23:50:30.263Z] Checked if tokens are valid: true, expires at: 1750294198760
+[debug] [2025-06-18T23:50:30.263Z] Checked if tokens are valid: true, expires at: 1750294198760
+[debug] [2025-06-18T23:50:30.264Z] >>> [apiv2][query] GET https://firebase.googleapis.com/v1beta1/projects/tech-website-prod [none]
+[debug] [2025-06-18T23:50:30.889Z] <<< [apiv2][status] GET https://firebase-public.firebaseio.com/cli.json 200
+[debug] [2025-06-18T23:50:30.889Z] <<< [apiv2][body] GET https://firebase-public.firebaseio.com/cli.json {"cloudBuildErrorAfter":1594252800000,"cloudBuildWarnAfter":1590019200000,"defaultNode10After":1594252800000,"minVersion":"3.0.5","node8DeploysDisabledAfter":1613390400000,"node8RuntimeDisabledAfter":1615809600000,"node8WarnAfter":1600128000000}
+[debug] [2025-06-18T23:50:31.127Z] <<< [apiv2][status] GET https://firebase.googleapis.com/v1beta1/projects/tech-website-prod 200
+[debug] [2025-06-18T23:50:31.127Z] <<< [apiv2][body] GET https://firebase.googleapis.com/v1beta1/projects/tech-website-prod {"projectId":"tech-website-prod","projectNumber":"578108451083","displayName":"tech-website-prod","name":"projects/tech-website-prod","resources":{"hostingSite":"tech-website-prod"},"state":"ACTIVE","etag":"1_d9630251-3281-4f96-80d1-00798fb99cb0"}
+[info] i  Using project tech-website-prod (tech-website-prod) 
+[info] 
+=== Dataconnect Setup
+[debug] [2025-06-18T23:50:31.134Z] Checked if tokens are valid: true, expires at: 1750294198760
+[debug] [2025-06-18T23:50:31.134Z] Checked if tokens are valid: true, expires at: 1750294198760
+[debug] [2025-06-18T23:50:31.135Z] >>> [apiv2][query] GET https://cloudbilling.googleapis.com/v1/projects/tech-website-prod/billingInfo [none]
+[debug] [2025-06-18T23:50:32.688Z] <<< [apiv2][status] GET https://cloudbilling.googleapis.com/v1/projects/tech-website-prod/billingInfo 200
+[debug] [2025-06-18T23:50:32.689Z] <<< [apiv2][body] GET https://cloudbilling.googleapis.com/v1/projects/tech-website-prod/billingInfo {"name":"projects/tech-website-prod/billingInfo","projectId":"tech-website-prod","billingAccountName":"billingAccounts/01FBC9-DBDB84-5776AB","billingEnabled":true}
+[info] i  dataconnect: ensuring required API firebasedataconnect.googleapis.com is enabled... 
+[debug] [2025-06-18T23:50:32.689Z] Checked if tokens are valid: true, expires at: 1750294198760
+[debug] [2025-06-18T23:50:32.689Z] Checked if tokens are valid: true, expires at: 1750294198760
+[debug] [2025-06-18T23:50:32.689Z] >>> [apiv2][query] GET https://serviceusage.googleapis.com/v1/projects/tech-website-prod/services/firebasedataconnect.googleapis.com [none]
+[debug] [2025-06-18T23:50:32.689Z] >>> [apiv2][(partial)header] GET https://serviceusage.googleapis.com/v1/projects/tech-website-prod/services/firebasedataconnect.googleapis.com x-goog-quota-user=projects/tech-website-prod
+[debug] [2025-06-18T23:50:34.599Z] <<< [apiv2][status] GET https://serviceusage.googleapis.com/v1/projects/tech-website-prod/services/firebasedataconnect.googleapis.com 200
+[debug] [2025-06-18T23:50:34.599Z] <<< [apiv2][body] GET https://serviceusage.googleapis.com/v1/projects/tech-website-prod/services/firebasedataconnect.googleapis.com [omitted]
+[warn] ⚠  dataconnect: missing required API firebasedataconnect.googleapis.com. Enabling now... 
+[debug] [2025-06-18T23:50:34.600Z] Checked if tokens are valid: true, expires at: 1750294198760
+[debug] [2025-06-18T23:50:34.600Z] Checked if tokens are valid: true, expires at: 1750294198760
+[debug] [2025-06-18T23:50:34.600Z] >>> [apiv2][query] POST https://serviceusage.googleapis.com/v1/projects/tech-website-prod/services/firebasedataconnect.googleapis.com:enable [none]
+[debug] [2025-06-18T23:50:34.600Z] >>> [apiv2][(partial)header] POST https://serviceusage.googleapis.com/v1/projects/tech-website-prod/services/firebasedataconnect.googleapis.com:enable x-goog-quota-user=projects/tech-website-prod
+[debug] [2025-06-18T23:50:35.252Z] <<< [apiv2][status] POST https://serviceusage.googleapis.com/v1/projects/tech-website-prod/services/firebasedataconnect.googleapis.com:enable 200
+[debug] [2025-06-18T23:50:35.252Z] <<< [apiv2][body] POST https://serviceusage.googleapis.com/v1/projects/tech-website-prod/services/firebasedataconnect.googleapis.com:enable [omitted]
+[debug] [2025-06-18T23:50:45.257Z] Checked if tokens are valid: true, expires at: 1750294198760
+[debug] [2025-06-18T23:50:45.259Z] Checked if tokens are valid: true, expires at: 1750294198760
+[debug] [2025-06-18T23:50:45.260Z] >>> [apiv2][query] GET https://serviceusage.googleapis.com/v1/projects/tech-website-prod/services/firebasedataconnect.googleapis.com [none]
+[debug] [2025-06-18T23:50:45.260Z] >>> [apiv2][(partial)header] GET https://serviceusage.googleapis.com/v1/projects/tech-website-prod/services/firebasedataconnect.googleapis.com x-goog-quota-user=projects/tech-website-prod
+[debug] [2025-06-18T23:50:47.079Z] <<< [apiv2][status] GET https://serviceusage.googleapis.com/v1/projects/tech-website-prod/services/firebasedataconnect.googleapis.com 200
+[debug] [2025-06-18T23:50:47.079Z] <<< [apiv2][body] GET https://serviceusage.googleapis.com/v1/projects/tech-website-prod/services/firebasedataconnect.googleapis.com [omitted]
+[info] ✔  dataconnect: required API firebasedataconnect.googleapis.com is enabled 
+[info] i  dataconnect: ensuring required API sqladmin.googleapis.com is enabled... 
+[debug] [2025-06-18T23:50:47.081Z] Checked if tokens are valid: true, expires at: 1750294198760
+[debug] [2025-06-18T23:50:47.081Z] Checked if tokens are valid: true, expires at: 1750294198760
+[debug] [2025-06-18T23:50:47.081Z] >>> [apiv2][query] GET https://serviceusage.googleapis.com/v1/projects/tech-website-prod/services/sqladmin.googleapis.com [none]
+[debug] [2025-06-18T23:50:47.081Z] >>> [apiv2][(partial)header] GET https://serviceusage.googleapis.com/v1/projects/tech-website-prod/services/sqladmin.googleapis.com x-goog-quota-user=projects/tech-website-prod
+[debug] [2025-06-18T23:50:47.470Z] <<< [apiv2][status] GET https://serviceusage.googleapis.com/v1/projects/tech-website-prod/services/sqladmin.googleapis.com 200
+[debug] [2025-06-18T23:50:47.470Z] <<< [apiv2][body] GET https://serviceusage.googleapis.com/v1/projects/tech-website-prod/services/sqladmin.googleapis.com [omitted]
+[warn] ⚠  dataconnect: missing required API sqladmin.googleapis.com. Enabling now... 
+[debug] [2025-06-18T23:50:47.470Z] Checked if tokens are valid: true, expires at: 1750294198760
+[debug] [2025-06-18T23:50:47.470Z] Checked if tokens are valid: true, expires at: 1750294198760
+[debug] [2025-06-18T23:50:47.470Z] >>> [apiv2][query] POST https://serviceusage.googleapis.com/v1/projects/tech-website-prod/services/sqladmin.googleapis.com:enable [none]
+[debug] [2025-06-18T23:50:47.470Z] >>> [apiv2][(partial)header] POST https://serviceusage.googleapis.com/v1/projects/tech-website-prod/services/sqladmin.googleapis.com:enable x-goog-quota-user=projects/tech-website-prod
+[debug] [2025-06-18T23:50:48.900Z] <<< [apiv2][status] POST https://serviceusage.googleapis.com/v1/projects/tech-website-prod/services/sqladmin.googleapis.com:enable 200
+[debug] [2025-06-18T23:50:48.900Z] <<< [apiv2][body] POST https://serviceusage.googleapis.com/v1/projects/tech-website-prod/services/sqladmin.googleapis.com:enable [omitted]
+[debug] [2025-06-18T23:50:58.902Z] Checked if tokens are valid: true, expires at: 1750294198760
+[debug] [2025-06-18T23:50:58.902Z] Checked if tokens are valid: true, expires at: 1750294198760
+[debug] [2025-06-18T23:50:58.902Z] >>> [apiv2][query] GET https://serviceusage.googleapis.com/v1/projects/tech-website-prod/services/sqladmin.googleapis.com [none]
+[debug] [2025-06-18T23:50:58.902Z] >>> [apiv2][(partial)header] GET https://serviceusage.googleapis.com/v1/projects/tech-website-prod/services/sqladmin.googleapis.com x-goog-quota-user=projects/tech-website-prod
+[debug] [2025-06-18T23:51:00.729Z] <<< [apiv2][status] GET https://serviceusage.googleapis.com/v1/projects/tech-website-prod/services/sqladmin.googleapis.com 200
+[debug] [2025-06-18T23:51:00.729Z] <<< [apiv2][body] GET https://serviceusage.googleapis.com/v1/projects/tech-website-prod/services/sqladmin.googleapis.com [omitted]
+[info] ✔  dataconnect: required API sqladmin.googleapis.com is enabled 
+[info] i  dataconnect: ensuring required API compute.googleapis.com is enabled... 
+[debug] [2025-06-18T23:51:00.731Z] Checked if tokens are valid: true, expires at: 1750294198760
+[debug] [2025-06-18T23:51:00.731Z] Checked if tokens are valid: true, expires at: 1750294198760
+[debug] [2025-06-18T23:51:00.731Z] >>> [apiv2][query] GET https://serviceusage.googleapis.com/v1/projects/tech-website-prod/services/compute.googleapis.com [none]
+[debug] [2025-06-18T23:51:00.731Z] >>> [apiv2][(partial)header] GET https://serviceusage.googleapis.com/v1/projects/tech-website-prod/services/compute.googleapis.com x-goog-quota-user=projects/tech-website-prod
+[debug] [2025-06-18T23:51:01.619Z] <<< [apiv2][status] GET https://serviceusage.googleapis.com/v1/projects/tech-website-prod/services/compute.googleapis.com 200
+[debug] [2025-06-18T23:51:01.620Z] <<< [apiv2][body] GET https://serviceusage.googleapis.com/v1/projects/tech-website-prod/services/compute.googleapis.com [omitted]
+[warn] ⚠  dataconnect: missing required API compute.googleapis.com. Enabling now... 
+[debug] [2025-06-18T23:51:01.620Z] Checked if tokens are valid: true, expires at: 1750294198760
+[debug] [2025-06-18T23:51:01.620Z] Checked if tokens are valid: true, expires at: 1750294198760
+[debug] [2025-06-18T23:51:01.620Z] >>> [apiv2][query] POST https://serviceusage.googleapis.com/v1/projects/tech-website-prod/services/compute.googleapis.com:enable [none]
+[debug] [2025-06-18T23:51:01.620Z] >>> [apiv2][(partial)header] POST https://serviceusage.googleapis.com/v1/projects/tech-website-prod/services/compute.googleapis.com:enable x-goog-quota-user=projects/tech-website-prod
+[debug] [2025-06-18T23:51:02.732Z] <<< [apiv2][status] POST https://serviceusage.googleapis.com/v1/projects/tech-website-prod/services/compute.googleapis.com:enable 200
+[debug] [2025-06-18T23:51:02.732Z] <<< [apiv2][body] POST https://serviceusage.googleapis.com/v1/projects/tech-website-prod/services/compute.googleapis.com:enable [omitted]
+[debug] [2025-06-18T23:51:12.733Z] Checked if tokens are valid: true, expires at: 1750294198760
+[debug] [2025-06-18T23:51:12.733Z] Checked if tokens are valid: true, expires at: 1750294198760
+[debug] [2025-06-18T23:51:12.733Z] >>> [apiv2][query] GET https://serviceusage.googleapis.com/v1/projects/tech-website-prod/services/compute.googleapis.com [none]
+[debug] [2025-06-18T23:51:12.734Z] >>> [apiv2][(partial)header] GET https://serviceusage.googleapis.com/v1/projects/tech-website-prod/services/compute.googleapis.com x-goog-quota-user=projects/tech-website-prod
+[debug] [2025-06-18T23:51:15.048Z] <<< [apiv2][status] GET https://serviceusage.googleapis.com/v1/projects/tech-website-prod/services/compute.googleapis.com 200
+[debug] [2025-06-18T23:51:15.048Z] <<< [apiv2][body] GET https://serviceusage.googleapis.com/v1/projects/tech-website-prod/services/compute.googleapis.com [omitted]
+[info] i  dataconnect: waiting for API compute.googleapis.com to activate... 
+[debug] [2025-06-18T23:51:25.050Z] Checked if tokens are valid: true, expires at: 1750294198760
+[debug] [2025-06-18T23:51:25.050Z] Checked if tokens are valid: true, expires at: 1750294198760
+[debug] [2025-06-18T23:51:25.051Z] >>> [apiv2][query] GET https://serviceusage.googleapis.com/v1/projects/tech-website-prod/services/compute.googleapis.com [none]
+[debug] [2025-06-18T23:51:25.051Z] >>> [apiv2][(partial)header] GET https://serviceusage.googleapis.com/v1/projects/tech-website-prod/services/compute.googleapis.com x-goog-quota-user=projects/tech-website-prod
+[debug] [2025-06-18T23:51:27.270Z] <<< [apiv2][status] GET https://serviceusage.googleapis.com/v1/projects/tech-website-prod/services/compute.googleapis.com 200
+[debug] [2025-06-18T23:51:27.270Z] <<< [apiv2][body] GET https://serviceusage.googleapis.com/v1/projects/tech-website-prod/services/compute.googleapis.com [omitted]
+[info] i  dataconnect: waiting for API compute.googleapis.com to activate... 
+[debug] [2025-06-18T23:51:37.274Z] Checked if tokens are valid: true, expires at: 1750294198760
+[debug] [2025-06-18T23:51:37.275Z] Checked if tokens are valid: true, expires at: 1750294198760
+[debug] [2025-06-18T23:51:37.275Z] >>> [apiv2][query] GET https://serviceusage.googleapis.com/v1/projects/tech-website-prod/services/compute.googleapis.com [none]
+[debug] [2025-06-18T23:51:37.275Z] >>> [apiv2][(partial)header] GET https://serviceusage.googleapis.com/v1/projects/tech-website-prod/services/compute.googleapis.com x-goog-quota-user=projects/tech-website-prod
+[debug] [2025-06-18T23:51:39.634Z] <<< [apiv2][status] GET https://serviceusage.googleapis.com/v1/projects/tech-website-prod/services/compute.googleapis.com 200
+[debug] [2025-06-18T23:51:39.634Z] <<< [apiv2][body] GET https://serviceusage.googleapis.com/v1/projects/tech-website-prod/services/compute.googleapis.com [omitted]
+[info] i  dataconnect: waiting for API compute.googleapis.com to activate... 
+[debug] [2025-06-18T23:51:49.636Z] Checked if tokens are valid: true, expires at: 1750294198760
+[debug] [2025-06-18T23:51:49.638Z] Checked if tokens are valid: true, expires at: 1750294198760
+[debug] [2025-06-18T23:51:49.639Z] >>> [apiv2][query] GET https://serviceusage.googleapis.com/v1/projects/tech-website-prod/services/compute.googleapis.com [none]
+[debug] [2025-06-18T23:51:49.639Z] >>> [apiv2][(partial)header] GET https://serviceusage.googleapis.com/v1/projects/tech-website-prod/services/compute.googleapis.com x-goog-quota-user=projects/tech-website-prod
+[debug] [2025-06-18T23:51:52.067Z] <<< [apiv2][status] GET https://serviceusage.googleapis.com/v1/projects/tech-website-prod/services/compute.googleapis.com 200
+[debug] [2025-06-18T23:51:52.067Z] <<< [apiv2][body] GET https://serviceusage.googleapis.com/v1/projects/tech-website-prod/services/compute.googleapis.com [omitted]
+[info] i  dataconnect: waiting for API compute.googleapis.com to activate... 
+[debug] [2025-06-18T23:51:59.549Z] ----------------------------------------------------------------------
+[debug] [2025-06-18T23:51:59.550Z] Command:       /usr/local/bin/node /Users/mukul7711/.npm/_npx/ba4f1959e38407b5/node_modules/.bin/firebase init dataconnect --project tech-website-prod
+[debug] [2025-06-18T23:51:59.550Z] CLI Version:   14.7.0
+[debug] [2025-06-18T23:51:59.551Z] Platform:      darwin
+[debug] [2025-06-18T23:51:59.551Z] Node Version:  v20.14.0
+[debug] [2025-06-18T23:51:59.551Z] Time:          Thu Jun 19 2025 05:21:59 GMT+0530 (India Standard Time)
+[debug] [2025-06-18T23:51:59.551Z] ----------------------------------------------------------------------
+[debug] 
+[debug] [2025-06-18T23:51:59.555Z] > command requires scopes: ["email","openid","https://www.googleapis.com/auth/cloudplatformprojects.readonly","https://www.googleapis.com/auth/firebase","https://www.googleapis.com/auth/cloud-platform"]
+[debug] [2025-06-18T23:51:59.556Z] > authorizing via signed-in user (mukul.meena@iitgn.ac.in)
+[info] 
+     ######## #### ########  ######## ########     ###     ######  ########
+     ##        ##  ##     ## ##       ##     ##  ##   ##  ##       ##
+     ######    ##  ########  ######   ########  #########  ######  ######
+     ##        ##  ##    ##  ##       ##     ## ##     ##       ## ##
+     ##       #### ##     ## ######## ########  ##     ##  ######  ########
+
+You're about to initialize a Firebase project in this directory:
+
+  /Users/mukul7711/Documents/webdev/tech-website
+
+[info] 
+=== Project Setup
+[info] 
+[info] First, let's associate this project directory with a Firebase project.
+[info] You can create multiple project aliases by running firebase use --add, 
+[info] but for now we'll just set up a default project.
+[info] 
+[debug] [2025-06-18T23:51:59.559Z] Using project from CLI flag: tech-website-prod
+[debug] [2025-06-18T23:51:59.560Z] Checked if tokens are valid: true, expires at: 1750294198760
+[debug] [2025-06-18T23:51:59.560Z] Checked if tokens are valid: true, expires at: 1750294198760
+[debug] [2025-06-18T23:51:59.561Z] >>> [apiv2][query] GET https://firebase.googleapis.com/v1beta1/projects/tech-website-prod [none]
+[debug] [2025-06-18T23:52:00.199Z] <<< [apiv2][status] GET https://firebase.googleapis.com/v1beta1/projects/tech-website-prod 200
+[debug] [2025-06-18T23:52:00.199Z] <<< [apiv2][body] GET https://firebase.googleapis.com/v1beta1/projects/tech-website-prod {"projectId":"tech-website-prod","projectNumber":"578108451083","displayName":"tech-website-prod","name":"projects/tech-website-prod","resources":{"hostingSite":"tech-website-prod"},"state":"ACTIVE","etag":"1_d9630251-3281-4f96-80d1-00798fb99cb0"}
+[info] i  Using project tech-website-prod (tech-website-prod) 
+[info] 
+=== Dataconnect Setup
+[debug] [2025-06-18T23:52:00.206Z] Checked if tokens are valid: true, expires at: 1750294198760
+[debug] [2025-06-18T23:52:00.206Z] Checked if tokens are valid: true, expires at: 1750294198760
+[debug] [2025-06-18T23:52:00.206Z] >>> [apiv2][query] GET https://cloudbilling.googleapis.com/v1/projects/tech-website-prod/billingInfo [none]
+[debug] [2025-06-18T23:52:01.558Z] <<< [apiv2][status] GET https://cloudbilling.googleapis.com/v1/projects/tech-website-prod/billingInfo 200
+[debug] [2025-06-18T23:52:01.558Z] <<< [apiv2][body] GET https://cloudbilling.googleapis.com/v1/projects/tech-website-prod/billingInfo {"name":"projects/tech-website-prod/billingInfo","projectId":"tech-website-prod","billingAccountName":"billingAccounts/01FBC9-DBDB84-5776AB","billingEnabled":true}
+[info] i  dataconnect: ensuring required API firebasedataconnect.googleapis.com is enabled... 
+[debug] [2025-06-18T23:52:01.559Z] Checked if tokens are valid: true, expires at: 1750294198760
+[debug] [2025-06-18T23:52:01.559Z] Checked if tokens are valid: true, expires at: 1750294198760
+[debug] [2025-06-18T23:52:01.559Z] >>> [apiv2][query] GET https://serviceusage.googleapis.com/v1/projects/tech-website-prod/services/firebasedataconnect.googleapis.com [none]
+[debug] [2025-06-18T23:52:01.559Z] >>> [apiv2][(partial)header] GET https://serviceusage.googleapis.com/v1/projects/tech-website-prod/services/firebasedataconnect.googleapis.com x-goog-quota-user=projects/tech-website-prod
+[debug] [2025-06-18T23:52:02.070Z] Checked if tokens are valid: true, expires at: 1750294198760
+[debug] [2025-06-18T23:52:02.071Z] Checked if tokens are valid: true, expires at: 1750294198760
+[debug] [2025-06-18T23:52:02.071Z] >>> [apiv2][query] GET https://serviceusage.googleapis.com/v1/projects/tech-website-prod/services/compute.googleapis.com [none]
+[debug] [2025-06-18T23:52:02.071Z] >>> [apiv2][(partial)header] GET https://serviceusage.googleapis.com/v1/projects/tech-website-prod/services/compute.googleapis.com x-goog-quota-user=projects/tech-website-prod
+[debug] [2025-06-18T23:52:03.289Z] <<< [apiv2][status] GET https://serviceusage.googleapis.com/v1/projects/tech-website-prod/services/firebasedataconnect.googleapis.com 200
+[debug] [2025-06-18T23:52:03.289Z] <<< [apiv2][body] GET https://serviceusage.googleapis.com/v1/projects/tech-website-prod/services/firebasedataconnect.googleapis.com [omitted]
+[info] ✔  dataconnect: required API firebasedataconnect.googleapis.com is enabled 
+[info] i  dataconnect: ensuring required API sqladmin.googleapis.com is enabled... 
+[debug] [2025-06-18T23:52:03.292Z] Checked if tokens are valid: true, expires at: 1750294198760
+[debug] [2025-06-18T23:52:03.292Z] Checked if tokens are valid: true, expires at: 1750294198760
+[debug] [2025-06-18T23:52:03.292Z] >>> [apiv2][query] GET https://serviceusage.googleapis.com/v1/projects/tech-website-prod/services/sqladmin.googleapis.com [none]
+[debug] [2025-06-18T23:52:03.292Z] >>> [apiv2][(partial)header] GET https://serviceusage.googleapis.com/v1/projects/tech-website-prod/services/sqladmin.googleapis.com x-goog-quota-user=projects/tech-website-prod
+[debug] [2025-06-18T23:52:03.913Z] <<< [apiv2][status] GET https://serviceusage.googleapis.com/v1/projects/tech-website-prod/services/sqladmin.googleapis.com 200
+[debug] [2025-06-18T23:52:03.914Z] <<< [apiv2][body] GET https://serviceusage.googleapis.com/v1/projects/tech-website-prod/services/sqladmin.googleapis.com [omitted]
+[info] ✔  dataconnect: required API sqladmin.googleapis.com is enabled 
+[info] i  dataconnect: ensuring required API compute.googleapis.com is enabled... 
+[debug] [2025-06-18T23:52:03.914Z] Checked if tokens are valid: true, expires at: 1750294198760
+[debug] [2025-06-18T23:52:03.914Z] Checked if tokens are valid: true, expires at: 1750294198760
+[debug] [2025-06-18T23:52:03.914Z] >>> [apiv2][query] GET https://serviceusage.googleapis.com/v1/projects/tech-website-prod/services/compute.googleapis.com [none]
+[debug] [2025-06-18T23:52:03.914Z] >>> [apiv2][(partial)header] GET https://serviceusage.googleapis.com/v1/projects/tech-website-prod/services/compute.googleapis.com x-goog-quota-user=projects/tech-website-prod
+[debug] [2025-06-18T23:52:04.316Z] <<< [apiv2][status] GET https://serviceusage.googleapis.com/v1/projects/tech-website-prod/services/compute.googleapis.com 200
+[debug] [2025-06-18T23:52:04.317Z] <<< [apiv2][body] GET https://serviceusage.googleapis.com/v1/projects/tech-website-prod/services/compute.googleapis.com [omitted]
+[info] ✔  dataconnect: required API compute.googleapis.com is enabled 
+[debug] [2025-06-18T23:52:04.317Z] Checked if tokens are valid: true, expires at: 1750294198760
+[debug] [2025-06-18T23:52:04.317Z] Checked if tokens are valid: true, expires at: 1750294198760
+[debug] [2025-06-18T23:52:04.317Z] >>> [apiv2][query] GET https://firebasedataconnect.googleapis.com/v1/projects/tech-website-prod/locations/-/services [none]
+[debug] [2025-06-18T23:52:05.453Z] <<< [apiv2][status] GET https://serviceusage.googleapis.com/v1/projects/tech-website-prod/services/compute.googleapis.com 200
+[debug] [2025-06-18T23:52:05.454Z] <<< [apiv2][body] GET https://serviceusage.googleapis.com/v1/projects/tech-website-prod/services/compute.googleapis.com [omitted]
+[info] ✔  dataconnect: required API compute.googleapis.com is enabled 
+[debug] [2025-06-18T23:52:05.454Z] Checked if tokens are valid: true, expires at: 1750294198760
+[debug] [2025-06-18T23:52:05.454Z] Checked if tokens are valid: true, expires at: 1750294198760
+[debug] [2025-06-18T23:52:05.454Z] >>> [apiv2][query] GET https://firebasedataconnect.googleapis.com/v1/projects/tech-website-prod/locations/-/services [none]
+[debug] [2025-06-18T23:52:06.318Z] <<< [apiv2][status] GET https://firebasedataconnect.googleapis.com/v1/projects/tech-website-prod/locations/-/services 200
+[debug] [2025-06-18T23:52:06.318Z] <<< [apiv2][body] GET https://firebasedataconnect.googleapis.com/v1/projects/tech-website-prod/locations/-/services {}
+[debug] [2025-06-18T23:52:08.173Z] <<< [apiv2][status] GET https://firebasedataconnect.googleapis.com/v1/projects/tech-website-prod/locations/-/services 200
+[debug] [2025-06-18T23:52:08.173Z] <<< [apiv2][body] GET https://firebasedataconnect.googleapis.com/v1/projects/tech-website-prod/locations/-/services {}
+[debug] [2025-06-19T00:01:06.916Z] Checked if tokens are valid: true, expires at: 1750294198760
+[debug] [2025-06-19T00:01:06.918Z] Checked if tokens are valid: true, expires at: 1750294198760
+[debug] [2025-06-19T00:01:06.919Z] >>> [apiv2][query] GET https://sqladmin.googleapis.com/v1/projects/tech-website-prod/instances [none]
+[debug] [2025-06-19T00:01:08.843Z] <<< [apiv2][status] GET https://sqladmin.googleapis.com/v1/projects/tech-website-prod/instances 200
+[debug] [2025-06-19T00:01:08.843Z] <<< [apiv2][body] GET https://sqladmin.googleapis.com/v1/projects/tech-website-prod/instances {}
+[debug] [2025-06-19T00:01:11.286Z] Checked if tokens are valid: true, expires at: 1750294198760
+[debug] [2025-06-19T00:01:11.287Z] Checked if tokens are valid: true, expires at: 1750294198760
+[debug] [2025-06-19T00:01:11.287Z] >>> [apiv2][query] GET https://firebasedataconnect.googleapis.com/v1/projects/tech-website-prod/locations [none]
+[debug] [2025-06-19T00:01:13.152Z] <<< [apiv2][status] GET https://firebasedataconnect.googleapis.com/v1/projects/tech-website-prod/locations 200
+[debug] [2025-06-19T00:01:13.153Z] <<< [apiv2][body] GET https://firebasedataconnect.googleapis.com/v1/projects/tech-website-prod/locations {"locations":[{"name":"projects/tech-website-prod/locations/asia-east1","locationId":"asia-east1","displayName":"Taiwan"},{"name":"projects/tech-website-prod/locations/asia-east2","locationId":"asia-east2","displayName":"Hong Kong"},{"name":"projects/tech-website-prod/locations/asia-northeast1","locationId":"asia-northeast1","displayName":"Tokyo"},{"name":"projects/tech-website-prod/locations/asia-northeast2","locationId":"asia-northeast2","displayName":"Osaka"},{"name":"projects/tech-website-prod/locations/asia-northeast3","locationId":"asia-northeast3","displayName":"Seoul"},{"name":"projects/tech-website-prod/locations/asia-south1","locationId":"asia-south1","displayName":"Mumbai"},{"name":"projects/tech-website-prod/locations/asia-southeast1","locationId":"asia-southeast1","displayName":"Singapore"},{"name":"projects/tech-website-prod/locations/asia-southeast2","locationId":"asia-southeast2","displayName":"Jakarta"},{"name":"projects/tech-website-prod/locations/australia-southeast1","locationId":"australia-southeast1","displayName":"Sydney"},{"name":"projects/tech-website-prod/locations/australia-southeast2","locationId":"australia-southeast2","displayName":"Melbourne"},{"name":"projects/tech-website-prod/locations/europe-central2","locationId":"europe-central2","displayName":"Warsaw"},{"name":"projects/tech-website-prod/locations/europe-north1","locationId":"europe-north1","displayName":"Finland"},{"name":"projects/tech-website-prod/locations/europe-southwest1","locationId":"europe-southwest1","displayName":"Madrid"},{"name":"projects/tech-website-prod/locations/europe-west1","locationId":"europe-west1","displayName":"Belgium"},{"name":"projects/tech-website-prod/locations/europe-west2","locationId":"europe-west2","displayName":"London"},{"name":"projects/tech-website-prod/locations/europe-west3","locationId":"europe-west3","displayName":"Frankfurt"},{"name":"projects/tech-website-prod/locations/europe-west4","locationId":"europe-west4","displayName":"Netherlands"},{"name":"projects/tech-website-prod/locations/europe-west6","locationId":"europe-west6","displayName":"Zurich"},{"name":"projects/tech-website-prod/locations/europe-west8","locationId":"europe-west8","displayName":"Milan"},{"name":"projects/tech-website-prod/locations/europe-west9","locationId":"europe-west9","displayName":"Paris"},{"name":"projects/tech-website-prod/locations/me-west1","locationId":"me-west1","displayName":"Tel Aviv"},{"name":"projects/tech-website-prod/locations/northamerica-northeast1","locationId":"northamerica-northeast1","displayName":"Montréal"},{"name":"projects/tech-website-prod/locations/northamerica-northeast2","locationId":"northamerica-northeast2","displayName":"Toronto"},{"name":"projects/tech-website-prod/locations/southamerica-east1","locationId":"southamerica-east1","displayName":"São Paulo"},{"name":"projects/tech-website-prod/locations/southamerica-west1","locationId":"southamerica-west1","displayName":"Santiago"},{"name":"projects/tech-website-prod/locations/us-central1","locationId":"us-central1","displayName":"Iowa"},{"name":"projects/tech-website-prod/locations/us-east1","locationId":"us-east1","displayName":"South Carolina"},{"name":"projects/tech-website-prod/locations/us-east4","locationId":"us-east4","displayName":"Northern Virginia"},{"name":"projects/tech-website-prod/locations/us-south1","locationId":"us-south1","displayName":"Dallas"},{"name":"projects/tech-website-prod/locations/us-west1","locationId":"us-west1","displayName":"Oregon"},{"name":"projects/tech-website-prod/locations/us-west2","locationId":"us-west2","displayName":"Los Angeles"},{"name":"projects/tech-website-prod/locations/us-west3","locationId":"us-west3","displayName":"Salt Lake City"},{"name":"projects/tech-website-prod/locations/us-west4","locationId":"us-west4","displayName":"Las Vegas"}]}
+[debug] [2025-06-19T00:01:17.898Z] Checked if tokens are valid: true, expires at: 1750294198760
+[debug] [2025-06-19T00:01:17.899Z] Checked if tokens are valid: true, expires at: 1750294198760
+[debug] [2025-06-19T00:01:17.899Z] >>> [apiv2][query] GET https://sqladmin.googleapis.com/v1/projects/tech-website-prod/instances/tech-website-fdc/databases [none]
+[debug] [2025-06-19T00:01:18.468Z] <<< [apiv2][status] GET https://sqladmin.googleapis.com/v1/projects/tech-website-prod/instances/tech-website-fdc/databases 404
+[debug] [2025-06-19T00:01:18.468Z] <<< [apiv2][body] GET https://sqladmin.googleapis.com/v1/projects/tech-website-prod/instances/tech-website-fdc/databases {"error":{"code":404,"message":"Not Found","errors":[{"message":"Not Found","domain":"global","reason":"notFound"}]}}
+[debug] [2025-06-19T00:01:18.469Z] [dataconnect] Cannot list databases during init: FirebaseError: Request to https://sqladmin.googleapis.com/v1/projects/tech-website-prod/instances/tech-website-fdc/databases had HTTP Error: 404, Not Found
+[info] ✔  Wrote dataconnect/dataconnect.yaml 
+[info] ✔  Wrote dataconnect/schema/schema.gql 
+[info] ✔  Wrote dataconnect/connector/connector.yaml 
+[info] ✔  Wrote dataconnect/connector/queries.gql 
+[info] ✔  Wrote dataconnect/connector/mutations.gql 
+[debug] [2025-06-19T00:01:27.569Z] Checked if tokens are valid: true, expires at: 1750294198760
+[debug] [2025-06-19T00:01:27.569Z] Checked if tokens are valid: true, expires at: 1750294198760
+[debug] [2025-06-19T00:01:27.569Z] >>> [apiv2][query] GET https://sqladmin.googleapis.com/v1/projects/tech-website-prod/instances/tech-website-fdc [none]
+[debug] [2025-06-19T00:01:28.189Z] <<< [apiv2][status] GET https://sqladmin.googleapis.com/v1/projects/tech-website-prod/instances/tech-website-fdc 404
+[debug] [2025-06-19T00:01:28.189Z] <<< [apiv2][body] GET https://sqladmin.googleapis.com/v1/projects/tech-website-prod/instances/tech-website-fdc {"error":{"code":404,"message":"The Cloud SQL instance does not exist.","errors":[{"message":"The Cloud SQL instance does not exist.","domain":"global","reason":"instanceDoesNotExist"}]}}
+[warn] ⚠  dataconnect: Cloud SQL instances created via the Firebase CLI do not support customer managed encryption keys.
+If you'd like to use a CMEK to encrypt your data, first create a CMEK encrypted instance (https://cloud.google.com/sql/docs/postgres/configure-cmek#createcmekinstance).
+Then, edit your `dataconnect.yaml` file to use the encrypted instance and redeploy. 
+[info] i  dataconnect: Checking Cloud SQL no cost trial eligibility... 
+[debug] [2025-06-19T00:01:28.190Z] Checked if tokens are valid: true, expires at: 1750294198760
+[debug] [2025-06-19T00:01:28.190Z] Checked if tokens are valid: true, expires at: 1750294198760
+[debug] [2025-06-19T00:01:28.191Z] >>> [apiv2][query] GET https://monitoring.googleapis.com/v3/projects/tech-website-prod/timeSeries/ filter=metric.type%3D%22serviceruntime.googleapis.com%2Fquota%2Fallocation%2Fusage%22+AND+metric.label.quota_metric+%3D+%22sqladmin.googleapis.com%2Ffdc_lifetime_free_trial_per_project%22&interval.endTime=2025-06-19T00%3A01%3A28.190Z&interval.startTime=2025-06-12T00%3A01%3A28.190Z
+[debug] [2025-06-19T00:01:31.063Z] <<< [apiv2][status] GET https://monitoring.googleapis.com/v3/projects/tech-website-prod/timeSeries/ 200
+[debug] [2025-06-19T00:01:31.063Z] <<< [apiv2][body] GET https://monitoring.googleapis.com/v3/projects/tech-website-prod/timeSeries/ {"unit":"1"}
+[info] ✔  dataconnect: CloudSQL no cost trial available! 
+[info] i  dataconnect:  
+[debug] [2025-06-19T00:01:31.070Z] Checked if tokens are valid: true, expires at: 1750294198760
+[debug] [2025-06-19T00:01:31.070Z] Checked if tokens are valid: true, expires at: 1750294198760
+[debug] [2025-06-19T00:01:31.070Z] >>> [apiv2][query] POST https://sqladmin.googleapis.com/v1/projects/tech-website-prod/instances [none]
+[debug] [2025-06-19T00:01:31.070Z] >>> [apiv2][body] POST https://sqladmin.googleapis.com/v1/projects/tech-website-prod/instances {"name":"tech-website-fdc","region":"asia-south1","databaseVersion":"POSTGRES_15","settings":{"tier":"db-f1-micro","edition":"ENTERPRISE","ipConfiguration":{"authorizedNetworks":[]},"enableGoogleMlIntegration":false,"databaseFlags":[{"name":"cloudsql.iam_authentication","value":"on"}],"storageAutoResize":false,"userLabels":{"firebase-data-connect":"ft"},"insightsConfig":{"queryInsightsEnabled":true,"queryPlansPerMinute":5,"queryStringLength":1024}}}
+[debug] [2025-06-19T00:01:40.342Z] <<< [apiv2][status] POST https://sqladmin.googleapis.com/v1/projects/tech-website-prod/instances 200
+[debug] [2025-06-19T00:01:40.342Z] <<< [apiv2][body] POST https://sqladmin.googleapis.com/v1/projects/tech-website-prod/instances {"kind":"sql#operation","targetLink":"https://sqladmin.googleapis.com/v1/projects/tech-website-prod/instances/tech-website-fdc","status":"PENDING","user":"mukul.meena@iitgn.ac.in","insertTime":"2025-06-19T00:01:44.886Z","operationType":"CREATE","name":"f93383a1-b64a-440a-b38b-3bdb0000002f","targetId":"tech-website-fdc","selfLink":"https://sqladmin.googleapis.com/v1/projects/tech-website-prod/operations/f93383a1-b64a-440a-b38b-3bdb0000002f","targetProject":"tech-website-prod"}
+[info] i  dataconnect: Cloud SQL instance creation started - it should be ready shortly. Database and users will be created on your next deploy. 
+[info] ✔  Detected WEB app in directory /Users/mukul7711/Documents/webdev/tech-website 
+[info] i  Detected react app. Enabling react generated SDKs. 
+[debug] [2025-06-19T00:02:03.697Z] Error: read EIO
+    at TTY.onStreamRead (node:internal/stream_base_commons:218:20)
+    at TTY.callbackTrampoline (node:internal/async_hooks:130:17)
+[error] 
+[error] Error: An unexpected error has occurred.
+[debug] [2025-06-19T00:02:03.704Z] Error: write EIO
+    at afterWriteDispatched (node:internal/stream_base_commons:161:15)
+    at writeGeneric (node:internal/stream_base_commons:152:3)
+    at Socket._writeGeneric (node:net:953:11)
+    at Socket._write (node:net:965:8)
+    at writeOrBuffer (node:internal/streams/writable:564:12)
+    at _write (node:internal/streams/writable:493:10)
+    at Writable.write (node:internal/streams/writable:502:10)
+    at Console.log (/Users/mukul7711/.npm/_npx/ba4f1959e38407b5/node_modules/winston/lib/winston/transports/console.js:87:23)
+    at Console._write (/Users/mukul7711/.npm/_npx/ba4f1959e38407b5/node_modules/winston-transport/modern.js:103:17)
+    at doWrite (/Users/mukul7711/.npm/_npx/ba4f1959e38407b5/node_modules/winston-transport/node_modules/readable-stream/lib/_stream_writable.js:390:139)
+[error] 
+[error] Error: An unexpected error has occurred.
+[debug] [2025-06-19T00:02:03.704Z] Error: write EIO
+    at afterWriteDispatched (node:internal/stream_base_commons:161:15)
+    at writeGeneric (node:internal/stream_base_commons:152:3)
+    at Socket._writeGeneric (node:net:953:11)
+    at Socket._write (node:net:965:8)
+    at writeOrBuffer (node:internal/streams/writable:564:12)
+    at _write (node:internal/streams/writable:493:10)
+    at Writable.write (node:internal/streams/writable:502:10)
+    at Console.log (/Users/mukul7711/.npm/_npx/ba4f1959e38407b5/node_modules/winston/lib/winston/transports/console.js:87:23)
+    at Console._write (/Users/mukul7711/.npm/_npx/ba4f1959e38407b5/node_modules/winston-transport/modern.js:103:17)
+    at doWrite (/Users/mukul7711/.npm/_npx/ba4f1959e38407b5/node_modules/winston-transport/node_modules/readable-stream/lib/_stream_writable.js:390:139)
+[error] 
+[error] Error: An unexpected error has occurred.
+[debug] [2025-06-19T00:02:03.704Z] Error: write EIO
+    at afterWriteDispatched (node:internal/stream_base_commons:161:15)
+    at writeGeneric (node:internal/stream_base_commons:152:3)
+    at Socket._writeGeneric (node:net:953:11)
+    at Socket._write (node:net:965:8)
+    at writeOrBuffer (node:internal/streams/writable:564:12)
+    at _write (node:internal/streams/writable:493:10)
+    at Writable.write (node:internal/streams/writable:502:10)
+    at Console.log (/Users/mukul7711/.npm/_npx/ba4f1959e38407b5/node_modules/winston/lib/winston/transports/console.js:87:23)
+    at Console._write (/Users/mukul7711/.npm/_npx/ba4f1959e38407b5/node_modules/winston-transport/modern.js:103:17)
+    at doWrite (/Users/mukul7711/.npm/_npx/ba4f1959e38407b5/node_modules/winston-transport/node_modules/readable-stream/lib/_stream_writable.js:390:139)
+[error] 
+[error] Error: An unexpected error has occurred.
+[debug] [2025-06-19T00:02:03.705Z] Error: write EIO
+    at afterWriteDispatched (node:internal/stream_base_commons:161:15)
+    at writeGeneric (node:internal/stream_base_commons:152:3)
+    at Socket._writeGeneric (node:net:953:11)
+    at Socket._write (node:net:965:8)
+    at writeOrBuffer (node:internal/streams/writable:564:12)
+    at _write (node:internal/streams/writable:493:10)
+    at Writable.write (node:internal/streams/writable:502:10)
+    at Console.log (/Users/mukul7711/.npm/_npx/ba4f1959e38407b5/node_modules/winston/lib/winston/transports/console.js:87:23)
+    at Console._write (/Users/mukul7711/.npm/_npx/ba4f1959e38407b5/node_modules/winston-transport/modern.js:103:17)
+    at doWrite (/Users/mukul7711/.npm/_npx/ba4f1959e38407b5/node_modules/winston-transport/node_modules/readable-stream/lib/_stream_writable.js:390:139)
+[error] 
+[error] Error: An unexpected error has occurred.
+[debug] [2025-06-19T00:02:03.705Z] Error: write EIO
+    at afterWriteDispatched (node:internal/stream_base_commons:161:15)
+    at writeGeneric (node:internal/stream_base_commons:152:3)
+    at Socket._writeGeneric (node:net:953:11)
+    at Socket._write (node:net:965:8)
+    at writeOrBuffer (node:internal/streams/writable:564:12)
+    at _write (node:internal/streams/writable:493:10)
+    at Writable.write (node:internal/streams/writable:502:10)
+    at Console.log (/Users/mukul7711/.npm/_npx/ba4f1959e38407b5/node_modules/winston/lib/winston/transports/console.js:87:23)
+    at Console._write (/Users/mukul7711/.npm/_npx/ba4f1959e38407b5/node_modules/winston-transport/modern.js:103:17)
+    at doWrite (/Users/mukul7711/.npm/_npx/ba4f1959e38407b5/node_modules/winston-transport/node_modules/readable-stream/lib/_stream_writable.js:390:139)
+[error] 
+[error] Error: An unexpected error has occurred.
+[debug] [2025-06-19T00:02:03.705Z] Error: write EIO
+    at afterWriteDispatched (node:internal/stream_base_commons:161:15)
+    at writeGeneric (node:internal/stream_base_commons:152:3)
+    at Socket._writeGeneric (node:net:953:11)
+    at Socket._write (node:net:965:8)
+    at writeOrBuffer (node:internal/streams/writable:564:12)
+    at _write (node:internal/streams/writable:493:10)
+    at Writable.write (node:internal/streams/writable:502:10)
+    at Console.log (/Users/mukul7711/.npm/_npx/ba4f1959e38407b5/node_modules/winston/lib/winston/transports/console.js:87:23)
+    at Console._write (/Users/mukul7711/.npm/_npx/ba4f1959e38407b5/node_modules/winston-transport/modern.js:103:17)
+    at doWrite (/Users/mukul7711/.npm/_npx/ba4f1959e38407b5/node_modules/winston-transport/node_modules/readable-stream/lib/_stream_writable.js:390:139)
+[error] 
+[error] Error: An unexpected error has occurred.
+[debug] [2025-06-19T00:02:03.705Z] Error: write EIO
+    at afterWriteDispatched (node:internal/stream_base_commons:161:15)
+    at writeGeneric (node:internal/stream_base_commons:152:3)
+    at Socket._writeGeneric (node:net:953:11)
+    at Socket._write (node:net:965:8)
+    at writeOrBuffer (node:internal/streams/writable:564:12)
+    at _write (node:internal/streams/writable:493:10)
+    at Writable.write (node:internal/streams/writable:502:10)
+    at Console.log (/Users/mukul7711/.npm/_npx/ba4f1959e38407b5/node_modules/winston/lib/winston/transports/console.js:87:23)
+    at Console._write (/Users/mukul7711/.npm/_npx/ba4f1959e38407b5/node_modules/winston-transport/modern.js:103:17)
+    at doWrite (/Users/mukul7711/.npm/_npx/ba4f1959e38407b5/node_modules/winston-transport/node_modules/readable-stream/lib/_stream_writable.js:390:139)
+[error] 
+[error] Error: An unexpected error has occurred.
+[debug] [2025-06-19T00:02:03.705Z] Error: write EIO
+    at afterWriteDispatched (node:internal/stream_base_commons:161:15)
+    at writeGeneric (node:internal/stream_base_commons:152:3)
+    at Socket._writeGeneric (node:net:953:11)
+    at Socket._write (node:net:965:8)
+    at writeOrBuffer (node:internal/streams/writable:564:12)
+    at _write (node:internal/streams/writable:493:10)
+    at Writable.write (node:internal/streams/writable:502:10)
+    at Console.log (/Users/mukul7711/.npm/_npx/ba4f1959e38407b5/node_modules/winston/lib/winston/transports/console.js:87:23)
+    at Console._write (/Users/mukul7711/.npm/_npx/ba4f1959e38407b5/node_modules/winston-transport/modern.js:103:17)
+    at doWrite (/Users/mukul7711/.npm/_npx/ba4f1959e38407b5/node_modules/winston-transport/node_modules/readable-stream/lib/_stream_writable.js:390:139)
+[error] 
+[error] Error: An unexpected error has occurred.
+[debug] [2025-06-19T00:02:03.706Z] Error: write EIO
+    at afterWriteDispatched (node:internal/stream_base_commons:161:15)
+    at writeGeneric (node:internal/stream_base_commons:152:3)
+    at Socket._writeGeneric (node:net:953:11)
+    at Socket._write (node:net:965:8)
+    at writeOrBuffer (node:internal/streams/writable:564:12)
+    at _write (node:internal/streams/writable:493:10)
+    at Writable.write (node:internal/streams/writable:502:10)
+    at Console.log (/Users/mukul7711/.npm/_npx/ba4f1959e38407b5/node_modules/winston/lib/winston/transports/console.js:87:23)
+    at Console._write (/Users/mukul7711/.npm/_npx/ba4f1959e38407b5/node_modules/winston-transport/modern.js:103:17)
+    at doWrite (/Users/mukul7711/.npm/_npx/ba4f1959e38407b5/node_modules/winston-transport/node_modules/readable-stream/lib/_stream_writable.js:390:139)
+[error] 
+[error] Error: An unexpected error has occurred.
+[debug] [2025-06-19T00:02:03.706Z] Error: write EIO
+    at afterWriteDispatched (node:internal/stream_base_commons:161:15)
+    at writeGeneric (node:internal/stream_base_commons:152:3)
+    at Socket._writeGeneric (node:net:953:11)
+    at Socket._write (node:net:965:8)
+    at writeOrBuffer (node:internal/streams/writable:564:12)
+    at _write (node:internal/streams/writable:493:10)
+    at Writable.write (node:internal/streams/writable:502:10)
+    at Console.log (/Users/mukul7711/.npm/_npx/ba4f1959e38407b5/node_modules/winston/lib/winston/transports/console.js:87:23)
+    at Console._write (/Users/mukul7711/.npm/_npx/ba4f1959e38407b5/node_modules/winston-transport/modern.js:103:17)
+    at doWrite (/Users/mukul7711/.npm/_npx/ba4f1959e38407b5/node_modules/winston-transport/node_modules/readable-stream/lib/_stream_writable.js:390:139)
+[error] 
+[error] Error: An unexpected error has occurred.
+[debug] [2025-06-19T00:02:03.706Z] Error: write EIO
+    at afterWriteDispatched (node:internal/stream_base_commons:161:15)
+    at writeGeneric (node:internal/stream_base_commons:152:3)
+    at Socket._writeGeneric (node:net:953:11)
+    at Socket._write (node:net:965:8)
+    at writeOrBuffer (node:internal/streams/writable:564:12)
+    at _write (node:internal/streams/writable:493:10)
+    at Writable.write (node:internal/streams/writable:502:10)
+    at Console.log (/Users/mukul7711/.npm/_npx/ba4f1959e38407b5/node_modules/winston/lib/winston/transports/console.js:87:23)
+    at Console._write (/Users/mukul7711/.npm/_npx/ba4f1959e38407b5/node_modules/winston-transport/modern.js:103:17)
+    at doWrite (/Users/mukul7711/.npm/_npx/ba4f1959e38407b5/node_modules/winston-transport/node_modules/readable-stream/lib/_stream_writable.js:390:139)
+[error] 
+[error] Error: An unexpected error has occurred.
+[debug] [2025-06-19T00:02:03.709Z] Error: write EIO
+    at afterWriteDispatched (node:internal/stream_base_commons:161:15)
+    at writeGeneric (node:internal/stream_base_commons:152:3)
+    at Socket._writeGeneric (node:net:953:11)
+    at Socket._write (node:net:965:8)
+    at writeOrBuffer (node:internal/streams/writable:564:12)
+    at _write (node:internal/streams/writable:493:10)
+    at Writable.write (node:internal/streams/writable:502:10)
+    at Console.log (/Users/mukul7711/.npm/_npx/ba4f1959e38407b5/node_modules/winston/lib/winston/transports/console.js:87:23)
+    at Console._write (/Users/mukul7711/.npm/_npx/ba4f1959e38407b5/node_modules/winston-transport/modern.js:103:17)
+    at doWrite (/Users/mukul7711/.npm/_npx/ba4f1959e38407b5/node_modules/winston-transport/node_modules/readable-stream/lib/_stream_writable.js:390:139)
+[error] 
+[error] Error: An unexpected error has occurred.
+[debug] [2025-06-19T00:02:04.222Z] Error: read EIO
+    at TTY.onStreamRead (node:internal/stream_base_commons:218:20)
+    at TTY.callbackTrampoline (node:internal/async_hooks:130:17)

@@ -11,8 +11,6 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { ThemeAwareLogo } from "@/components/ui/theme-aware-logo";
-import { auth } from "@/lib/firebase-config";
-import { signInWithPopup, GoogleAuthProvider } from "firebase/auth";
 
 export default function AdminLoginPage() {
   const router = useRouter();
@@ -20,13 +18,8 @@ export default function AdminLoginPage() {
   const [loading, setLoading] = useState(false);
 
   useEffect(() => {
-    const checkSession = async () => {
-      const session = await getSession();
-      if (session?.user?.isAdmin) {
-        router.push("/admin");
-      }
-    };
-    checkSession();
+    // Use localStorage/sessionStorage or remove session check if not needed
+    // Or use useSession from next-auth/react for client-side session
   }, [router]);
 
   const handleGoogleSignIn = async () => {
@@ -36,32 +29,6 @@ export default function AdminLoginPage() {
       await signIn("google", { callbackUrl: "/admin" });
     } catch (err) {
       setError("Failed to sign in with Google");
-      console.error(err);
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const handleFirebaseGoogleSignIn = async () => {
-    try {
-      setLoading(true);
-      setError(null);
-      const provider = new GoogleAuthProvider();
-      if (!auth) throw new Error('Firebase auth not initialized');
-      const result = await signInWithPopup(auth, provider);
-      const idToken = await result.user.getIdToken();
-
-      const response = await signIn("credentials", {
-        idToken,
-        callbackUrl: "/admin",
-        redirect: true,
-      });
-
-      if (response?.error) {
-        setError("Not authorized to access admin panel");
-      }
-    } catch (err) {
-      setError("Failed to sign in with Firebase");
       console.error(err);
     } finally {
       setLoading(false);
@@ -107,15 +74,7 @@ export default function AdminLoginPage() {
                 disabled={loading}
                 className="w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:opacity-50"
               >
-                {loading ? "Signing in..." : "Sign in with Google (NextAuth)"}
-              </button>
-
-              <button
-                onClick={handleFirebaseGoogleSignIn}
-                disabled={loading}
-                className="w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-green-600 hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 disabled:opacity-50"
-              >
-                {loading ? "Signing in..." : "Sign in with Google (Firebase)"}
+                {loading ? "Signing in..." : "Sign in with Google"}
               </button>
             </div>
 

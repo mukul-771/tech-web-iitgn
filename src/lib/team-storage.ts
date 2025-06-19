@@ -1,5 +1,4 @@
-import { promises as fs } from 'fs';
-import path from 'path';
+import { firestore } from './firebase-admin';
 import {
   TeamMember,
   defaultTeamData,
@@ -8,26 +7,7 @@ import {
   isCoordinatorPosition
 } from './team-data';
 
-const DATA_DIR = path.join(process.cwd(), 'data');
-const TEAM_FILE = path.join(DATA_DIR, 'team.json');
-
-// Ensure data directory exists
-async function ensureDataDir() {
-  try {
-    await fs.access(DATA_DIR);
-  } catch {
-    await fs.mkdir(DATA_DIR, { recursive: true });
-  }
-}
-
-// Initialize team file if it doesn't exist
-async function initializeTeamFile() {
-  try {
-    await fs.access(TEAM_FILE);
-  } catch {
-    await fs.writeFile(TEAM_FILE, JSON.stringify(defaultTeamData, null, 2));
-  }
-}
+const TEAM_COLLECTION = 'team';
 
 // Migrate team member data to ensure correct category mappings
 function migrateTeamMemberData(teamMembers: Record<string, TeamMember>): Record<string, TeamMember> {
@@ -52,12 +32,25 @@ function migrateTeamMemberData(teamMembers: Record<string, TeamMember>): Record<
 
 // Get all team members
 export async function getAllTeamMembers(): Promise<Record<string, TeamMember>> {
-  try {
-    await ensureDataDir();
-    await initializeTeamFile();
+  if (!firestore) {
+    console.error('Firestore not initialized. Returning default data.');
+    return defaultTeamData;
+  }
 
-    const data = await fs.readFile(TEAM_FILE, 'utf-8');
-    const teamMembers = JSON.parse(data);
+  try {
+    const snapshot = await firestore.collection(TEAM_COLLECTION).get();
+    if (snapshot.empty) {
+      // Optionally seed Firestore with default data if empty
+      for (const [id, member] of Object.entries(defaultTeamData)) {
+        await firestore.collection(TEAM_COLLECTION).doc(id).set(member);
+      }
+      return defaultTeamData;
+    }
+
+    const teamMembers: Record<string, TeamMember> = {};
+    snapshot.forEach((doc: FirebaseFirestore.QueryDocumentSnapshot) => {
+      teamMembers[doc.id] = doc.data() as TeamMember;
+    });
 
     // Migrate data to ensure correct mappings
     const migratedMembers = migrateTeamMemberData(teamMembers);
@@ -70,31 +63,46 @@ export async function getAllTeamMembers(): Promise<Record<string, TeamMember>> {
 
     return migratedMembers;
   } catch (error) {
-    console.error('Error reading team members:', error);
+    console.error('Error reading team members from Firestore:', error);
     return defaultTeamData;
   }
 }
 
 // Get single team member by ID
 export async function getTeamMemberById(id: string): Promise<TeamMember | null> {
-  const teamMembers = await getAllTeamMembers();
-  return teamMembers[id] || null;
+  if (!firestore) return null;
+
+  try {
+    const doc = await firestore.collection(TEAM_COLLECTION).doc(id).get();
+    if (!doc.exists) return null;
+    return doc.data() as TeamMember;
+  } catch (error) {
+    console.error('Error fetching team member by ID:', error);
+    return null;
+  }
 }
 
-// Save all team members
+// Save all team members (overwrites the collection)
 export async function saveAllTeamMembers(teamMembers: Record<string, TeamMember>): Promise<void> {
-  try {
-    await ensureDataDir();
-    await fs.writeFile(TEAM_FILE, JSON.stringify(teamMembers, null, 2));
-  } catch (error) {
-    console.error('Error saving team members:', error);
-    throw new Error('Failed to save team members');
+  if (!firestore) throw new Error('Firestore not initialized');
+
+  const batch = firestore.batch();
+  const collectionRef = firestore.collection(TEAM_COLLECTION);
+
+  // Delete all existing docs first
+  const snapshot = await collectionRef.get();
+  snapshot.forEach((doc: FirebaseFirestore.QueryDocumentSnapshot) => batch.delete(doc.ref));
+
+  // Add new docs
+  for (const [id, member] of Object.entries(teamMembers)) {
+    batch.set(collectionRef.doc(id), member);
   }
+  await batch.commit();
 }
 
 // Create new team member
 export async function createTeamMember(member: Omit<TeamMember, 'id' | 'createdAt' | 'updatedAt'>): Promise<TeamMember> {
-  const teamMembers = await getAllTeamMembers();
+  if (!firestore) throw new Error('Firestore not initialized');
 
   const id = generateMemberId(member.name);
   const now = new Date().toISOString();
@@ -114,19 +122,20 @@ export async function createTeamMember(member: Omit<TeamMember, 'id' | 'createdA
     updatedAt: now
   };
 
-  teamMembers[id] = newMember;
-  await saveAllTeamMembers(teamMembers);
+  await firestore.collection(TEAM_COLLECTION).doc(id).set(newMember);
 
   return newMember;
 }
 
 // Update existing team member
 export async function updateTeamMember(id: string, updates: Partial<Omit<TeamMember, 'id' | 'createdAt'>>): Promise<TeamMember | null> {
-  const teamMembers = await getAllTeamMembers();
+  if (!firestore) throw new Error('Firestore not initialized');
 
-  if (!teamMembers[id]) {
-    return null;
-  }
+  const docRef = firestore.collection(TEAM_COLLECTION).doc(id);
+  const doc = await docRef.get();
+  if (!doc.exists) return null;
+
+  const existing = doc.data() as TeamMember;
 
   // If position is being updated, ensure correct category mapping
   const finalUpdates = updates.position ? {
@@ -137,27 +146,25 @@ export async function updateTeamMember(id: string, updates: Partial<Omit<TeamMem
   } : updates;
 
   const updatedMember: TeamMember = {
-    ...teamMembers[id],
+    ...existing,
     ...finalUpdates,
     updatedAt: new Date().toISOString()
   };
 
-  teamMembers[id] = updatedMember;
-  await saveAllTeamMembers(teamMembers);
+  await docRef.set(updatedMember);
 
   return updatedMember;
 }
 
 // Delete team member
 export async function deleteTeamMember(id: string): Promise<boolean> {
-  const teamMembers = await getAllTeamMembers();
+  if (!firestore) throw new Error('Firestore not initialized');
 
-  if (!teamMembers[id]) {
-    return false;
-  }
+  const docRef = firestore.collection(TEAM_COLLECTION).doc(id);
+  const doc = await docRef.get();
+  if (!doc.exists) return false;
 
-  delete teamMembers[id];
-  await saveAllTeamMembers(teamMembers);
+  await docRef.delete();
 
   return true;
 }
@@ -176,8 +183,8 @@ function generateMemberId(name: string): string {
 
 // Get team members by category
 export async function getTeamMembersByCategory(category: string): Promise<TeamMember[]> {
-  const teamMembers = await getAllTeamMembers();
-  return Object.values(teamMembers).filter(member => member.category === category);
+  const all = await getAllTeamMembers();
+  return Object.values(all).filter(member => member.category === category);
 }
 
 // Get leadership team (secretary + coordinators)
@@ -185,8 +192,8 @@ export async function getLeadershipTeam(): Promise<{
   secretary: TeamMember | null;
   coordinators: TeamMember[];
 }> {
-  const teamMembers = await getAllTeamMembers();
-  const allMembers = Object.values(teamMembers);
+  const all = await getAllTeamMembers();
+  const allMembers = Object.values(all);
 
   const secretary = allMembers.find(member => member.isSecretary) || null;
   const coordinators = allMembers.filter(member => member.isCoordinator);
@@ -206,9 +213,9 @@ export async function getTeamMembersForDisplay(): Promise<Array<{
   category: string;
   photoPath?: string;
 }>> {
-  const teamMembers = await getAllTeamMembers();
+  const all = await getAllTeamMembers();
 
-  return Object.values(teamMembers).map(member => ({
+  return Object.values(all).map(member => ({
     id: member.id,
     name: member.name,
     position: member.position,

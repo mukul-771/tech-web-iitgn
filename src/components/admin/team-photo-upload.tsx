@@ -9,6 +9,7 @@ import Image from "next/image";
 import { uploadTeamPhoto } from "@/lib/upload-firebase";
 import { storage } from "@/lib/firebaseClient";
 import { ref, uploadBytesResumable, getDownloadURL } from "firebase/storage";
+import { getAuth } from "firebase/auth";
 
 interface TeamPhotoUploadProps {
   memberId: string;
@@ -29,12 +30,25 @@ export function TeamPhotoUpload({
   const [isDragOver, setIsDragOver] = useState(false);
   const [previewUrl, setPreviewUrl] = useState<string | null>(currentPhotoUrl || null);
   const [uploadProgress, setUploadProgress] = useState<number | null>(null);
+  const [uploadError, setUploadError] = useState<string | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const targetSize = isSecretary ? 300 : 200;
 
   const handleFileSelect = async (file: File) => {
     if (!file) return;
+    setUploadError(null);
+
+    // Log current Firebase Auth user
+    const auth = getAuth();
+    const user = auth.currentUser;
+    console.log("Firebase Auth user before upload:", user);
+    if (!user) {
+      setUploadError("You must be signed in to upload. Please log in as an admin.");
+      setIsUploading(false);
+      setUploadProgress(null);
+      return;
+    }
 
     // Validate file type
     const allowedTypes = ["image/jpeg", "image/jpg", "image/png", "image/webp"];
@@ -63,7 +77,6 @@ export function TeamPhotoUpload({
       // Use resumable upload for progress
       const storageRef = ref(storage, `team/${memberId}/${file.name}`);
       const uploadTask = uploadBytesResumable(storageRef, file);
-
       uploadTask.on(
         'state_changed',
         (snapshot) => {
@@ -71,7 +84,10 @@ export function TeamPhotoUpload({
           setUploadProgress(progress);
         },
         (error) => {
-          throw error;
+          console.error("Firebase upload error:", error);
+          setUploadError(error.message || String(error));
+          setIsUploading(false);
+          setUploadProgress(null);
         },
         async () => {
           const url = await getDownloadURL(uploadTask.snapshot.ref);
@@ -82,7 +98,7 @@ export function TeamPhotoUpload({
       );
     } catch (error) {
       console.error("Error uploading photo:", error);
-      alert(error instanceof Error ? error.message : "Failed to upload photo");
+      setUploadError(error instanceof Error ? error.message : "Failed to upload photo");
       setPreviewUrl(currentPhotoUrl || null);
       setIsUploading(false);
       setUploadProgress(null);
@@ -136,6 +152,9 @@ export function TeamPhotoUpload({
   return (
     <div className="space-y-4">
       <Label>Profile Photo</Label>
+      {uploadError && (
+        <div className="text-red-500 text-sm">Upload error: {uploadError}</div>
+      )}
 
       <Card className="glass">
         <CardContent className="p-6">

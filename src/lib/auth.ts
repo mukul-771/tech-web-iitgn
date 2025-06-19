@@ -25,6 +25,8 @@ export const authOptions: NextAuthOptions = {
       authorization: {
         params: {
           prompt: "select_account",
+          access_type: "offline",
+          response_type: "code",
         },
       },
     }),
@@ -41,10 +43,13 @@ export const authOptions: NextAuthOptions = {
       }
       return false;
     },
-    async jwt({ token, user }) {
+    async jwt({ token, user, account }) {
       if (user) {
         token.uid = user.id;
         token.isAdmin = user.isAdmin;
+      }
+      if (account?.provider === "google" && account.id_token) {
+        token.idToken = account.id_token;
       }
       return token;
     },
@@ -52,6 +57,9 @@ export const authOptions: NextAuthOptions = {
       if (session.user) {
         session.user.id = token.sub ?? "";
         session.user.isAdmin = token.isAdmin;
+      }
+      if (typeof token.idToken === 'string') {
+        session.idToken = token.idToken;
       }
       return session;
     },
@@ -87,5 +95,13 @@ declare module "next-auth/jwt" {
   interface JWT {
     uid?: string;
     isAdmin?: boolean;
+  }
+}
+
+// Extend NextAuth Session type to include idToken
+import NextAuth from "next-auth";
+declare module "next-auth" {
+  interface Session {
+    idToken?: string;
   }
 }

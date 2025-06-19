@@ -15,7 +15,10 @@ export function useSyncFirebaseAuth() {
   const s = session as SessionWithIdToken;
   useEffect(() => {
     if (s?.idToken) {
+      console.log("Signing in to Firebase with ID token:", s.idToken);
       signInToFirebaseWithIdToken(s.idToken);
+    } else {
+      console.log("No idToken found in session", s);
     }
   }, [s]);
 }

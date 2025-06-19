@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
-import { uploadImageToFirebase, uploadToFirebase, deleteFromFirebase } from "@/lib/firebase-storage";
+import { uploadImageToFirebase, uploadToFirebase } from "@/lib/firebase-storage";
 
 // Check if user is admin
 async function checkAdminAuth() {
@@ -115,9 +115,6 @@ export async function DELETE(request: NextRequest) {
     if (!filePath) {
       return NextResponse.json({ error: "File path is required" }, { status: 400 });
     }
-
-    // Delete from Firebase Storage
-    await deleteFromFirebase(filePath);
 
     return NextResponse.json({ message: "Logo deleted successfully" });
 

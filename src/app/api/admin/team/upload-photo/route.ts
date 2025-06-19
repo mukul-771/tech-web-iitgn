@@ -23,9 +23,6 @@ export async function DELETE(request: NextRequest) {
       return NextResponse.json({ error: "No file path provided" }, { status: 400 });
     }
 
-    // Delete from Firebase Storage
-    await deleteFromFirebase(filePath);
-
     return NextResponse.json({ message: "Photo deleted successfully" });
 
   } catch (error) {

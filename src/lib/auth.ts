@@ -1,8 +1,6 @@
 import { NextAuthOptions } from "next-auth";
-import CredentialsProvider from "next-auth/providers/credentials";
 import GoogleProvider from "next-auth/providers/google";
 import { getAdminEmails } from "./admin-emails-storage";
-import { auth as adminAuth } from "./firebase-admin";
 
 // Get admin emails dynamically from storage
 async function getAuthorizedEmails(): Promise<string[]> {
@@ -30,50 +28,18 @@ export const authOptions: NextAuthOptions = {
         },
       },
     }),
-    CredentialsProvider({
-      name: "Firebase",
-      credentials: {
-        idToken: { label: "Firebase ID Token", type: "text" },
-      },
-      async authorize(credentials) {
-        if (!credentials?.idToken) {
-          return null;
-        }
-
-        try {
-          const decodedToken = await adminAuth.verifyIdToken(credentials.idToken);
-          const { email, name, picture } = decodedToken;
-
-          if (!email) {
-            return null;
-          }
-
-          const authorizedEmails = await getAuthorizedEmails();
-          if (!authorizedEmails.includes(email)) {
-            return null;
-          }
-
-          return {
-            id: decodedToken.uid,
-            email,
-            name,
-            image: picture,
-            isAdmin: true,
-          };
-        } catch (error) {
-          console.error("Firebase token verification failed:", error);
-          return null;
-        }
-      },
-    }),
   ],
   callbacks: {
     async signIn({ user, account }) {
       if (account?.provider === "google") {
         const authorizedEmails = await getAuthorizedEmails();
-        return authorizedEmails.includes(user.email ?? "");
+        if (authorizedEmails.includes(user.email ?? "")) {
+          user.isAdmin = true;
+          return true;
+        }
+        return false;
       }
-      return true;
+      return false;
     },
     async jwt({ token, user }) {
       if (user) {
@@ -85,6 +51,7 @@ export const authOptions: NextAuthOptions = {
     async session({ session, token }) {
       if (session.user) {
         session.user.id = token.sub ?? "";
+        session.user.isAdmin = token.isAdmin;
       }
       return session;
     },

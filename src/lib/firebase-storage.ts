@@ -1,5 +1,3 @@
-// Firebase Storage utilities for file operations
-import { bucket } from './firebase-admin';
 import sharp from 'sharp';
 import { v4 as uuidv4 } from 'uuid';
 

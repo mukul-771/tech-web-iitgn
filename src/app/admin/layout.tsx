@@ -3,7 +3,7 @@ import { Inter, Space_Grotesk } from "next/font/google";
 import "../globals.css";
 import { ThemeProvider } from "@/components/theme-provider";
 import { SessionProvider } from "@/components/providers/session-provider";
-import { useSyncFirebaseAuth } from "@/lib/useSyncFirebaseAuth";
+import SyncFirebaseAuthClient from "@/components/admin/SyncFirebaseAuthClient";
 
 const inter = Inter({
   variable: "--font-inter",
@@ -26,7 +26,6 @@ export default function AdminLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-  useSyncFirebaseAuth();
   return (
     <html lang="en" suppressHydrationWarning>
       <body
@@ -40,6 +39,7 @@ export default function AdminLayout({
             disableTransitionOnChange={false}
           >
             <div className="min-h-screen">
+              <SyncFirebaseAuthClient />
               {children}
             </div>
           </ThemeProvider>

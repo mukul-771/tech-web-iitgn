@@ -1,4 +1,3 @@
-import { firestore } from './firebase-admin';
 import {
   TeamMember,
   defaultTeamData,
@@ -32,25 +31,15 @@ function migrateTeamMemberData(teamMembers: Record<string, TeamMember>): Record<
 
 // Get all team members
 export async function getAllTeamMembers(): Promise<Record<string, TeamMember>> {
-  if (!firestore) {
-    console.error('Firestore not initialized. Returning default data.');
-    return defaultTeamData;
-  }
-
   try {
-    const snapshot = await firestore.collection(TEAM_COLLECTION).get();
-    if (snapshot.empty) {
-      // Optionally seed Firestore with default data if empty
-      for (const [id, member] of Object.entries(defaultTeamData)) {
-        await firestore.collection(TEAM_COLLECTION).doc(id).set(member);
-      }
-      return defaultTeamData;
+    const response = await fetch(`/api/team`);
+    const data = await response.json();
+
+    if (!response.ok) {
+      throw new Error(data.message || 'Failed to fetch team members');
     }
 
-    const teamMembers: Record<string, TeamMember> = {};
-    snapshot.forEach((doc: FirebaseFirestore.QueryDocumentSnapshot) => {
-      teamMembers[doc.id] = doc.data() as TeamMember;
-    });
+    const teamMembers: Record<string, TeamMember> = data.members;
 
     // Migrate data to ensure correct mappings
     const migratedMembers = migrateTeamMemberData(teamMembers);
@@ -63,19 +52,22 @@ export async function getAllTeamMembers(): Promise<Record<string, TeamMember>> {
 
     return migratedMembers;
   } catch (error) {
-    console.error('Error reading team members from Firestore:', error);
+    console.error('Error fetching team members:', error);
     return defaultTeamData;
   }
 }
 
 // Get single team member by ID
 export async function getTeamMemberById(id: string): Promise<TeamMember | null> {
-  if (!firestore) return null;
-
   try {
-    const doc = await firestore.collection(TEAM_COLLECTION).doc(id).get();
-    if (!doc.exists) return null;
-    return doc.data() as TeamMember;
+    const response = await fetch(`/api/team/${id}`);
+    const data = await response.json();
+
+    if (!response.ok) {
+      throw new Error(data.message || 'Failed to fetch team member');
+    }
+
+    return data.member;
   } catch (error) {
     console.error('Error fetching team member by ID:', error);
     return null;
@@ -84,89 +76,85 @@ export async function getTeamMemberById(id: string): Promise<TeamMember | null> 
 
 // Save all team members (overwrites the collection)
 export async function saveAllTeamMembers(teamMembers: Record<string, TeamMember>): Promise<void> {
-  if (!firestore) throw new Error('Firestore not initialized');
+  try {
+    const response = await fetch(`/api/team`, {
+      method: 'PUT',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({ members: teamMembers })
+    });
 
-  const batch = firestore.batch();
-  const collectionRef = firestore.collection(TEAM_COLLECTION);
-
-  // Delete all existing docs first
-  const snapshot = await collectionRef.get();
-  snapshot.forEach((doc: FirebaseFirestore.QueryDocumentSnapshot) => batch.delete(doc.ref));
-
-  // Add new docs
-  for (const [id, member] of Object.entries(teamMembers)) {
-    batch.set(collectionRef.doc(id), member);
+    if (!response.ok) {
+      throw new Error('Failed to save team members');
+    }
+  } catch (error) {
+    console.error('Error saving team members:', error);
   }
-  await batch.commit();
 }
 
 // Create new team member
 export async function createTeamMember(member: Omit<TeamMember, 'id' | 'createdAt' | 'updatedAt'>): Promise<TeamMember> {
-  if (!firestore) throw new Error('Firestore not initialized');
+  try {
+    const response = await fetch(`/api/team`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify(member)
+    });
 
-  const id = generateMemberId(member.name);
-  const now = new Date().toISOString();
+    if (!response.ok) {
+      throw new Error('Failed to create team member');
+    }
 
-  // Ensure correct category mapping based on position
-  const correctCategory = getCategoryFromPosition(member.position);
-  const isSecretary = isSecretaryPosition(member.position);
-  const isCoordinator = isCoordinatorPosition(member.position);
-
-  const newMember: TeamMember = {
-    ...member,
-    id,
-    category: correctCategory,
-    isSecretary,
-    isCoordinator,
-    createdAt: now,
-    updatedAt: now
-  };
-
-  await firestore.collection(TEAM_COLLECTION).doc(id).set(newMember);
-
-  return newMember;
+    const data = await response.json();
+    return data.member;
+  } catch (error) {
+    console.error('Error creating team member:', error);
+    throw error;
+  }
 }
 
 // Update existing team member
 export async function updateTeamMember(id: string, updates: Partial<Omit<TeamMember, 'id' | 'createdAt'>>): Promise<TeamMember | null> {
-  if (!firestore) throw new Error('Firestore not initialized');
+  try {
+    const response = await fetch(`/api/team/${id}`, {
+      method: 'PATCH',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify(updates)
+    });
 
-  const docRef = firestore.collection(TEAM_COLLECTION).doc(id);
-  const doc = await docRef.get();
-  if (!doc.exists) return null;
+    if (!response.ok) {
+      throw new Error('Failed to update team member');
+    }
 
-  const existing = doc.data() as TeamMember;
-
-  // If position is being updated, ensure correct category mapping
-  const finalUpdates = updates.position ? {
-    ...updates,
-    category: getCategoryFromPosition(updates.position),
-    isSecretary: isSecretaryPosition(updates.position),
-    isCoordinator: isCoordinatorPosition(updates.position)
-  } : updates;
-
-  const updatedMember: TeamMember = {
-    ...existing,
-    ...finalUpdates,
-    updatedAt: new Date().toISOString()
-  };
-
-  await docRef.set(updatedMember);
-
-  return updatedMember;
+    const data = await response.json();
+    return data.member;
+  } catch (error) {
+    console.error('Error updating team member:', error);
+    return null;
+  }
 }
 
 // Delete team member
 export async function deleteTeamMember(id: string): Promise<boolean> {
-  if (!firestore) throw new Error('Firestore not initialized');
+  try {
+    const response = await fetch(`/api/team/${id}`, {
+      method: 'DELETE'
+    });
 
-  const docRef = firestore.collection(TEAM_COLLECTION).doc(id);
-  const doc = await docRef.get();
-  if (!doc.exists) return false;
+    if (!response.ok) {
+      throw new Error('Failed to delete team member');
+    }
 
-  await docRef.delete();
-
-  return true;
+    return true;
+  } catch (error) {
+    console.error('Error deleting team member:', error);
+    return false;
+  }
 }
 
 // Generate member ID from name

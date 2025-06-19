@@ -7,6 +7,8 @@ import { Label } from "@/components/ui/label";
 import { X, Image as ImageIcon, Loader2 } from "lucide-react";
 import Image from "next/image";
 import { uploadTeamPhoto } from "@/lib/upload-firebase";
+import { storage } from "@/lib/firebaseClient";
+import { ref, uploadBytesResumable, getDownloadURL } from "firebase/storage";
 
 interface TeamPhotoUploadProps {
   memberId: string;
@@ -26,6 +28,7 @@ export function TeamPhotoUpload({
   const [isUploading, setIsUploading] = useState(false);
   const [isDragOver, setIsDragOver] = useState(false);
   const [previewUrl, setPreviewUrl] = useState<string | null>(currentPhotoUrl || null);
+  const [uploadProgress, setUploadProgress] = useState<number | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const targetSize = isSecretary ? 300 : 200;
@@ -48,7 +51,7 @@ export function TeamPhotoUpload({
     }
 
     setIsUploading(true);
-
+    setUploadProgress(0);
     try {
       // Create preview
       const reader = new FileReader();
@@ -57,15 +60,32 @@ export function TeamPhotoUpload({
       };
       reader.readAsDataURL(file);
 
-      // Upload file to Firebase Storage
-      const url = await uploadTeamPhoto(file, memberId);
-      onPhotoUploaded(url);
+      // Use resumable upload for progress
+      const storageRef = ref(storage, `team/${memberId}/${file.name}`);
+      const uploadTask = uploadBytesResumable(storageRef, file);
+
+      uploadTask.on(
+        'state_changed',
+        (snapshot) => {
+          const progress = (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
+          setUploadProgress(progress);
+        },
+        (error) => {
+          throw error;
+        },
+        async () => {
+          const url = await getDownloadURL(uploadTask.snapshot.ref);
+          setUploadProgress(null);
+          onPhotoUploaded(url);
+          setIsUploading(false);
+        }
+      );
     } catch (error) {
       console.error("Error uploading photo:", error);
       alert(error instanceof Error ? error.message : "Failed to upload photo");
       setPreviewUrl(currentPhotoUrl || null);
-    } finally {
       setIsUploading(false);
+      setUploadProgress(null);
     }
   };
 
@@ -135,6 +155,14 @@ export function TeamPhotoUpload({
               <div className="flex flex-col items-center space-y-2">
                 <Loader2 className="h-8 w-8 animate-spin text-blue-500" />
                 <p className="text-sm text-muted-foreground">Uploading photo...</p>
+                {uploadProgress !== null && (
+                  <div className="w-full bg-gray-200 rounded-full h-2 mt-2">
+                    <div
+                      className="bg-blue-500 h-2 rounded-full transition-all"
+                      style={{ width: `${uploadProgress}%` }}
+                    />
+                  </div>
+                )}
               </div>
             ) : previewUrl ? (
               <div className="space-y-4">

@@ -1,3 +1,5 @@
+"use client";
+
 import { useSession } from "next-auth/react";
 import { signInToFirebaseWithIdToken } from "@/lib/firebaseSignIn";
 import { useEffect } from "react";

@@ -6,6 +6,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Label } from "@/components/ui/label";
 import { X, Image as ImageIcon, Loader2 } from "lucide-react";
 import Image from "next/image";
+import { uploadTeamPhoto } from "@/lib/upload-firebase";
 
 interface TeamPhotoUploadProps {
   memberId: string;
@@ -56,25 +57,9 @@ export function TeamPhotoUpload({
       };
       reader.readAsDataURL(file);
 
-      // Upload file
-      const formData = new FormData();
-      formData.append("file", file);
-      formData.append("memberId", memberId);
-      formData.append("isSecretary", isSecretary.toString());
-
-      const response = await fetch("/api/admin/team/upload-photo", {
-        method: "POST",
-        body: formData,
-      });
-
-      if (!response.ok) {
-        const error = await response.json();
-        throw new Error(error.error || "Failed to upload photo");
-      }
-
-      const result = await response.json();
-      onPhotoUploaded(result.url);
-
+      // Upload file to Firebase Storage
+      const url = await uploadTeamPhoto(file, memberId);
+      onPhotoUploaded(url);
     } catch (error) {
       console.error("Error uploading photo:", error);
       alert(error instanceof Error ? error.message : "Failed to upload photo");
@@ -88,17 +73,7 @@ export function TeamPhotoUpload({
     if (!currentPhotoUrl) return;
 
     try {
-      const filename = currentPhotoUrl.split('/').pop();
-      if (!filename) return;
-
-      const response = await fetch(`/api/admin/team/upload-photo?filename=${filename}`, {
-        method: "DELETE",
-      });
-
-      if (!response.ok) {
-        throw new Error("Failed to delete photo");
-      }
-
+      // Optionally: Remove from Firebase Storage using the Firebase SDK if needed
       setPreviewUrl(null);
       onPhotoRemoved();
     } catch (error) {

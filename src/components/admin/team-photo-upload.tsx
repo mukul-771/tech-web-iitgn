@@ -86,6 +86,7 @@ export function TeamPhotoUpload({
       reader.readAsDataURL(file);
 
       // Use resumable upload for progress
+      if (!storage) throw new Error("Firebase Storage not initialized");
       const storageRef = ref(storage, `team/${memberId}/${file.name}`);
       const uploadTask = uploadBytesResumable(storageRef, file);
       uploadTask.on(

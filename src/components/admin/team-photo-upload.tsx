@@ -217,6 +217,7 @@ export function TeamPhotoUpload({
                     alt="Profile preview"
                     fill
                     className="object-cover rounded-xl"
+                    unoptimized
                   />
                 </div>
                 <div className="flex justify-center space-x-2">

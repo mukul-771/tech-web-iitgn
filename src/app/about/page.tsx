@@ -3,7 +3,7 @@ import { Target, Eye, MapPin, BookOpen } from "lucide-react"
 import Image from "next/image"
 import Link from "next/link"
 import { Button } from "@/components/ui/button"
-import { getAllTeamMembers } from "@/lib/team-storage"
+import { getAllTeamMembers, TeamMember } from "@/lib/team-firebase"
 import { TechCube3D } from "@/components/ui/tech-cube-3d"
 
 export const metadata: Metadata = {
@@ -14,7 +14,7 @@ export const metadata: Metadata = {
 export default async function AboutPage() {
   // Get team data from the admin system
   const teamData = await getAllTeamMembers();
-  const teamMembers = Object.values(teamData);
+  const teamMembers = Array.isArray(teamData) ? teamData as TeamMember[] : Object.values(teamData) as TeamMember[];
 
   // Get leadership team (secretary)
   const secretary = teamMembers.find(member => member.category === "leadership");

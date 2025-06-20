@@ -18,6 +18,7 @@ import {
   isSecretaryPosition,
   isCoordinatorPosition
 } from "@/lib/team-data";
+import { createTeamMember } from "@/lib/team-firebase";
 
 interface FormData {
   name: string;
@@ -131,19 +132,20 @@ export default function NewTeamMemberPage() {
     setIsLoading(true);
 
     try {
-      const response = await fetch("/api/admin/team", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(formData),
+      // Remove id, createdAt, updatedAt if present
+      const { name, email, position, category, initials, gradientFrom, gradientTo, photoPath, isSecretary, isCoordinator } = formData;
+      await createTeamMember({
+        name,
+        email,
+        position,
+        category,
+        initials,
+        gradientFrom,
+        gradientTo,
+        photoPath,
+        isSecretary,
+        isCoordinator,
       });
-
-      if (!response.ok) {
-        const error = await response.json();
-        throw new Error(error.error || "Failed to create team member");
-      }
-
       router.push("/admin/team");
     } catch (error) {
       console.error("Error creating team member:", error);

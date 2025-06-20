@@ -19,6 +19,7 @@ import {
   isSecretaryPosition,
   isCoordinatorPosition
 } from "@/lib/team-data";
+import { getAllTeamMembers, updateTeamMember, deleteTeamMember } from "@/lib/team-firebase";
 
 interface FormData {
   name: string;
@@ -74,34 +75,35 @@ export default function EditTeamMemberPage({ params }: { params: Promise<{ id: s
 
   useEffect(() => {
     if (status === "loading" || !memberId) return;
-
     if (!session?.user?.isAdmin) {
       router.push("/admin/login");
       return;
     }
-
     fetchMember();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [session, status, router, memberId]);
 
   const fetchMember = async () => {
     try {
       setIsLoading(true);
-
-      const response = await fetch(`/api/admin/team/${memberId}`);
-      if (!response.ok) {
-        throw new Error("Failed to fetch team member");
+      // Use Firestore SDK to get all members and find the one with memberId
+      const allMembers = await getAllTeamMembers();
+      let memberData: TeamMember | undefined;
+      if (Array.isArray(allMembers)) {
+        memberData = (allMembers as TeamMember[]).find((m) => m.id === memberId);
+      } else {
+        memberData = Object.values(allMembers).find((m) => (m as TeamMember).id === memberId) as TeamMember | undefined;
       }
-
-      const memberData = await response.json();
+      if (!memberData) throw new Error("Team member not found");
       setMember(memberData);
       setFormData({
-        name: memberData.name,
-        email: memberData.email,
-        position: memberData.position,
-        category: memberData.category,
-        initials: memberData.initials,
-        gradientFrom: memberData.gradientFrom,
-        gradientTo: memberData.gradientTo,
+        name: memberData.name || "",
+        email: memberData.email || "",
+        position: memberData.position || "",
+        category: memberData.category || "",
+        initials: memberData.initials || "",
+        gradientFrom: memberData.gradientFrom || "from-blue-600",
+        gradientTo: memberData.gradientTo || "to-purple-600",
         photoPath: memberData.photoPath || "",
         isSecretary: memberData.isSecretary || false,
         isCoordinator: memberData.isCoordinator || false,
@@ -165,19 +167,7 @@ export default function EditTeamMemberPage({ params }: { params: Promise<{ id: s
     setIsSaving(true);
 
     try {
-      const response = await fetch(`/api/admin/team/${memberId}`, {
-        method: "PUT",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(formData),
-      });
-
-      if (!response.ok) {
-        const error = await response.json();
-        throw new Error(error.error || "Failed to update team member");
-      }
-
+      await updateTeamMember(memberId, formData);
       router.push("/admin/team");
     } catch (error) {
       console.error("Error updating team member:", error);
@@ -193,14 +183,7 @@ export default function EditTeamMemberPage({ params }: { params: Promise<{ id: s
     }
 
     try {
-      const response = await fetch(`/api/admin/team/${memberId}`, {
-        method: "DELETE",
-      });
-
-      if (!response.ok) {
-        throw new Error("Failed to delete team member");
-      }
-
+      await deleteTeamMember(memberId);
       router.push("/admin/team");
     } catch (error) {
       console.error("Error deleting team member:", error);
@@ -249,7 +232,7 @@ export default function EditTeamMemberPage({ params }: { params: Promise<{ id: s
                 Edit Team Member
               </h1>
               <p className="text-gray-600 dark:text-gray-400 mt-2">
-                Update {member.name}'s profile information
+                Update {member.name}&apos;s profile information
               </p>
             </div>
           </div>

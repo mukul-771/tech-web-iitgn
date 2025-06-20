@@ -19,6 +19,7 @@ import {
 } from "lucide-react";
 import { TeamMember } from "@/lib/team-data";
 import Image from "next/image";
+import { getAllTeamMembers, deleteTeamMember } from "@/lib/team-firebase";
 
 export default function TeamManagementPage() {
   const { data: session, status } = useSession();
@@ -42,14 +43,12 @@ export default function TeamManagementPage() {
     try {
       setIsLoading(true);
       setError(null);
-      
-      const response = await fetch("/api/admin/team");
-      if (!response.ok) {
-        throw new Error("Failed to fetch team members");
-      }
-      
-      const data = await response.json();
-      setTeamMembers(data);
+      const data = await getAllTeamMembers();
+      // If Firestore returns an array, convert to object keyed by id for compatibility
+      const membersObj = Array.isArray(data)
+        ? Object.fromEntries(data.map((m) => [m.id, m]))
+        : data;
+      setTeamMembers(membersObj);
     } catch (error) {
       console.error("Error fetching team members:", error);
       setError(error instanceof Error ? error.message : "Failed to fetch team members");
@@ -62,17 +61,8 @@ export default function TeamManagementPage() {
     if (!confirm("Are you sure you want to delete this team member?")) {
       return;
     }
-
     try {
-      const response = await fetch(`/api/admin/team/${memberId}`, {
-        method: "DELETE",
-      });
-
-      if (!response.ok) {
-        throw new Error("Failed to delete team member");
-      }
-
-      // Remove from local state
+      await deleteTeamMember(memberId);
       setTeamMembers(prev => {
         const updated = { ...prev };
         delete updated[memberId];

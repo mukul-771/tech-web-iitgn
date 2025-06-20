@@ -11,6 +11,19 @@ import { storage } from "@/lib/firebase-config";
 import { ref, uploadBytesResumable, getDownloadURL } from "firebase/storage";
 import { getAuth } from "firebase/auth";
 
+// Utility to sanitize Firebase Storage URLs (decode if double-encoded)
+function sanitizeFirebaseUrl(url: string): string {
+  try {
+    const decoded = decodeURIComponent(url);
+    if (decodeURIComponent(decoded) !== decoded) {
+      return decodeURIComponent(decoded);
+    }
+    return decoded;
+  } catch {
+    return url;
+  }
+}
+
 interface TeamPhotoUploadProps {
   memberId: string;
   isSecretary?: boolean;
@@ -28,10 +41,10 @@ export function TeamPhotoUpload({
 }: TeamPhotoUploadProps) {
   const [isUploading, setIsUploading] = useState(false);
   const [isDragOver, setIsDragOver] = useState(false);
-  const [previewUrl, setPreviewUrl] = useState<string | null>(currentPhotoUrl || null);
+  const [previewUrl, setPreviewUrl] = useState<string | null>(currentPhotoUrl ? sanitizeFirebaseUrl(currentPhotoUrl) : null);
   const [uploadProgress, setUploadProgress] = useState<number | null>(null);
   const [uploadError, setUploadError] = useState<string | null>(null);
-  const [firebaseUser, setFirebaseUser] = useState<any>(null);
+  const [firebaseUser, setFirebaseUser] = useState<unknown>(null);
   const [checkingAuth, setCheckingAuth] = useState(true);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
@@ -43,6 +56,10 @@ export function TeamPhotoUpload({
     });
     return () => unsubscribe();
   }, []);
+
+  useEffect(() => {
+    setPreviewUrl(currentPhotoUrl ? sanitizeFirebaseUrl(currentPhotoUrl) : null);
+  }, [currentPhotoUrl]);
 
   const targetSize = isSecretary ? 300 : 200;
 
@@ -85,7 +102,6 @@ export function TeamPhotoUpload({
       };
       reader.readAsDataURL(file);
 
-      // Use resumable upload for progress
       if (!storage) throw new Error("Firebase Storage not initialized");
       const storageRef = ref(storage, `team/${memberId}/${file.name}`);
       const uploadTask = uploadBytesResumable(storageRef, file);
@@ -96,7 +112,6 @@ export function TeamPhotoUpload({
           setUploadProgress(progress);
         },
         (error) => {
-          console.error("Firebase upload error:", error);
           setUploadError(error.message || String(error));
           setIsUploading(false);
           setUploadProgress(null);
@@ -104,14 +119,13 @@ export function TeamPhotoUpload({
         async () => {
           const url = await getDownloadURL(uploadTask.snapshot.ref);
           setUploadProgress(null);
-          onPhotoUploaded(url);
+          onPhotoUploaded(sanitizeFirebaseUrl(url));
           setIsUploading(false);
         }
       );
     } catch (error) {
-      console.error("Error uploading photo:", error);
       setUploadError(error instanceof Error ? error.message : "Failed to upload photo");
-      setPreviewUrl(currentPhotoUrl || null);
+      setPreviewUrl(currentPhotoUrl ? sanitizeFirebaseUrl(currentPhotoUrl) : null);
       setIsUploading(false);
       setUploadProgress(null);
     }
@@ -201,7 +215,7 @@ export function TeamPhotoUpload({
               <div className="space-y-4">
                 <div className="relative mx-auto" style={{ width: targetSize, height: targetSize }}>
                   <Image
-                    src={previewUrl}
+                    src={previewUrl ? sanitizeFirebaseUrl(previewUrl) : ""}
                     alt="Profile preview"
                     fill
                     className="object-cover rounded-xl"

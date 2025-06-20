@@ -2,23 +2,23 @@
 
 import { useSession } from "next-auth/react";
 import { signInToFirebaseWithIdToken } from "@/lib/firebaseSignIn";
-import { useEffect } from "react";
+import { useEffect, useRef } from "react";
 
 // Extend the Session type to include idToken
 interface SessionWithIdToken {
   idToken?: string;
-  [key: string]: any;
+  [key: string]: unknown;
 }
 
 export function useSyncFirebaseAuth() {
   const { data: session } = useSession();
-  const s = session as SessionWithIdToken;
+  const s = session as unknown as SessionWithIdToken;
+  const lastTokenRef = useRef<string | undefined>(undefined);
+
   useEffect(() => {
-    if (s?.idToken) {
-      console.log("Signing in to Firebase with ID token:", s.idToken);
+    if (s?.idToken && s.idToken !== lastTokenRef.current) {
+      lastTokenRef.current = s.idToken;
       signInToFirebaseWithIdToken(s.idToken);
-    } else {
-      console.log("No idToken found in session", s);
     }
-  }, [s]);
+  }, [s?.idToken]);
 }

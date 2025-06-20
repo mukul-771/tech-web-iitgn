@@ -7,7 +7,7 @@ import { Label } from "@/components/ui/label";
 import { X, Image as ImageIcon, Loader2 } from "lucide-react";
 import Image from "next/image";
 import { uploadTeamPhoto } from "@/lib/upload-firebase";
-import { storage } from "@/lib/firebaseClient";
+import { storage } from "@/lib/firebase-config";
 import { ref, uploadBytesResumable, getDownloadURL } from "firebase/storage";
 import { getAuth } from "firebase/auth";
 

@@ -2,6 +2,7 @@
 import { initializeApp, getApps, FirebaseApp } from 'firebase/app';
 import { getStorage, FirebaseStorage } from 'firebase/storage';
 import { getAuth, GoogleAuthProvider, Auth } from 'firebase/auth';
+import { getFirestore, Firestore } from 'firebase/firestore';
 
 // Check if Firebase is configured
 const isFirebaseConfigured = () => {
@@ -30,6 +31,7 @@ const firebaseConfig = {
 let app: FirebaseApp | null = null;
 let storage: FirebaseStorage | null = null;
 let auth: Auth | null = null;
+let db: Firestore | null = null;
 const googleProvider = new GoogleAuthProvider();
 
 if (isFirebaseConfigured()) {
@@ -41,6 +43,7 @@ if (isFirebaseConfigured()) {
     }
     storage = getStorage(app);
     auth = getAuth(app);
+    db = getFirestore(app);
   } catch (error) {
     console.warn('Firebase initialization failed:', error);
   }
@@ -48,5 +51,5 @@ if (isFirebaseConfigured()) {
   console.warn('Firebase not configured. Some features may not work.');
 }
 
-export { storage, auth, googleProvider };
+export { storage, auth, googleProvider, db };
 export default app;

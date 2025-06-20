@@ -41,6 +41,18 @@ export default function CouncilMembersPage() {
     { id: "social", name: "Social Media Team", color: "purple" }
   ];
 
+  function sanitizeFirebaseUrl(url: string): string {
+    try {
+      const decoded = decodeURIComponent(url);
+      if (decodeURIComponent(decoded) !== decoded) {
+        return decodeURIComponent(decoded);
+      }
+      return decoded;
+    } catch {
+      return url;
+    }
+  }
+
   if (isLoading) {
     return (
       <div className="min-h-screen bg-white dark:bg-gray-900 flex items-center justify-center">
@@ -103,7 +115,7 @@ export default function CouncilMembersPage() {
                         )}>
                           {member.photoPath ? (
                             <Image
-                              src={member.photoPath}
+                              src={sanitizeFirebaseUrl(member.photoPath)}
                               alt={member.name}
                               width={200}
                               height={200}

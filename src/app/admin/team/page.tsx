@@ -219,13 +219,11 @@ export default function TeamManagementPage() {
                         <div className="flex-shrink-0">
                           {member.photoPath ? (
                             <Image
-                              src={member.photoPath}
+                              src={sanitizeFirebaseUrl(member.photoPath)}
                               alt={member.name}
                               width={member.isSecretary ? 60 : 48}
                               height={member.isSecretary ? 60 : 48}
-                              className={`object-cover rounded-lg ${
-                                member.isSecretary ? 'w-15 h-15' : 'w-12 h-12'
-                              }`}
+                              className={`object-cover rounded-lg ${member.isSecretary ? 'w-15 h-15' : 'w-12 h-12'}`}
                             />
                           ) : (
                             <div className={`${
@@ -278,4 +276,16 @@ export default function TeamManagementPage() {
       </div>
     </AdminLayout>
   );
+}
+
+function sanitizeFirebaseUrl(url: string): string {
+  try {
+    const decoded = decodeURIComponent(url);
+    if (decodeURIComponent(decoded) !== decoded) {
+      return decodeURIComponent(decoded);
+    }
+    return decoded;
+  } catch {
+    return url;
+  }
 }

@@ -133,7 +133,7 @@ export default async function AboutPage() {
                     <div className="relative mb-4 sm:mb-6">
                       {secretary.photoPath ? (
                         <Image
-                          src={secretary.photoPath}
+                          src={sanitizeFirebaseUrl(secretary.photoPath)}
                           alt={secretary.name}
                           width={300}
                           height={300}
@@ -178,7 +178,7 @@ export default async function AboutPage() {
                       <div className="relative mb-3 sm:mb-4 lg:mb-6">
                         {coordinator.photoPath ? (
                           <Image
-                            src={coordinator.photoPath}
+                            src={sanitizeFirebaseUrl(coordinator.photoPath)}
                             alt={coordinator.name}
                             width={200}
                             height={200}
@@ -282,4 +282,17 @@ export default async function AboutPage() {
       </section>
     </div>
   )
+}
+
+// Utility to sanitize Firebase Storage URLs (decode if double-encoded)
+function sanitizeFirebaseUrl(url: string): string {
+  try {
+    const decoded = decodeURIComponent(url);
+    if (decodeURIComponent(decoded) !== decoded) {
+      return decodeURIComponent(decoded);
+    }
+    return decoded;
+  } catch {
+    return url;
+  }
 }

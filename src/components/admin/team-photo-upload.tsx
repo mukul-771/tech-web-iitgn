@@ -6,10 +6,9 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Label } from "@/components/ui/label";
 import { X, Image as ImageIcon, Loader2 } from "lucide-react";
 import Image from "next/image";
-import { uploadTeamPhoto } from "@/lib/upload-firebase";
 import { storage } from "@/lib/firebase-config";
 import { ref, uploadBytesResumable, getDownloadURL } from "firebase/storage";
-import { getAuth } from "firebase/auth";
+import { auth as firebaseAuth } from "@/lib/firebase-config";
 
 // Utility to sanitize Firebase Storage URLs (decode if double-encoded)
 function sanitizeFirebaseUrl(url: string): string {
@@ -49,12 +48,11 @@ export function TeamPhotoUpload({
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
-    const auth = getAuth();
-    const unsubscribe = auth.onAuthStateChanged((user) => {
+    const unsubscribe = firebaseAuth?.onAuthStateChanged((user) => {
       setFirebaseUser(user);
       setCheckingAuth(false);
     });
-    return () => unsubscribe();
+    return () => unsubscribe && unsubscribe();
   }, []);
 
   useEffect(() => {

@@ -138,6 +138,7 @@ export default async function AboutPage() {
                           width={300}
                           height={300}
                           className="w-[200px] h-[200px] sm:w-[250px] sm:h-[250px] md:w-[300px] md:h-[300px] object-cover rounded-xl mx-auto"
+                          unoptimized
                         />
                       ) : (
                         <div className={`w-[200px] h-[200px] sm:w-[250px] sm:h-[250px] md:w-[300px] md:h-[300px] rounded-xl bg-gradient-to-r ${secretary.gradientFrom} ${secretary.gradientTo} flex items-center justify-center text-white font-bold text-4xl sm:text-5xl md:text-6xl mx-auto`}>
@@ -183,6 +184,7 @@ export default async function AboutPage() {
                             width={200}
                             height={200}
                             className="w-[120px] h-[120px] sm:w-[150px] sm:h-[150px] md:w-[160px] md:h-[160px] lg:w-[180px] lg:h-[180px] xl:w-[200px] xl:h-[200px] object-cover rounded-xl mx-auto"
+                            unoptimized
                           />
                         ) : (
                           <div className={`w-[120px] h-[120px] sm:w-[150px] sm:h-[150px] md:w-[160px] md:h-[160px] lg:w-[180px] lg:h-[180px] xl:w-[200px] xl:h-[200px] rounded-xl bg-gradient-to-r ${coordinator.gradientFrom} ${coordinator.gradientTo} flex items-center justify-center text-white font-bold text-xl sm:text-2xl md:text-2xl lg:text-3xl mx-auto`}>

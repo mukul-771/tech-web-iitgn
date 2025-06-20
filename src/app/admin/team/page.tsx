@@ -224,6 +224,7 @@ export default function TeamManagementPage() {
                               width={member.isSecretary ? 60 : 48}
                               height={member.isSecretary ? 60 : 48}
                               className={`object-cover rounded-lg ${member.isSecretary ? 'w-15 h-15' : 'w-12 h-12'}`}
+                              unoptimized
                             />
                           ) : (
                             <div className={`${

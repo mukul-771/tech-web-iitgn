@@ -92,14 +92,13 @@ export function TeamPhotoUpload({
 
     setIsUploading(true);
     setUploadProgress(0);
+    // Create preview immediately
+    const reader = new FileReader();
+    reader.onload = (e) => {
+      setPreviewUrl(e.target?.result as string);
+    };
+    reader.readAsDataURL(file);
     try {
-      // Create preview
-      const reader = new FileReader();
-      reader.onload = (e) => {
-        setPreviewUrl(e.target?.result as string);
-      };
-      reader.readAsDataURL(file);
-
       if (!storage) throw new Error("Firebase Storage not initialized");
       const storageRef = ref(storage, `team/${memberId}/${file.name}`);
       const uploadTask = uploadBytesResumable(storageRef, file);
@@ -117,6 +116,8 @@ export function TeamPhotoUpload({
         async () => {
           const url = await getDownloadURL(uploadTask.snapshot.ref);
           setUploadProgress(null);
+          // Only update preview if the URL is valid
+          setPreviewUrl(url);
           onPhotoUploaded(sanitizeFirebaseUrl(url));
           setIsUploading(false);
         }

@@ -18,9 +18,8 @@ import {
   User
 } from "lucide-react";
 import { TeamMember } from "@/lib/team-data";
-import Image from "next/image";
 import { getAllTeamMembers, deleteTeamMember } from "@/lib/team-firebase";
-import { sanitizeFirebaseUrl } from "@/lib/image-utils";
+import { FirebaseImage } from "@/components/ui/firebase-image";
 
 export default function TeamManagementPage() {
   const { data: session, status } = useSession();
@@ -219,8 +218,8 @@ export default function TeamManagementPage() {
                         {/* Profile Photo */}
                         <div className="flex-shrink-0">
                           {member.photoPath ? (
-                            <Image
-                              src={sanitizeFirebaseUrl(member.photoPath)}
+                            <FirebaseImage
+                              src={member.photoPath}
                               alt={member.name}
                               width={member.isSecretary ? 60 : 48}
                               height={member.isSecretary ? 60 : 48}

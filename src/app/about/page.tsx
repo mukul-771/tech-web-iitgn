@@ -1,11 +1,10 @@
 import { Metadata } from "next"
 import { Target, Eye, MapPin, BookOpen } from "lucide-react"
-import Image from "next/image"
 import Link from "next/link"
 import { Button } from "@/components/ui/button"
 import { getAllTeamMembers, TeamMember } from "@/lib/team-firebase"
 import { TechCube3D } from "@/components/ui/tech-cube-3d"
-import { sanitizeFirebaseUrl } from "@/lib/image-utils"
+import { FirebaseImage } from "@/components/ui/firebase-image"
 
 export const metadata: Metadata = {
   title: "About Us - Technical Council IITGN",
@@ -133,8 +132,8 @@ export default async function AboutPage() {
                   <div className="glass rounded-2xl p-4 sm:p-6 md:p-8 text-center transition-all duration-300 hover:scale-105 max-w-sm sm:max-w-md md:max-w-lg">
                     <div className="relative mb-4 sm:mb-6">
                       {secretary.photoPath ? (
-                        <Image
-                          src={sanitizeFirebaseUrl(secretary.photoPath)}
+                        <FirebaseImage
+                          src={secretary.photoPath}
                           alt={secretary.name}
                           width={300}
                           height={300}
@@ -179,8 +178,8 @@ export default async function AboutPage() {
                     <div key={coordinator.id} className="glass rounded-2xl p-3 sm:p-4 lg:p-6 text-center transition-all duration-300 hover:scale-105 w-full">
                       <div className="relative mb-3 sm:mb-4 lg:mb-6">
                         {coordinator.photoPath ? (
-                          <Image
-                            src={sanitizeFirebaseUrl(coordinator.photoPath)}
+                          <FirebaseImage
+                            src={coordinator.photoPath}
                             alt={coordinator.name}
                             width={200}
                             height={200}

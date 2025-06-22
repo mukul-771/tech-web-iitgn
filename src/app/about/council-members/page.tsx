@@ -2,10 +2,9 @@
 
 import { motion } from "framer-motion";
 import { cn } from "@/lib/utils";
-import Image from "next/image";
 import { useEffect, useState } from "react";
 import { TeamMember } from "@/lib/team-data";
-import { sanitizeFirebaseUrl } from "@/lib/image-utils";
+import { FirebaseImage } from "@/components/ui/firebase-image";
 
 export default function CouncilMembersPage() {
   const [teamMembers, setTeamMembers] = useState<TeamMember[]>([]);
@@ -105,8 +104,8 @@ export default function CouncilMembersPage() {
                           member.gradientTo
                         )}>
                           {member.photoPath ? (
-                            <Image
-                              src={sanitizeFirebaseUrl(member.photoPath)}
+                            <FirebaseImage
+                              src={member.photoPath}
                               alt={member.name}
                               width={200}
                               height={200}

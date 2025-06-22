@@ -5,6 +5,7 @@ import Link from "next/link"
 import { Button } from "@/components/ui/button"
 import { getAllTeamMembers, TeamMember } from "@/lib/team-firebase"
 import { TechCube3D } from "@/components/ui/tech-cube-3d"
+import { getOptimizedImageUrl } from "@/lib/image-utils"
 
 export const metadata: Metadata = {
   title: "About Us - Technical Council IITGN",
@@ -133,7 +134,7 @@ export default async function AboutPage() {
                     <div className="relative mb-4 sm:mb-6">
                       {secretary.photoPath ? (
                         <Image
-                          src={sanitizeFirebaseUrl(secretary.photoPath)}
+                          src={getOptimizedImageUrl(secretary.photoPath)}
                           alt={secretary.name}
                           width={300}
                           height={300}
@@ -179,7 +180,7 @@ export default async function AboutPage() {
                       <div className="relative mb-3 sm:mb-4 lg:mb-6">
                         {coordinator.photoPath ? (
                           <Image
-                            src={sanitizeFirebaseUrl(coordinator.photoPath)}
+                            src={getOptimizedImageUrl(coordinator.photoPath)}
                             alt={coordinator.name}
                             width={200}
                             height={200}
@@ -287,14 +288,4 @@ export default async function AboutPage() {
 }
 
 // Utility to sanitize Firebase Storage URLs (decode if double-encoded)
-function sanitizeFirebaseUrl(url: string): string {
-  try {
-    const decoded = decodeURIComponent(url);
-    if (decodeURIComponent(decoded) !== decoded) {
-      return decodeURIComponent(decoded);
-    }
-    return decoded;
-  } catch {
-    return url;
-  }
-}
+

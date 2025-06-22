@@ -9,19 +9,7 @@ import Image from "next/image";
 import { storage } from "@/lib/firebase-config";
 import { ref, uploadBytesResumable, getDownloadURL } from "firebase/storage";
 import { auth as firebaseAuth } from "@/lib/firebase-config";
-
-// Utility to sanitize Firebase Storage URLs (decode if double-encoded)
-function sanitizeFirebaseUrl(url: string): string {
-  try {
-    const decoded = decodeURIComponent(url);
-    if (decodeURIComponent(decoded) !== decoded) {
-      return decodeURIComponent(decoded);
-    }
-    return decoded;
-  } catch {
-    return url;
-  }
-}
+import { getOptimizedImageUrl } from "@/lib/image-utils";
 
 interface TeamPhotoUploadProps {
   memberId: string;
@@ -40,7 +28,7 @@ export function TeamPhotoUpload({
 }: TeamPhotoUploadProps) {
   const [isUploading, setIsUploading] = useState(false);
   const [isDragOver, setIsDragOver] = useState(false);
-  const [previewUrl, setPreviewUrl] = useState<string | null>(currentPhotoUrl ? sanitizeFirebaseUrl(currentPhotoUrl) : null);
+  const [previewUrl, setPreviewUrl] = useState<string | null>(currentPhotoUrl ? getOptimizedImageUrl(currentPhotoUrl) : null);
   const [uploadProgress, setUploadProgress] = useState<number | null>(null);
   const [uploadError, setUploadError] = useState<string | null>(null);
   const [firebaseUser, setFirebaseUser] = useState<unknown>(null);
@@ -56,7 +44,7 @@ export function TeamPhotoUpload({
   }, []);
 
   useEffect(() => {
-    setPreviewUrl(currentPhotoUrl ? sanitizeFirebaseUrl(currentPhotoUrl) : null);
+    setPreviewUrl(currentPhotoUrl ? getOptimizedImageUrl(currentPhotoUrl) : null);
   }, [currentPhotoUrl]);
 
   const targetSize = isSecretary ? 300 : 200;
@@ -118,13 +106,13 @@ export function TeamPhotoUpload({
           setUploadProgress(null);
           // Only update preview if the URL is valid
           setPreviewUrl(url);
-          onPhotoUploaded(sanitizeFirebaseUrl(url));
+          onPhotoUploaded(getOptimizedImageUrl(url));
           setIsUploading(false);
         }
       );
     } catch (error) {
       setUploadError(error instanceof Error ? error.message : "Failed to upload photo");
-      setPreviewUrl(currentPhotoUrl ? sanitizeFirebaseUrl(currentPhotoUrl) : null);
+      setPreviewUrl(currentPhotoUrl ? getOptimizedImageUrl(currentPhotoUrl) : null);
       setIsUploading(false);
       setUploadProgress(null);
     }
@@ -214,7 +202,7 @@ export function TeamPhotoUpload({
               <div className="space-y-4">
                 <div className="relative mx-auto" style={{ width: targetSize, height: targetSize }}>
                   <Image
-                    src={previewUrl ? sanitizeFirebaseUrl(previewUrl) : ""}
+                    src={previewUrl ? getOptimizedImageUrl(previewUrl) : ""}
                     alt="Profile preview"
                     fill
                     className="object-cover rounded-xl"

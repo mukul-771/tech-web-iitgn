@@ -118,3 +118,64 @@ Generated sources: prelude.gql [71531B]
 [debug] [2025-06-20T23:43:52.634Z] >>> [apiv2][query] GET https://firebase.googleapis.com/v1beta1/projects pageSize=1000
 [debug] [2025-06-20T23:43:53.471Z] <<< [apiv2][status] GET https://firebase.googleapis.com/v1beta1/projects 200
 [debug] [2025-06-20T23:43:53.471Z] <<< [apiv2][body] GET https://firebase.googleapis.com/v1beta1/projects [omitted]
+[info] [Firebase Plugin] Stopping Data Connect toolkit
+[warn] ⚠  Data Connect Emulator has exited upon receiving signal: SIGINT 
+[debug] [2025-06-22T22:36:59.536Z] [Firebase Plugin] Activating Firebase extension.
+[debug] [2025-06-22T22:37:02.349Z] [Firebase Plugin] requireAuthWrapper
+[debug] [2025-06-22T22:37:02.350Z] > command requires scopes: ["email","openid","https://www.googleapis.com/auth/cloudplatformprojects.readonly","https://www.googleapis.com/auth/firebase","https://www.googleapis.com/auth/cloud-platform"]
+[debug] [2025-06-22T22:37:02.350Z] > authorizing via signed-in user (mukul.meena@iitgn.ac.in)
+[debug] [2025-06-22T22:37:02.352Z] Checked if tokens are valid: false, expires at: 1750466631623
+[debug] [2025-06-22T22:37:02.353Z] Checked if tokens are valid: false, expires at: 1750466631623
+[debug] [2025-06-22T22:37:02.353Z] > refreshing access token with scopes: []
+[debug] [2025-06-22T22:37:02.354Z] >>> [apiv2][query] POST https://www.googleapis.com/oauth2/v3/token [none]
+[debug] [2025-06-22T22:37:02.354Z] >>> [apiv2][body] POST https://www.googleapis.com/oauth2/v3/token [omitted]
+[debug] [2025-06-22T22:37:02.359Z] [Firebase Plugin] VSCode notification server listening on port 40001
+[info] [Firebase Plugin] Starting Data Connect toolkit (version 2.6.3) on port 50001
+[debug] [2025-06-22T22:37:03.774Z] I0623 04:07:03.762355    6810 control.go:73] [/emulator/tech-website 63d4] UpdateResources(): done
+Schema: sources: schema/schema.gql [2088B] 
+Connector "default": sources: connector/mutations.gql [1233B] connector/queries.gql [1802B] 
+ {"metadata":{"emulator":{"name":"dataconnect"},"message":"I0623 04:07:03.762355    6810 control.go:73] [/emulator/tech-website 63d4] UpdateResources(): done\nSchema: sources: schema/schema.gql [2088B] \nConnector \"default\": sources: connector/mutations.gql [1233B] connector/queries.gql [1802B] \n"}}
+[debug] [2025-06-22T22:37:03.775Z] Ignoring unsupported arg: auto_download {"metadata":{"emulator":{"name":"dataconnect"},"message":"Ignoring unsupported arg: auto_download"}}
+[debug] [2025-06-22T22:37:03.775Z] Ignoring unsupported arg: port {"metadata":{"emulator":{"name":"dataconnect"},"message":"Ignoring unsupported arg: port"}}
+[debug] [2025-06-22T22:37:03.775Z] Starting Data Connect Emulator with command {"binary":"/Users/mukul7711/.cache/firebase/emulators/dataconnect-emulator-2.6.3","args":["--logtostderr","-v=2","dev","--listen=localhost:50001","--config_dir=/Users/mukul7711/Documents/webdev/tech-website/dataconnect","--enable_output_schema_extensions=true","--enable_output_generated_sdk=true"],"optionalArgs":["listen","config_dir","enable_output_schema_extensions","enable_output_generated_sdk"],"joinArgs":true,"shell":false,"port":9399} {"metadata":{"emulator":{"name":"dataconnect"},"message":"Starting Data Connect Emulator with command {\"binary\":\"/Users/mukul7711/.cache/firebase/emulators/dataconnect-emulator-2.6.3\",\"args\":[\"--logtostderr\",\"-v=2\",\"dev\",\"--listen=localhost:50001\",\"--config_dir=/Users/mukul7711/Documents/webdev/tech-website/dataconnect\",\"--enable_output_schema_extensions=true\",\"--enable_output_generated_sdk=true\"],\"optionalArgs\":[\"listen\",\"config_dir\",\"enable_output_schema_extensions\",\"enable_output_generated_sdk\"],\"joinArgs\":true,\"shell\":false,\"port\":9399}"}}
+[info] i  dataconnect: Data Connect Emulator logging to dataconnect-debug.log {"metadata":{"emulator":{"name":"dataconnect"},"message":"Data Connect Emulator logging to dataconnect-debug.log"}}
+[debug] [2025-06-22T22:37:04.383Z] I0623 04:07:03.953853    6813 load.go:37] Reloading schema and connectors...
+I0623 04:07:03.984465    6813 control.go:73] [/emulator/tech-website 78e8] UpdateResources(): done
+Schema: sources: schema/schema.gql [2088B] 
+Connector "default": sources: connector/mutations.gql [1233B] connector/queries.gql [1802B] 
+I0623 04:07:04.008795    6813 collector.go:107] schema extensions wrote into "/Users/mukul7711/Documents/webdev/tech-website/dataconnect/.dataconnect/schema"
+Generated sources: prelude.gql [71531B] 
+I0623 04:07:04.009123    6813 load.go:115] Finished reloading
+I0623 04:07:04.016560    6813 dev.go:95] Listening on address (HTTP + gRPC): 127.0.0.1:50001
+ {"metadata":{"emulator":{"name":"dataconnect"},"message":"I0623 04:07:03.953853    6813 load.go:37] Reloading schema and connectors...\nI0623 04:07:03.984465    6813 control.go:73] [/emulator/tech-website 78e8] UpdateResources(): done\nSchema: sources: schema/schema.gql [2088B] \nConnector \"default\": sources: connector/mutations.gql [1233B] connector/queries.gql [1802B] \nI0623 04:07:04.008795    6813 collector.go:107] schema extensions wrote into \"/Users/mukul7711/Documents/webdev/tech-website/dataconnect/.dataconnect/schema\"\nGenerated sources: prelude.gql [71531B] \nI0623 04:07:04.009123    6813 load.go:115] Finished reloading\nI0623 04:07:04.016560    6813 dev.go:95] Listening on address (HTTP + gRPC): 127.0.0.1:50001\n"}}
+[error] [Firebase Plugin] error:  {}
+[debug] [2025-06-22T22:37:04.570Z] <<< [apiv2][status] POST https://www.googleapis.com/oauth2/v3/token 200
+[debug] [2025-06-22T22:37:04.570Z] <<< [apiv2][body] POST https://www.googleapis.com/oauth2/v3/token [omitted]
+[debug] [2025-06-22T22:37:04.584Z] [Firebase Plugin] User found:  mukul.meena@iitgn.ac.in
+[info] [Firebase Plugin] (Core:Project) New user detected, fetching projects
+[debug] [2025-06-22T22:37:04.585Z] Checked if tokens are valid: true, expires at: 1750635423571
+[debug] [2025-06-22T22:37:04.585Z] >>> [apiv2][query] GET https://firebase.googleapis.com/v1beta1/projects pageSize=1000
+[debug] [2025-06-22T22:37:05.438Z] <<< [apiv2][status] GET https://firebase.googleapis.com/v1beta1/projects 200
+[debug] [2025-06-22T22:37:05.438Z] <<< [apiv2][body] GET https://firebase.googleapis.com/v1beta1/projects [omitted]
+[debug] [2025-06-22T22:43:26.913Z] [Firebase Plugin] Value of process.env.MONOSPACE_ENV: undefined
+[debug] [2025-06-22T22:43:26.914Z] [Firebase Plugin] requireAuthWrapper
+[debug] [2025-06-22T22:43:26.914Z] > command requires scopes: ["email","openid","https://www.googleapis.com/auth/cloudplatformprojects.readonly","https://www.googleapis.com/auth/firebase","https://www.googleapis.com/auth/cloud-platform"]
+[debug] [2025-06-22T22:43:26.915Z] > authorizing via signed-in user (mukul.meena@iitgn.ac.in)
+[debug] [2025-06-22T22:43:26.915Z] Checked if tokens are valid: true, expires at: 1750635423571
+[debug] [2025-06-22T22:43:26.915Z] [Firebase Plugin] User found:  mukul.meena@iitgn.ac.in
+[info] [Firebase Plugin] (Core:Project) New user detected, fetching projects
+[debug] [2025-06-22T22:43:26.915Z] Checked if tokens are valid: true, expires at: 1750635423571
+[debug] [2025-06-22T22:43:26.916Z] >>> [apiv2][query] GET https://firebase.googleapis.com/v1beta1/projects pageSize=1000
+[debug] [2025-06-22T22:43:26.922Z] [Firebase Plugin] Value of process.env.MONOSPACE_ENV: undefined
+[debug] [2025-06-22T22:43:26.922Z] [Firebase Plugin] requireAuthWrapper
+[debug] [2025-06-22T22:43:26.922Z] > command requires scopes: ["email","openid","https://www.googleapis.com/auth/cloudplatformprojects.readonly","https://www.googleapis.com/auth/firebase","https://www.googleapis.com/auth/cloud-platform"]
+[debug] [2025-06-22T22:43:26.922Z] > authorizing via signed-in user (mukul.meena@iitgn.ac.in)
+[debug] [2025-06-22T22:43:26.922Z] Checked if tokens are valid: true, expires at: 1750635423571
+[debug] [2025-06-22T22:43:26.922Z] [Firebase Plugin] User found:  mukul.meena@iitgn.ac.in
+[info] [Firebase Plugin] (Core:Project) New user detected, fetching projects
+[debug] [2025-06-22T22:43:26.922Z] Checked if tokens are valid: true, expires at: 1750635423571
+[debug] [2025-06-22T22:43:26.923Z] >>> [apiv2][query] GET https://firebase.googleapis.com/v1beta1/projects pageSize=1000
+[debug] [2025-06-22T22:43:27.983Z] <<< [apiv2][status] GET https://firebase.googleapis.com/v1beta1/projects 200
+[debug] [2025-06-22T22:43:27.984Z] <<< [apiv2][body] GET https://firebase.googleapis.com/v1beta1/projects [omitted]
+[debug] [2025-06-22T22:43:28.632Z] <<< [apiv2][status] GET https://firebase.googleapis.com/v1beta1/projects 200
+[debug] [2025-06-22T22:43:28.632Z] <<< [apiv2][body] GET https://firebase.googleapis.com/v1beta1/projects [omitted]

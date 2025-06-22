@@ -5,6 +5,7 @@ import { cn } from "@/lib/utils";
 import Image from "next/image";
 import { useEffect, useState } from "react";
 import { TeamMember } from "@/lib/team-data";
+import { getOptimizedImageUrl } from "@/lib/image-utils";
 
 export default function CouncilMembersPage() {
   const [teamMembers, setTeamMembers] = useState<TeamMember[]>([]);
@@ -41,17 +42,7 @@ export default function CouncilMembersPage() {
     { id: "social", name: "Social Media Team", color: "purple" }
   ];
 
-  function sanitizeFirebaseUrl(url: string): string {
-    try {
-      const decoded = decodeURIComponent(url);
-      if (decodeURIComponent(decoded) !== decoded) {
-        return decodeURIComponent(decoded);
-      }
-      return decoded;
-    } catch {
-      return url;
-    }
-  }
+
 
   if (isLoading) {
     return (
@@ -115,7 +106,7 @@ export default function CouncilMembersPage() {
                         )}>
                           {member.photoPath ? (
                             <Image
-                              src={sanitizeFirebaseUrl(member.photoPath)}
+                              src={getOptimizedImageUrl(member.photoPath)}
                               alt={member.name}
                               width={200}
                               height={200}

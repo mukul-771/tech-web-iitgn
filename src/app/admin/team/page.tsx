@@ -20,6 +20,7 @@ import {
 import { TeamMember } from "@/lib/team-data";
 import Image from "next/image";
 import { getAllTeamMembers, deleteTeamMember } from "@/lib/team-firebase";
+import { getOptimizedImageUrl } from "@/lib/image-utils";
 
 export default function TeamManagementPage() {
   const { data: session, status } = useSession();
@@ -219,7 +220,7 @@ export default function TeamManagementPage() {
                         <div className="flex-shrink-0">
                           {member.photoPath ? (
                             <Image
-                              src={sanitizeFirebaseUrl(member.photoPath)}
+                              src={getOptimizedImageUrl(member.photoPath)}
                               alt={member.name}
                               width={member.isSecretary ? 60 : 48}
                               height={member.isSecretary ? 60 : 48}
@@ -279,14 +280,4 @@ export default function TeamManagementPage() {
   );
 }
 
-function sanitizeFirebaseUrl(url: string): string {
-  try {
-    const decoded = decodeURIComponent(url);
-    if (decodeURIComponent(decoded) !== decoded) {
-      return decodeURIComponent(decoded);
-    }
-    return decoded;
-  } catch {
-    return url;
-  }
-}
+

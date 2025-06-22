@@ -9,7 +9,7 @@ import Image from "next/image";
 import { storage } from "@/lib/firebase-config";
 import { ref, uploadBytesResumable, getDownloadURL } from "firebase/storage";
 import { auth as firebaseAuth } from "@/lib/firebase-config";
-import { sanitizeFirebaseUrl } from "@/lib/image-utils";
+import { ensureDirectAccessUrl } from "@/lib/image-utils";
 
 interface TeamPhotoUploadProps {
   memberId: string;
@@ -28,7 +28,7 @@ export function TeamPhotoUpload({
 }: TeamPhotoUploadProps) {
   const [isUploading, setIsUploading] = useState(false);
   const [isDragOver, setIsDragOver] = useState(false);
-  const [previewUrl, setPreviewUrl] = useState<string | null>(currentPhotoUrl ? sanitizeFirebaseUrl(currentPhotoUrl) : null);
+  const [previewUrl, setPreviewUrl] = useState<string | null>(currentPhotoUrl ? ensureDirectAccessUrl(currentPhotoUrl) : null);
   const [uploadProgress, setUploadProgress] = useState<number | null>(null);
   const [uploadError, setUploadError] = useState<string | null>(null);
   const [firebaseUser, setFirebaseUser] = useState<unknown>(null);
@@ -44,7 +44,7 @@ export function TeamPhotoUpload({
   }, []);
 
   useEffect(() => {
-    setPreviewUrl(currentPhotoUrl ? sanitizeFirebaseUrl(currentPhotoUrl) : null);
+    setPreviewUrl(currentPhotoUrl ? ensureDirectAccessUrl(currentPhotoUrl) : null);
   }, [currentPhotoUrl]);
 
   const targetSize = isSecretary ? 300 : 200;
@@ -104,15 +104,16 @@ export function TeamPhotoUpload({
         async () => {
           const url = await getDownloadURL(uploadTask.snapshot.ref);
           setUploadProgress(null);
-          // Only update preview if the URL is valid
-          setPreviewUrl(url);
-          onPhotoUploaded(sanitizeFirebaseUrl(url));
+          // Ensure the URL has the alt=media parameter needed for direct access
+          const accessibleUrl = ensureDirectAccessUrl(url);
+          setPreviewUrl(accessibleUrl);
+          onPhotoUploaded(accessibleUrl);
           setIsUploading(false);
         }
       );
     } catch (error) {
       setUploadError(error instanceof Error ? error.message : "Failed to upload photo");
-      setPreviewUrl(currentPhotoUrl ? sanitizeFirebaseUrl(currentPhotoUrl) : null);
+      setPreviewUrl(currentPhotoUrl ? ensureDirectAccessUrl(currentPhotoUrl) : null);
       setIsUploading(false);
       setUploadProgress(null);
     }
@@ -202,7 +203,7 @@ export function TeamPhotoUpload({
               <div className="space-y-4">
                 <div className="relative mx-auto" style={{ width: targetSize, height: targetSize }}>
                   <Image
-                    src={previewUrl ? sanitizeFirebaseUrl(previewUrl) : ""}
+                    src={previewUrl ? ensureDirectAccessUrl(previewUrl) : ""}
                     alt="Profile preview"
                     fill
                     className="object-cover rounded-xl"

@@ -1,5 +1,3 @@
-"use client";
-
 /**
  * Utility functions for working with Firebase storage URLs
  * and other common operations related to image handling
@@ -28,7 +26,6 @@ export function sanitizeFirebaseUrl(url: string | null | undefined): string {
     return url;
   } catch {
     // If decoding fails for any reason, return the original
-    console.warn("Failed to sanitize URL:", url);
     return url || "";
   }
 }
@@ -39,21 +36,4 @@ export function sanitizeFirebaseUrl(url: string | null | undefined): string {
 export function isFirebaseStorageUrl(url: string | null | undefined): boolean {
   if (!url) return false;
   return url.startsWith("https://firebasestorage.googleapis.com");
-}
-
-/**
- * Gets a relative URL for Firebase Storage URLs to work better with Next.js Image component
- */
-export function getOptimizedImageUrl(url: string | null | undefined): string {
-  if (!url) return "";
-  
-  const sanitized = sanitizeFirebaseUrl(url);
-  
-  // Log the URL for debugging
-  console.debug("Image URL optimized:", {
-    original: url,
-    sanitized: sanitized,
-  });
-  
-  return sanitized;
 }

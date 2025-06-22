@@ -5,7 +5,7 @@ import { cn } from "@/lib/utils";
 import Image from "next/image";
 import { useEffect, useState } from "react";
 import { TeamMember } from "@/lib/team-data";
-import { getOptimizedImageUrl } from "@/lib/image-utils";
+import { sanitizeFirebaseUrl } from "@/lib/image-utils";
 
 export default function CouncilMembersPage() {
   const [teamMembers, setTeamMembers] = useState<TeamMember[]>([]);
@@ -106,7 +106,7 @@ export default function CouncilMembersPage() {
                         )}>
                           {member.photoPath ? (
                             <Image
-                              src={getOptimizedImageUrl(member.photoPath)}
+                              src={sanitizeFirebaseUrl(member.photoPath)}
                               alt={member.name}
                               width={200}
                               height={200}

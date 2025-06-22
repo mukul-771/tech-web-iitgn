@@ -5,7 +5,7 @@ import Link from "next/link"
 import { Button } from "@/components/ui/button"
 import { getAllTeamMembers, TeamMember } from "@/lib/team-firebase"
 import { TechCube3D } from "@/components/ui/tech-cube-3d"
-import { getOptimizedImageUrl } from "@/lib/image-utils"
+import { sanitizeFirebaseUrl } from "@/lib/image-utils"
 
 export const metadata: Metadata = {
   title: "About Us - Technical Council IITGN",
@@ -134,7 +134,7 @@ export default async function AboutPage() {
                     <div className="relative mb-4 sm:mb-6">
                       {secretary.photoPath ? (
                         <Image
-                          src={getOptimizedImageUrl(secretary.photoPath)}
+                          src={sanitizeFirebaseUrl(secretary.photoPath)}
                           alt={secretary.name}
                           width={300}
                           height={300}
@@ -180,7 +180,7 @@ export default async function AboutPage() {
                       <div className="relative mb-3 sm:mb-4 lg:mb-6">
                         {coordinator.photoPath ? (
                           <Image
-                            src={getOptimizedImageUrl(coordinator.photoPath)}
+                            src={sanitizeFirebaseUrl(coordinator.photoPath)}
                             alt={coordinator.name}
                             width={200}
                             height={200}

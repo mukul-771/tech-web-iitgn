@@ -27,13 +27,15 @@ const nextConfig: NextConfig = {
         port: '',
         pathname: '/**',
       },
+      // Support any Firebase Storage URL
       {
         protocol: 'https',
         hostname: 'firebasestorage.googleapis.com',
         port: '',
-        pathname: '/v0/b/tech-website-prod.firebasestorage.app/o/**',
+        pathname: '/**',
       },
     ],
+    unoptimized: process.env.NODE_ENV === 'development', // Disable optimization in dev for Firebase URLs
   },
   // Production optimizations
   serverExternalPackages: ['sharp'],
@@ -42,6 +44,12 @@ const nextConfig: NextConfig = {
   // Optimize for production
   compress: true,
   poweredByHeader: false,
+  // Add specific configurations for Firebase integration
+  experimental: {
+    serverActions: {
+      bodySizeLimit: '2mb', // Increase limit for file uploads
+    },
+  },
 };
 
 export default nextConfig;

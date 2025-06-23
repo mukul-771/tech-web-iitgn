@@ -43,45 +43,45 @@ export default function EditClubPage() {
   const [team, setTeam] = useState<TeamMember[]>([{ name: "", role: "", email: "" }]);
 
   useEffect(() => {
-    fetchClub();
-  }, [clubId]);
+    const fetchClubData = async () => {
+      try {
+        setIsLoadingData(true);
+        const response = await fetch(`/api/admin/clubs/${clubId}`);
+        if (!response.ok) {
+          throw new Error("Failed to fetch club");
+        }
 
-  const fetchClub = async () => {
-    try {
-      setIsLoadingData(true);
-      const response = await fetch(`/api/admin/clubs/${clubId}`);
-      if (!response.ok) {
-        throw new Error("Failed to fetch club");
+        const clubData = await response.json();
+        setClub(clubData);
+
+        // Populate form data
+        setFormData({
+          name: clubData.name,
+          description: clubData.description,
+          longDescription: clubData.longDescription,
+          type: clubData.type,
+          category: clubData.category,
+          email: clubData.email,
+          members: clubData.members || "",
+          established: clubData.established || "",
+          logoPath: clubData.logoPath || ""
+        });
+
+        setAchievements(clubData.achievements.length > 0 ? clubData.achievements : [""]);
+        setProjects(clubData.projects.length > 0 ? clubData.projects : [""]);
+        setTeam(clubData.team.length > 0 ? clubData.team : [{ name: "", role: "", email: "" }]);
+
+      } catch (error) {
+        console.error("Error fetching club:", error);
+        alert("Failed to load club data");
+        router.push("/admin/clubs");
+      } finally {
+        setIsLoadingData(false);
       }
+    };
 
-      const clubData = await response.json();
-      setClub(clubData);
-
-      // Populate form data
-      setFormData({
-        name: clubData.name,
-        description: clubData.description,
-        longDescription: clubData.longDescription,
-        type: clubData.type,
-        category: clubData.category,
-        email: clubData.email,
-        members: clubData.members || "",
-        established: clubData.established || "",
-        logoPath: clubData.logoPath || ""
-      });
-
-      setAchievements(clubData.achievements.length > 0 ? clubData.achievements : [""]);
-      setProjects(clubData.projects.length > 0 ? clubData.projects : [""]);
-      setTeam(clubData.team.length > 0 ? clubData.team : [{ name: "", role: "", email: "" }]);
-
-    } catch (error) {
-      console.error("Error fetching club:", error);
-      alert("Failed to load club data");
-      router.push("/admin/clubs");
-    } finally {
-      setIsLoadingData(false);
-    }
-  };
+    fetchClubData();
+  }, [clubId, router]);
 
   const handleInputChange = (field: string, value: string) => {
     setFormData(prev => ({ ...prev, [field]: value }));
@@ -189,8 +189,14 @@ export default function EditClubPage() {
       });
 
       if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.error || "Failed to update club");
+        const errorData = await response.json().catch(() => ({}));
+        console.error("API Error:", {
+          status: response.status,
+          statusText: response.statusText,
+          errorData,
+          clubData
+        });
+        throw new Error(errorData.error || `HTTP ${response.status}: ${response.statusText}`);
       }
 
       alert("Club updated successfully!");

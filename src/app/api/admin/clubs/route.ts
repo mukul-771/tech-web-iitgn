@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
-import { getAllClubs, createClub } from "@/lib/clubs-storage";
+import { getAllClubs, createClub } from "@/lib/clubs-blob-storage";
 import { z } from "zod";
 
 // Validation schema for club creation

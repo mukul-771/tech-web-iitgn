@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { getClubById } from "@/lib/clubs-storage";
+import { getClubById } from "@/lib/clubs-blob-storage";
 
 // GET /api/clubs/[id] - Get single club for public display
 export async function GET(

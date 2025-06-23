@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { getClubsForDisplay } from "@/lib/clubs-storage";
+import { getClubsForDisplay } from "@/lib/clubs-blob-storage";
 
 // GET /api/clubs - Get all clubs for public display
 export async function GET() {

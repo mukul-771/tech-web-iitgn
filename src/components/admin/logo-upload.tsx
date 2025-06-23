@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useRef } from "react";
+import Image from "next/image";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Label } from "@/components/ui/label";
@@ -137,24 +138,36 @@ export function LogoUpload({
 
   return (
     <div className="space-y-4">
-      <Label>Club Logo</Label>
+      <Label className="text-base font-semibold">Club Logo</Label>
 
-      {/* Current Logo Preview */}
+      {/* Current Logo Display - More Prominent */}
       {previewUrl && (
-        <Card className="glass">
-          <CardContent className="p-4">
-            <div className="flex items-center gap-4">
+        <Card className="glass border-2 border-blue-200 dark:border-blue-800">
+          <CardContent className="p-6">
+            <div className="flex flex-col items-center gap-4 sm:flex-row sm:items-start">
               <div className="relative">
-                <img
+                <Image
                   src={previewUrl}
-                  alt="Club logo"
-                  className="w-16 h-16 object-contain rounded-lg border"
+                  alt="Current club logo"
+                  width={96}
+                  height={96}
+                  className="w-24 h-24 object-contain rounded-xl border-2 border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 p-2"
                 />
+                <div className="absolute -top-2 -right-2">
+                  <div className="bg-green-100 dark:bg-green-900 text-green-800 dark:text-green-200 px-2 py-1 rounded-full text-xs font-medium">
+                    Current
+                  </div>
+                </div>
               </div>
-              <div className="flex-1">
-                <p className="text-sm font-medium">Current Logo</p>
-                <p className="text-xs text-muted-foreground">
-                  Click upload area to replace
+              <div className="flex-1 text-center sm:text-left">
+                <p className="text-lg font-semibold text-gray-900 dark:text-gray-100">
+                  Current Logo
+                </p>
+                <p className="text-sm text-muted-foreground mt-1">
+                  This is the logo currently displayed for your club
+                </p>
+                <p className="text-xs text-muted-foreground mt-2">
+                  Use the upload area below to replace with a new logo
                 </p>
               </div>
               <Button
@@ -163,18 +176,24 @@ export function LogoUpload({
                 size="sm"
                 onClick={handleRemoveLogo}
                 disabled={isUploading}
+                className="text-red-600 hover:text-red-700 hover:bg-red-50 dark:hover:bg-red-950"
               >
-                <X className="h-4 w-4" />
+                <X className="h-4 w-4 mr-1" />
+                Remove
               </Button>
             </div>
           </CardContent>
         </Card>
       )}
 
-      {/* Upload Area */}
+      {/* Upload Area - Enhanced */}
       <Card
-        className={`glass cursor-pointer transition-all duration-200 ${
-          isDragOver ? 'border-primary bg-primary/5' : 'border-dashed border-muted-foreground/25'
+        className={`glass cursor-pointer transition-all duration-200 hover:shadow-md ${
+          isDragOver 
+            ? 'border-2 border-primary bg-primary/10 shadow-lg' 
+            : previewUrl 
+              ? 'border-dashed border-gray-300 dark:border-gray-600' 
+              : 'border-2 border-dashed border-primary/50'
         }`}
         onClick={handleClick}
         onDragOver={handleDragOver}
@@ -185,30 +204,32 @@ export function LogoUpload({
           <div className="flex flex-col items-center justify-center text-center space-y-4">
             {isUploading ? (
               <>
-                <Loader2 className="h-8 w-8 animate-spin text-primary" />
-                <p className="text-sm text-muted-foreground">Uploading logo...</p>
+                <Loader2 className="h-10 w-10 animate-spin text-primary" />
+                <p className="text-base font-medium">Uploading logo...</p>
+                <p className="text-sm text-muted-foreground">Please wait</p>
               </>
             ) : (
               <>
-                <div className="p-3 rounded-full bg-primary/10">
+                <div className={`p-4 rounded-full ${previewUrl ? 'bg-blue-50 dark:bg-blue-950' : 'bg-primary/10'}`}>
                   {previewUrl ? (
-                    <ImageIcon className="h-6 w-6 text-primary" />
+                    <ImageIcon className="h-8 w-8 text-blue-600 dark:text-blue-400" />
                   ) : (
-                    <Upload className="h-6 w-6 text-primary" />
+                    <Upload className="h-8 w-8 text-primary" />
                   )}
                 </div>
                 <div>
-                  <p className="text-sm font-medium">
-                    {previewUrl ? 'Replace Logo' : 'Replace Logo'}
+                  <p className="text-base font-semibold text-gray-900 dark:text-gray-100">
+                    {previewUrl ? 'Replace Current Logo' : 'Upload Club Logo'}
                   </p>
-                  <p className="text-xs text-muted-foreground">
-                    Drag and drop or click to select
+                  <p className="text-sm text-muted-foreground mt-1">
+                    Drag and drop your logo here, or click to browse
                   </p>
                 </div>
-                <div className="text-xs text-muted-foreground">
-                  <p>Supported formats: JPEG, PNG, WebP, SVG</p>
-                  <p>Maximum size: 5MB</p>
-                  <p>Recommended: Square aspect ratio</p>
+                <div className="text-xs text-muted-foreground space-y-1 bg-gray-50 dark:bg-gray-800 rounded-lg p-3">
+                  <p><strong>Supported formats:</strong> JPEG, PNG, WebP, SVG</p>
+                  <p><strong>Maximum size:</strong> 5MB</p>
+                  <p><strong>Recommended:</strong> Square aspect ratio (512x512px)</p>
+                  <p><strong>Background:</strong> Transparent or white for best results</p>
                 </div>
               </>
             )}

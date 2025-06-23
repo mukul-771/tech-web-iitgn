@@ -150,6 +150,33 @@ export default function UploadTestPage() {
     }
   };
 
+  const handleNoSharpUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (!file) return;
+
+    setIsLoading(true);
+    setTestResult('');
+
+    try {
+      const formData = new FormData();
+      formData.append('file', file);
+      formData.append('memberId', 'test-member-id');
+      formData.append('isSecretary', 'false');
+
+      const response = await fetch('/api/admin/team/upload-photo-no-sharp', {
+        method: 'POST',
+        body: formData,
+      });
+
+      const result = await response.json();
+      setTestResult(JSON.stringify(result, null, 2));
+    } catch (error) {
+      setTestResult(`No-Sharp upload error: ${error}`);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
   if (status === 'loading') {
     return <div className="p-8">Loading...</div>;
   }
@@ -279,6 +306,34 @@ export default function UploadTestPage() {
         />
         <p className="text-sm text-gray-600">
           Tests the complete upload pipeline without updating team member database - isolates Firebase Storage issues
+        </p>
+      </div>
+
+      <div className="mb-6">
+        <h2 className="text-lg font-semibold mb-2">No-Sharp Upload Test</h2>
+        <input
+          type="file"
+          accept="image/*"
+          onChange={handleNoSharpUpload}
+          disabled={isLoading}
+          className="mb-2"
+        />
+        <p className="text-sm text-gray-600">
+          This tests the upload pipeline with the no-Sharp image processing route
+        </p>
+      </div>
+
+      <div className="mb-6">
+        <h2 className="text-lg font-semibold mb-2">No-Sharp Upload (Team Photo)</h2>
+        <input
+          type="file"
+          accept="image/*"
+          onChange={handleNoSharpUpload}
+          disabled={isLoading}
+          className="mb-2"
+        />
+        <p className="text-sm text-gray-600">
+          Uploads directly to Firebase without ANY Sharp processing - bypasses all decoder issues
         </p>
       </div>
 

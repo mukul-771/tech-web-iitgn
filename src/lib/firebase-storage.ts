@@ -62,7 +62,7 @@ export async function uploadImageToFirebase(
     
     console.log('Starting image optimization:', { originalName, maxWidth, maxHeight, quality, format });
     
-    // Use the robust format conversion first
+    // First attempt: Use the robust format conversion
     let processedImage;
     try {
       processedImage = await convertToSupportedFormat(fileBuffer);
@@ -73,28 +73,29 @@ export async function uploadImageToFirebase(
       });
     } catch (conversionError) {
       console.error('Image format conversion failed:', conversionError);
-      throw new Error(`Image format conversion failed: ${conversionError instanceof Error ? conversionError.message : 'Unknown error'}`);
+      
+      // FALLBACK 1: Try direct upload without Sharp processing
+      console.log('Attempting direct upload without Sharp processing...');
+      return await uploadDirectlyToFirebase(fileBuffer, originalName, folder);
     }
-    
-    // Use the converted image buffer for Sharp processing
-    let sharpInstance = sharp(processedImage.buffer);
-    
-    console.log('Image validation passed, proceeding with optimization...');
-    
-    // Resize if needed
-    if (maxWidth || maxHeight) {
-      sharpInstance = sharpInstance.resize(maxWidth, maxHeight, {
-        fit: 'inside',
-        withoutEnlargement: true
-      });
-    }
-    
-    // Convert to specified format with quality - using try/catch for more robust error handling
+
+    // Second attempt: Use Sharp with the converted image
     let optimizedBuffer: Buffer;
     let contentType: string;
     let extension: string;
     
     try {
+      let sharpInstance = sharp(processedImage.buffer);
+      
+      // Resize if needed
+      if (maxWidth || maxHeight) {
+        sharpInstance = sharpInstance.resize(maxWidth, maxHeight, {
+          fit: 'inside',
+          withoutEnlargement: true
+        });
+      }
+      
+      // Convert to specified format with quality
       switch (format) {
         case 'webp':
           optimizedBuffer = await sharpInstance.webp({ quality }).toBuffer();
@@ -111,12 +112,16 @@ export async function uploadImageToFirebase(
           contentType = 'image/jpeg';
           extension = 'jpg';
       }
+      
+      console.log('Sharp processing successful:', { size: optimizedBuffer.length, contentType, extension });
+      
     } catch (sharpError) {
-      console.error('Sharp processing error:', sharpError);
-      throw new Error(`Image processing failed: ${sharpError instanceof Error ? sharpError.message : 'Unknown Sharp error'}`);
+      console.error('Sharp processing failed:', sharpError);
+      
+      // FALLBACK 2: Try direct upload with the converted buffer
+      console.log('Sharp failed, attempting direct upload with converted buffer...');
+      return await uploadDirectlyToFirebase(processedImage.buffer, originalName, folder);
     }
-    
-    console.log('Image optimized:', { size: optimizedBuffer.length, contentType, extension });
     
     // Generate filename with correct extension
     const fileName = generateFileName(originalName.replace(/\.[^/.]+$/, `.${extension}`));
@@ -152,8 +157,74 @@ export async function uploadImageToFirebase(
       size: optimizedBuffer.length,
       path: filePath,
     };
+    
   } catch (error) {
     console.error('Error optimizing and uploading image:', error);
+    
+    // FALLBACK 3: Last resort - direct upload of original buffer
+    console.log('All processing failed, attempting direct upload of original buffer...');
+    try {
+      return await uploadDirectlyToFirebase(fileBuffer, originalName, folder);
+    } catch (directError) {
+      console.error('Direct upload also failed:', directError);
+      throw new Error(`All upload attempts failed. Last error: ${directError instanceof Error ? directError.message : 'Unknown error'}`);
+    }
+  }
+}
+
+// Direct upload without any processing
+async function uploadDirectlyToFirebase(
+  fileBuffer: Buffer,
+  originalName: string,
+  folder: string = 'images'
+): Promise<UploadResult> {
+  try {
+    console.log('Starting direct upload without processing...', { originalName, size: fileBuffer.length });
+    
+    // Determine content type from file signature
+    let contentType = 'image/jpeg'; // default
+    if (fileBuffer[0] === 0x89 && fileBuffer[1] === 0x50 && fileBuffer[2] === 0x4E && fileBuffer[3] === 0x47) {
+      contentType = 'image/png';
+    } else if (fileBuffer[8] === 0x57 && fileBuffer[9] === 0x45 && fileBuffer[10] === 0x42 && fileBuffer[11] === 0x50) {
+      contentType = 'image/webp';
+    }
+    
+    // Generate filename
+    const fileName = generateFileName(originalName, 'direct');
+    const filePath = `${folder}/${fileName}`;
+    
+    // Upload to Firebase Storage
+    const storage = getStorage();
+    const bucket = storage.bucket();
+    const file = bucket.file(filePath);
+    
+    console.log('Direct upload to Firebase:', { fileName, filePath, contentType });
+    
+    await file.save(fileBuffer, {
+      metadata: {
+        contentType,
+        metadata: {
+          originalName,
+          uploadedAt: new Date().toISOString(),
+          uploadType: 'direct', // Mark as direct upload
+        }
+      },
+      public: true,
+    });
+    
+    console.log('Direct upload successful:', filePath);
+    
+    const publicUrl = `https://storage.googleapis.com/${bucket.name}/${filePath}`;
+    
+    return {
+      url: publicUrl,
+      filename: fileName,
+      size: fileBuffer.length,
+      path: filePath,
+    };
+    
+  } catch (error) {
+    console.error('Direct upload failed:', error);
     
     // Provide more specific error information
     if (error instanceof Error) {
@@ -175,6 +246,6 @@ export async function uploadImageToFirebase(
       }
     }
     
-    throw new Error(`Failed to optimize and upload image: ${error instanceof Error ? error.message : 'Unknown error'}`);
+    throw new Error(`Direct upload failed: ${error instanceof Error ? error.message : 'Unknown error'}`);
   }
 }

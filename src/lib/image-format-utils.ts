@@ -116,13 +116,25 @@ export async function convertToSupportedFormat(buffer: Buffer): Promise<{ buffer
   } catch (error) {
     console.error('Error in format conversion:', error);
     
+    // Check if it's a decoder error specifically
+    const isDecoderError = error instanceof Error && 
+      (error.message.includes('DECODER') || 
+       error.message.includes('unsupported') ||
+       error.message.includes('decode') ||
+       error.message.includes('1E08010C'));
+    
+    if (isDecoderError) {
+      console.log('Decoder error detected, this image cannot be processed by Sharp on this system');
+      throw new Error('This image format cannot be processed by the server. Please try converting the image to a standard JPEG or PNG format using an image editor before uploading.');
+    }
+    
     // Last resort: force convert to JPEG
     try {
       console.log('Attempting force conversion to JPEG...');
       return await forceConvertToJPEG(buffer);
     } catch (forceError) {
       console.error('Force conversion also failed:', forceError);
-      throw new Error('Unable to process this image. The file may be corrupted or in an unsupported format. Please try a different image.');
+      throw new Error('Unable to process this image. The file may be corrupted or in an unsupported format. Please try a different image or convert it to JPEG using an image editor.');
     }
   }
 }

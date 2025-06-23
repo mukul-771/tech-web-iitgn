@@ -85,8 +85,8 @@ export default function EditTeamMemberPage({ params }: { params: Promise<{ id: s
   const fetchMember = async () => {
     try {
       setIsLoading(true);
-      // Load team data from JSON file
-      const response = await fetch('/data/team.json');
+      // Load team data from API
+      const response = await fetch('/api/team');
       if (!response.ok) {
         throw new Error('Failed to fetch team data');
       }

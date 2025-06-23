@@ -42,8 +42,8 @@ export default function TeamManagementPage() {
     try {
       setIsLoading(true);
       setError(null);
-      // Load team data from JSON file
-      const response = await fetch('/data/team.json');
+      // Load team data from API
+      const response = await fetch('/api/team');
       if (!response.ok) {
         throw new Error('Failed to fetch team data');
       }

@@ -223,61 +223,61 @@ export default function TeamManagementPage() {
               </CardTitle>
             </CardHeader>
             <CardContent>
-              <div className={`grid ${
+              <div className={`grid gap-6 ${
                 category === "leadership" 
-                  ? "gap-4 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5"
+                  ? "md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5"
                   : category === "coordinator"
-                  ? "gap-3 md:grid-cols-2 lg:grid-cols-5"
-                  : "gap-4 md:grid-cols-2 lg:grid-cols-3"
+                  ? "md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5"
+                  : "md:grid-cols-2 lg:grid-cols-3"
               }`}>
                 {groupedMembers[category].map((member) => (
-                  <Card key={member.id} className="border">
+                  <Card key={member.id} className="border hover:shadow-md transition-shadow">
                     <CardContent className="p-4">
-                      <div className="flex items-start space-x-3">
-                        {/* Profile Photo */}
-                        <div className="flex-shrink-0">
-                          <TeamMemberImage
-                            src={member.photoPath}
-                            alt={member.name}
-                            initials={member.initials}
-                            gradientFrom={member.gradientFrom}
-                            gradientTo={member.gradientTo}
-                            width={member.isSecretary ? 60 : 48}
-                            height={member.isSecretary ? 60 : 48}
-                            className={`rounded-lg ${member.isSecretary ? 'w-15 h-15' : 'w-12 h-12'}`}
-                          />
+                      {/* Profile Photo - Centered */}
+                      <div className="flex justify-center mb-3">
+                        <TeamMemberImage
+                          src={member.photoPath}
+                          alt={member.name}
+                          initials={member.initials}
+                          gradientFrom={member.gradientFrom}
+                          gradientTo={member.gradientTo}
+                          width={member.isSecretary ? 80 : 64}
+                          height={member.isSecretary ? 80 : 64}
+                          className={`rounded-lg ${member.isSecretary ? 'w-20 h-20' : 'w-16 h-16'}`}
+                        />
+                      </div>
+
+                      {/* Member Info - Centered */}
+                      <div className="text-center space-y-2">
+                        <div className="flex justify-center">
+                          <Badge className={`text-xs ${getCategoryColor(member.category)}`}>
+                            {member.category}
+                          </Badge>
+                        </div>
+                        <div>
+                          <h3 className="font-semibold text-sm">{member.name}</h3>
+                          <p className="text-xs text-muted-foreground">{member.position}</p>
+                          <p className="text-xs text-muted-foreground truncate">{member.email}</p>
                         </div>
 
-                        {/* Member Info */}
-                        <div className="flex-1 min-w-0">
-                          <div className="flex items-start justify-between">
-                            <div>
-                              <h3 className="font-semibold text-sm truncate">{member.name}</h3>
-                              <p className="text-xs text-muted-foreground">{member.position}</p>
-                              <p className="text-xs text-muted-foreground">{member.email}</p>
-                            </div>
-                            <Badge className={`text-xs ${getCategoryColor(member.category)}`}>
-                              {member.category}
-                            </Badge>
-                          </div>
-
-                          {/* Actions */}
-                          <div className="flex space-x-1 mt-3">
-                            <Button
-                              variant="outline"
-                              size="sm"
-                              onClick={() => router.push(`/admin/team/${member.id}/edit`)}
-                            >
-                              <Edit className="h-3 w-3" />
-                            </Button>
-                            <Button
-                              variant="outline"
-                              size="sm"
-                              onClick={() => handleDeleteMember(member.id)}
-                            >
-                              <Trash2 className="h-3 w-3" />
-                            </Button>
-                          </div>
+                        {/* Actions */}
+                        <div className="flex justify-center space-x-2 pt-2">
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            onClick={() => router.push(`/admin/team/${member.id}/edit`)}
+                            className="flex-1 max-w-[80px]"
+                          >
+                            <Edit className="h-3 w-3" />
+                          </Button>
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            onClick={() => handleDeleteMember(member.id)}
+                            className="flex-1 max-w-[80px]"
+                          >
+                            <Trash2 className="h-3 w-3" />
+                          </Button>
                         </div>
                       </div>
                     </CardContent>

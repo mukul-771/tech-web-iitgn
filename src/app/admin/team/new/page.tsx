@@ -131,24 +131,21 @@ export default function NewTeamMemberPage() {
     setIsLoading(true);
 
     try {
-      // For now, just show success message
-      // In a real app, you'd want to save to a backend/database
-      const { name, email, position, category, initials, gradientFrom, gradientTo, photoPath, isSecretary, isCoordinator } = formData;
-      
-      console.log("Team member data:", {
-        name,
-        email,
-        position,
-        category,
-        initials,
-        gradientFrom,
-        gradientTo,
-        photoPath,
-        isSecretary,
-        isCoordinator,
+      // Call the API to create the team member
+      const response = await fetch('/api/admin/team', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(formData),
       });
-      
-      alert("Team member created successfully! Note: This is temporary without a backend.");
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.error || 'Failed to create team member');
+      }
+
+      alert("Team member created successfully!");
       router.push("/admin/team");
     } catch (error) {
       console.error("Error creating team member:", error);

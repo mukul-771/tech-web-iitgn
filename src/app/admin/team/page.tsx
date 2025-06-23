@@ -64,14 +64,23 @@ export default function TeamManagementPage() {
       return;
     }
     try {
-      // For now, just remove from local state
-      // In a real app, you'd want to update the JSON file via an API
+      // Call the API to delete the team member
+      const response = await fetch(`/api/admin/team/${memberId}`, {
+        method: 'DELETE',
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to delete team member');
+      }
+
+      // Remove from local state
       setTeamMembers(prev => {
         const updated = { ...prev };
         delete updated[memberId];
         return updated;
       });
-      alert("Team member removed from view. Note: This is temporary without a backend.");
+      
+      alert("Team member deleted successfully!");
     } catch (error) {
       console.error("Error deleting team member:", error);
       alert("Failed to delete team member");

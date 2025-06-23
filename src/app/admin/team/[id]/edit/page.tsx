@@ -166,10 +166,20 @@ export default function EditTeamMemberPage({ params }: { params: Promise<{ id: s
     setIsSaving(true);
 
     try {
-      // For now, just show success message
-      // In a real app, you'd want to save to a backend/database
-      console.log("Updating team member:", memberId, formData);
-      alert("Team member updated successfully! Note: This is temporary without a backend.");
+      // Call the API to update the team member
+      const response = await fetch(`/api/admin/team/${memberId}`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(formData),
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to update team member');
+      }
+
+      alert("Team member updated successfully!");
       router.push("/admin/team");
     } catch (error) {
       console.error("Error updating team member:", error);

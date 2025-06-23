@@ -51,13 +51,13 @@ export function TeamMemberImage({
     : "text-xl sm:text-2xl md:text-2xl lg:text-3xl";
 
   return (
-    <div className={`relative ${className}`}>
+    <div className={`relative aspect-square ${className}`}>
       {showGradient ? (
         <div className={`w-full h-full rounded-xl bg-gradient-to-r ${gradientFrom} ${gradientTo} flex items-center justify-center text-white font-bold ${gradientSizeClasses}`}>
           {initials}
         </div>
       ) : (
-        <div className="relative">
+        <div className="relative w-full h-full">
           <Image
             src={src || "/placeholder-avatar.svg"}
             alt={alt}

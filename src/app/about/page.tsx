@@ -12,12 +12,17 @@ export const metadata: Metadata = {
   description: "Learn about the Technical Council of IIT Gandhinagar, our mission, vision, and plans for fostering innovation.",
 }
 
+// Force dynamic rendering to ensure fresh data
+export const dynamic = 'force-dynamic'
+export const revalidate = 0
+
 export default async function AboutPage() {
   // Get team data from Blob storage (same source as admin panel)
   let teamMembers: TeamMember[] = [];
   try {
     const teamData = await getAllTeamMembers();
     teamMembers = Object.values(teamData) as TeamMember[];
+    console.log('About page: Loaded team members from storage:', teamMembers.length);
   } catch (error) {
     console.error('Error loading team data from storage:', error);
     // Fallback to default data
@@ -167,7 +172,7 @@ export default async function AboutPage() {
               )}
 
               {/* Coordinators Grid */}
-              <div className="grid gap-4 sm:gap-6 grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 w-full max-w-7xl mx-auto">
+              <div className="grid gap-6 grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 max-w-7xl mx-auto">
                 {coordinators.map((coordinator, index) => {
                   // Define color schemes for coordinators
                   const colorSchemes = [
@@ -180,8 +185,8 @@ export default async function AboutPage() {
                   const colorScheme = colorSchemes[index % colorSchemes.length];
 
                   return (
-                    <div key={coordinator.id} className="glass rounded-2xl p-3 sm:p-4 lg:p-6 text-center transition-all duration-300 hover:scale-105 w-full">
-                      <div className="relative mb-3 sm:mb-4 lg:mb-6">
+                    <div key={coordinator.id} className="glass rounded-2xl p-4 lg:p-6 text-center transition-all duration-300 hover:scale-105 w-full">
+                      <div className="relative mb-4 lg:mb-6">
                         <TeamMemberImage
                           src={coordinator.photoPath}
                           alt={coordinator.name}
@@ -190,19 +195,19 @@ export default async function AboutPage() {
                           gradientTo={coordinator.gradientTo}
                           width={200}
                           height={200}
-                          className="w-[120px] h-[120px] sm:w-[150px] sm:h-[150px] md:w-[160px] md:h-[160px] lg:w-[180px] lg:h-[180px] xl:w-[200px] xl:h-[200px] mx-auto"
+                          className="w-[140px] h-[140px] sm:w-[160px] sm:h-[160px] md:w-[180px] md:h-[180px] lg:w-[200px] lg:h-[200px] mx-auto"
                           isSecretary={false}
                         />
                         <div className={`absolute inset-0 rounded-xl bg-gradient-to-r ${coordinator.gradientFrom}/30 ${coordinator.gradientTo}/30 scale-105 opacity-0 group-hover:opacity-100 transition-all duration-300`} />
                       </div>
-                      <h3 className="font-bold text-xs sm:text-sm md:text-base lg:text-lg mb-1 font-space-grotesk">{coordinator.name}</h3>
-                      <p className={`text-xs sm:text-xs md:text-sm font-semibold text-${colorScheme.text} dark:text-${colorScheme.text.replace('600', '400')} mb-2 sm:mb-3`}>
+                      <h3 className="font-bold text-sm md:text-base lg:text-lg mb-2 font-space-grotesk">{coordinator.name}</h3>
+                      <p className={`text-xs md:text-sm font-semibold text-${colorScheme.text} dark:text-${colorScheme.text.replace('600', '400')} mb-3`}>
                         {coordinator.position}
                       </p>
-                      <div className="space-y-1 sm:space-y-2">
+                      <div className="space-y-2">
                         <a
                           href={`mailto:${coordinator.email}`}
-                          className="inline-flex items-center text-xs text-muted-foreground hover:text-blue-600 dark:hover:text-blue-400 transition-colors duration-200 bg-gray-50 dark:bg-gray-800/50 px-2 sm:px-3 py-1 sm:py-1.5 lg:py-2 rounded-lg hover:bg-blue-50 dark:hover:bg-blue-900/30 break-all max-w-full"
+                          className="inline-flex items-center text-xs text-muted-foreground hover:text-blue-600 dark:hover:text-blue-400 transition-colors duration-200 bg-gray-50 dark:bg-gray-800/50 px-3 py-2 rounded-lg hover:bg-blue-50 dark:hover:bg-blue-900/30 break-all max-w-full"
                         >
                           <span className="truncate">{coordinator.email}</span>
                         </a>

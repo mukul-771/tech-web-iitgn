@@ -87,14 +87,14 @@ export default function CouncilMembersPage() {
                   {category.name}
                 </h2>
 
-                <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 max-w-7xl mx-auto">
+                <div className="grid gap-8 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 max-w-7xl mx-auto justify-items-center">
                   {categoryMembers.map((member, index) => (
                     <motion.div
                       key={member.name}
                       initial={{ opacity: 0, scale: 0.9 }}
                       animate={{ opacity: 1, scale: 1 }}
                       transition={{ duration: 0.5, delay: index * 0.1 }}
-                      className="bg-white dark:bg-gray-800 rounded-xl p-6 text-center transition-all duration-300 hover:scale-105 shadow-lg hover:shadow-xl border border-gray-200 dark:border-gray-700"
+                      className="bg-white dark:bg-gray-800 rounded-xl p-6 text-center transition-all duration-300 hover:scale-105 shadow-lg hover:shadow-xl border border-gray-200 dark:border-gray-700 w-full max-w-sm"
                     >
                       <div className="relative mb-6">
                         <TeamMemberImage
@@ -105,7 +105,7 @@ export default function CouncilMembersPage() {
                           gradientTo={member.gradientTo}
                           width={200}
                           height={200}
-                          className="h-[200px] w-[200px] rounded-xl mx-auto"
+                          className="w-[200px] h-[200px] mx-auto"
                         />
                       </div>
                       <h3 className="font-bold text-lg mb-2 font-space-grotesk text-gray-800 dark:text-white">{member.name}</h3>

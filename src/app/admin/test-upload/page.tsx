@@ -41,10 +41,37 @@ export default function UploadTestPage() {
     }
   };
 
+  const testFirebaseUpload = async (file: File) => {
+    setIsLoading(true);
+    try {
+      const formData = new FormData();
+      formData.append('file', file);
+
+      const response = await fetch('/api/admin/test-firebase-upload', {
+        method: 'POST',
+        body: formData,
+      });
+
+      const data = await response.json();
+      setTestResult(JSON.stringify(data, null, 2));
+    } catch (error) {
+      setTestResult(`Error: ${error instanceof Error ? error.message : 'Unknown error'}`);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
   const handleFileSelect = (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
     if (file) {
       testImageUpload(file);
+    }
+  };
+
+  const handleFirebaseTestSelect = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (file) {
+      testFirebaseUpload(file);
     }
   };
 
@@ -94,6 +121,20 @@ export default function UploadTestPage() {
         />
         <p className="text-sm text-gray-600">
           This will analyze the image file and test different Sharp configurations to identify the exact issue
+        </p>
+      </div>
+
+      <div className="mb-6">
+        <h2 className="text-lg font-semibold mb-2">Firebase Upload Test</h2>
+        <input
+          type="file"
+          accept="image/*"
+          onChange={handleFirebaseTestSelect}
+          disabled={isLoading}
+          className="mb-2"
+        />
+        <p className="text-sm text-gray-600">
+          This will test the complete upload pipeline including Firebase Storage
         </p>
       </div>
 

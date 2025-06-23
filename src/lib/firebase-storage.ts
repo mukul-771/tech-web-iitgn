@@ -2,6 +2,7 @@ import sharp from 'sharp';
 import { v4 as uuidv4 } from 'uuid';
 import { getStorage } from 'firebase-admin/storage';
 import { initializeApp, getApps, cert } from 'firebase-admin/app';
+import { convertToSupportedFormat } from './image-format-utils';
 
 // Initialize Firebase Admin if not already initialized
 if (!getApps().length) {
@@ -61,38 +62,22 @@ export async function uploadImageToFirebase(
     
     console.log('Starting image optimization:', { originalName, maxWidth, maxHeight, quality, format });
     
-    // Create Sharp instance and get metadata first to validate the image
-    let sharpInstance = sharp(fileBuffer);
-    
-    // Get image metadata to understand the input format
-    let metadata;
+    // Use the robust format conversion first
+    let processedImage;
     try {
-      metadata = await sharpInstance.metadata();
-      console.log('Image metadata:', {
-        format: metadata.format,
-        width: metadata.width,
-        height: metadata.height,
-        channels: metadata.channels,
-        density: metadata.density,
-        hasAlpha: metadata.hasAlpha,
-        orientation: metadata.orientation
+      processedImage = await convertToSupportedFormat(fileBuffer);
+      console.log('Image format conversion successful:', { 
+        finalFormat: processedImage.format,
+        originalSize: fileBuffer.length,
+        processedSize: processedImage.buffer.length
       });
-    } catch (metadataError) {
-      console.error('Failed to read image metadata:', metadataError);
-      throw new Error(`Unsupported image format or corrupted file. Please try a standard JPEG or PNG image.`);
+    } catch (conversionError) {
+      console.error('Image format conversion failed:', conversionError);
+      throw new Error(`Image format conversion failed: ${conversionError instanceof Error ? conversionError.message : 'Unknown error'}`);
     }
     
-    // Check if the format is supported
-    const supportedFormats = ['jpeg', 'png', 'webp', 'tiff', 'gif', 'bmp'];
-    if (!metadata.format || !supportedFormats.includes(metadata.format)) {
-      throw new Error(`Unsupported image format: ${metadata.format || 'unknown'}. Please use JPEG, PNG, or WebP.`);
-    }
-    
-    // Create a fresh Sharp instance to avoid any issues with the metadata reading
-    sharpInstance = sharp(fileBuffer);
-    
-    // Remove any problematic metadata and normalize the image
-    sharpInstance = sharpInstance.rotate(); // Auto-rotate based on EXIF
+    // Use the converted image buffer for Sharp processing
+    let sharpInstance = sharp(processedImage.buffer);
     
     console.log('Image validation passed, proceeding with optimization...');
     
@@ -103,26 +88,34 @@ export async function uploadImageToFirebase(
         withoutEnlargement: true
       });
     }
-    // Convert to specified format with quality
+    
+    // Convert to specified format with quality - using try/catch for more robust error handling
     let optimizedBuffer: Buffer;
     let contentType: string;
     let extension: string;
-    switch (format) {
-      case 'webp':
-        optimizedBuffer = await sharpInstance.webp({ quality }).toBuffer();
-        contentType = 'image/webp';
-        extension = 'webp';
-        break;
-      case 'png':
-        optimizedBuffer = await sharpInstance.png({ quality }).toBuffer();
-        contentType = 'image/png';
-        extension = 'png';
-        break;
-      default:
-        optimizedBuffer = await sharpInstance.jpeg({ quality, progressive: true }).toBuffer();
-        contentType = 'image/jpeg';
-        extension = 'jpg';
+    
+    try {
+      switch (format) {
+        case 'webp':
+          optimizedBuffer = await sharpInstance.webp({ quality }).toBuffer();
+          contentType = 'image/webp';
+          extension = 'webp';
+          break;
+        case 'png':
+          optimizedBuffer = await sharpInstance.png({ quality }).toBuffer();
+          contentType = 'image/png';
+          extension = 'png';
+          break;
+        default:
+          optimizedBuffer = await sharpInstance.jpeg({ quality, progressive: true }).toBuffer();
+          contentType = 'image/jpeg';
+          extension = 'jpg';
+      }
+    } catch (sharpError) {
+      console.error('Sharp processing error:', sharpError);
+      throw new Error(`Image processing failed: ${sharpError instanceof Error ? sharpError.message : 'Unknown Sharp error'}`);
     }
+    
     console.log('Image optimized:', { size: optimizedBuffer.length, contentType, extension });
     
     // Generate filename with correct extension

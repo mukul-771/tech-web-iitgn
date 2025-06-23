@@ -90,8 +90,11 @@ export async function getClubById(id: string): Promise<Club | null> {
 // Save all clubs
 export async function saveAllClubs(clubs: Record<string, Club>): Promise<void> {
   try {
+    console.log('saveAllClubs called, isDevelopment:', isDevelopment);
+    
     if (isDevelopment) {
       // Use file-based storage in development
+      console.log('Using file-based storage for clubs');
       await ensureDataDir();
 
       // Create temporary file for atomic write
@@ -107,6 +110,7 @@ export async function saveAllClubs(clubs: Record<string, Club>): Promise<void> {
       console.log('Clubs data saved successfully (file)');
     } else {
       // Use Vercel Blob in production
+      console.log('Using Vercel Blob storage for clubs');
       if (!BLOB_TOKEN) {
         throw new Error('BLOB_READ_WRITE_TOKEN not found');
       }
@@ -120,7 +124,11 @@ export async function saveAllClubs(clubs: Record<string, Club>): Promise<void> {
       console.log('Clubs data saved successfully (blob):', blob.url);
     }
   } catch (error) {
-    console.error('Error saving clubs:', error);
+    console.error('Error saving clubs:', {
+      error: error instanceof Error ? error.message : error,
+      stack: error instanceof Error ? error.stack : undefined,
+      isDevelopment
+    });
 
     if (isDevelopment) {
       // Clean up temp file if it exists
@@ -131,7 +139,7 @@ export async function saveAllClubs(clubs: Record<string, Club>): Promise<void> {
       }
     }
 
-    throw new Error('Failed to save clubs data');
+    throw new Error(`Failed to save clubs data: ${error instanceof Error ? error.message : 'Unknown error'}`);
   }
 }
 
@@ -157,22 +165,35 @@ export async function createClub(club: Omit<Club, 'id' | 'createdAt' | 'updatedA
 
 // Update existing club
 export async function updateClub(id: string, updates: Partial<Omit<Club, 'id' | 'createdAt'>>): Promise<Club | null> {
-  const clubs = await getAllClubs();
-  
-  if (!clubs[id]) {
-    return null;
+  try {
+    console.log('Updating club:', { id, updates });
+    const clubs = await getAllClubs();
+    
+    if (!clubs[id]) {
+      console.log('Club not found:', id);
+      return null;
+    }
+    
+    const updatedClub: Club = {
+      ...clubs[id],
+      ...updates,
+      updatedAt: new Date().toISOString()
+    };
+    
+    clubs[id] = updatedClub;
+    console.log('Saving updated club data...');
+    await saveAllClubs(clubs);
+    
+    console.log('Club updated successfully:', id);
+    return updatedClub;
+  } catch (error) {
+    console.error('Error in updateClub function:', {
+      id,
+      error: error instanceof Error ? error.message : error,
+      stack: error instanceof Error ? error.stack : undefined
+    });
+    throw error;
   }
-  
-  const updatedClub: Club = {
-    ...clubs[id],
-    ...updates,
-    updatedAt: new Date().toISOString()
-  };
-  
-  clubs[id] = updatedClub;
-  await saveAllClubs(clubs);
-  
-  return updatedClub;
 }
 
 // Delete club

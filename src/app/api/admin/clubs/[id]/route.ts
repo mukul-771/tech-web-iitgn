@@ -84,7 +84,12 @@ export async function PUT(
 
     return NextResponse.json(updatedClub);
   } catch (error) {
-    console.error("Error updating club:", error);
+    console.error("Error updating club:", {
+      clubId: (await params).id,
+      error: error instanceof Error ? error.message : error,
+      stack: error instanceof Error ? error.stack : undefined,
+      type: error?.constructor?.name
+    });
     
     if (error instanceof z.ZodError) {
       return NextResponse.json(
@@ -94,7 +99,10 @@ export async function PUT(
     }
 
     return NextResponse.json(
-      { error: "Failed to update club" },
+      { 
+        error: "Failed to update club",
+        details: error instanceof Error ? error.message : "Unknown error"
+      },
       { status: 500 }
     );
   }

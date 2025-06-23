@@ -3,6 +3,7 @@ import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import { uploadImageToFirebase } from "@/lib/firebase-storage";
 import { updateTeamMember } from "@/lib/team-firebase";
+import { validateImageFile, convertToSupportedFormat } from "@/lib/image-format-utils";
 import fs from 'fs';
 import path from 'path';
 
@@ -54,6 +55,41 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: "File too large. Maximum size is 10MB." }, { status: 400 });
     }
 
+    // Additional validation: check if it's actually an image by reading the first few bytes
+    const bytes = await file.arrayBuffer();
+    const buffer = Buffer.from(bytes);
+    
+    // Use improved image validation
+    const validation = validateImageFile(buffer);
+    if (!validation.isValid) {
+      return NextResponse.json({ error: validation.error }, { status: 400 });
+    }
+    
+    // Convert to supported format if needed
+    let processedImage;
+    try {
+      processedImage = await convertToSupportedFormat(buffer);
+      console.log('Image format conversion successful:', { 
+        originalFormat: 'detected', 
+        finalFormat: processedImage.format,
+        originalSize: buffer.length,
+        processedSize: processedImage.buffer.length
+      });
+    } catch (conversionError) {
+      console.error('Image format conversion failed:', conversionError);
+      return NextResponse.json({ 
+        error: conversionError instanceof Error ? conversionError.message : 'Image format conversion failed'
+      }, { status: 400 });
+    }
+
+    console.log('File validation and processing passed:', { 
+      name: file.name, 
+      size: file.size, 
+      type: file.type,
+      finalFormat: processedImage.format,
+      processedSize: processedImage.buffer.length
+    });
+
     // Determine the folder based on role
     const folder = isSecretary ? "team/secretaries" : "team";
     
@@ -62,13 +98,9 @@ export async function POST(request: NextRequest) {
     const fileExtension = file.name.split('.').pop()?.toLowerCase() || 'jpg';
     const safeFileName = `${memberId}-${timestamp}.${fileExtension}`;
 
-    // Convert File to Buffer
-    const bytes = await file.arrayBuffer();
-    const buffer = Buffer.from(bytes);
-
-    // Upload to Firebase Storage
+    // Upload to Firebase Storage (using processed image buffer)
     const result = await uploadImageToFirebase(
-      buffer, 
+      processedImage.buffer, 
       safeFileName, 
       folder, 
       {

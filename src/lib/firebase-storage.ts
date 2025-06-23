@@ -58,9 +58,44 @@ export async function uploadImageToFirebase(
       quality = 85,
       format = 'jpeg'
     } = options;
-    console.log('Optimizing image:', { originalName, maxWidth, maxHeight, quality, format });
-    // Optimize image using Sharp
+    
+    console.log('Starting image optimization:', { originalName, maxWidth, maxHeight, quality, format });
+    
+    // Create Sharp instance and get metadata first to validate the image
     let sharpInstance = sharp(fileBuffer);
+    
+    // Get image metadata to understand the input format
+    let metadata;
+    try {
+      metadata = await sharpInstance.metadata();
+      console.log('Image metadata:', {
+        format: metadata.format,
+        width: metadata.width,
+        height: metadata.height,
+        channels: metadata.channels,
+        density: metadata.density,
+        hasAlpha: metadata.hasAlpha,
+        orientation: metadata.orientation
+      });
+    } catch (metadataError) {
+      console.error('Failed to read image metadata:', metadataError);
+      throw new Error(`Unsupported image format or corrupted file. Please try a standard JPEG or PNG image.`);
+    }
+    
+    // Check if the format is supported
+    const supportedFormats = ['jpeg', 'png', 'webp', 'tiff', 'gif', 'bmp'];
+    if (!metadata.format || !supportedFormats.includes(metadata.format)) {
+      throw new Error(`Unsupported image format: ${metadata.format || 'unknown'}. Please use JPEG, PNG, or WebP.`);
+    }
+    
+    // Create a fresh Sharp instance to avoid any issues with the metadata reading
+    sharpInstance = sharp(fileBuffer);
+    
+    // Remove any problematic metadata and normalize the image
+    sharpInstance = sharpInstance.rotate(); // Auto-rotate based on EXIF
+    
+    console.log('Image validation passed, proceeding with optimization...');
+    
     // Resize if needed
     if (maxWidth || maxHeight) {
       sharpInstance = sharpInstance.resize(maxWidth, maxHeight, {

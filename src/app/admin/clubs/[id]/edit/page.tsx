@@ -49,7 +49,12 @@ export default function EditClubPage() {
     const fetchClubData = async () => {
       try {
         setIsLoadingData(true);
-        const response = await fetch(`/api/admin/clubs/${clubId}`);
+        
+        // Clean the club ID (defensive measure against malformed IDs like "metis:1")
+        const cleanClubId = clubId.split(':')[0];
+        console.log('Data fetch - clubId:', clubId, 'cleanClubId:', cleanClubId);
+        
+        const response = await fetch(`/api/admin/clubs/${cleanClubId}`);
         if (!response.ok) {
           throw new Error("Failed to fetch club");
         }
@@ -186,7 +191,11 @@ export default function EditClubPage() {
         team: validTeam
       };
 
-      const response = await fetch(`/api/admin/clubs/${clubId}`, {
+      // Clean the club ID (defensive measure against malformed IDs like "metis:1")
+      const cleanClubId = clubId.split(':')[0];
+      console.log('Form submission - clubId:', clubId, 'cleanClubId:', cleanClubId);
+
+      const response = await fetch(`/api/admin/clubs/${cleanClubId}`, {
         method: "PUT",
         headers: {
           "Content-Type": "application/json",

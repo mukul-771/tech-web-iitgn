@@ -50,7 +50,17 @@ export async function GET() {
     if (hasServiceAccountKey) {
       try {
         const serviceAccount = JSON.parse(process.env.FIREBASE_SERVICE_ACCOUNT_KEY || '{}');
-        diagnostics.serviceAccount = {
+        const serviceAccountInfo: {
+          hasProjectId: boolean;
+          hasPrivateKey: boolean;
+          hasClientEmail: boolean;
+          hasClientId: boolean;
+          keyType: string;
+          projectId: string;
+          clientEmail: string;
+          privateKeyStart: string;
+          privateKeyValid?: boolean;
+        } = {
           hasProjectId: !!serviceAccount.project_id,
           hasPrivateKey: !!serviceAccount.private_key,
           hasClientEmail: !!serviceAccount.client_email,
@@ -65,8 +75,10 @@ export async function GET() {
         if (serviceAccount.private_key) {
           const validKeyStart = serviceAccount.private_key.startsWith('-----BEGIN PRIVATE KEY-----');
           const validKeyEnd = serviceAccount.private_key.includes('-----END PRIVATE KEY-----');
-          diagnostics.serviceAccount.privateKeyValid = validKeyStart && validKeyEnd;
+          serviceAccountInfo.privateKeyValid = validKeyStart && validKeyEnd;
         }
+
+        diagnostics.serviceAccount = serviceAccountInfo;
 
       } catch (parseError) {
         diagnostics.serviceAccount = {
@@ -77,7 +89,7 @@ export async function GET() {
 
     // Try basic Firebase Admin initialization test (without actual operations)
     try {
-      const { initializeApp, getApps } = await import('firebase-admin/app');
+      const { getApps } = await import('firebase-admin/app');
       const appsInitialized = getApps().length;
       diagnostics.firebaseAdmin = {
         appsInitialized,

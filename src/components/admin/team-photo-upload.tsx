@@ -32,7 +32,7 @@ export function TeamPhotoUpload({
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
-    setPreviewUrl(currentPhotoUrl ? ensureDirectAccessUrl(currentPhotoUrl) : null);
+    setPreviewUrl(currentPhotoUrl || null);
   }, [currentPhotoUrl]);
 
   const targetSize = isSecretary ? 300 : 200;
@@ -202,7 +202,7 @@ export function TeamPhotoUpload({
               <div className="space-y-4">
                 <div className="relative mx-auto" style={{ width: targetSize, height: targetSize }}>
                   <Image
-                    src={previewUrl ? ensureDirectAccessUrl(previewUrl) : ""}
+                    src={previewUrl || ""}
                     alt="Profile preview"
                     fill
                     className="object-cover rounded-xl"

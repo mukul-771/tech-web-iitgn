@@ -23,6 +23,9 @@ export default function EditClubPage() {
   const router = useRouter();
   const params = useParams();
   const clubId = params.id as string;
+  
+  console.log('EditClubPage - params:', params);
+  console.log('EditClubPage - clubId:', clubId);
 
   const [isLoading, setIsLoading] = useState(false);
   const [isLoadingData, setIsLoadingData] = useState(true);
@@ -66,6 +69,8 @@ export default function EditClubPage() {
           established: clubData.established || "",
           logoPath: clubData.logoPath || ""
         });
+        
+        console.log('Club data loaded, logoPath:', clubData.logoPath);
 
         setAchievements(clubData.achievements.length > 0 ? clubData.achievements : [""]);
         setProjects(clubData.projects.length > 0 ? clubData.projects : [""]);
@@ -88,6 +93,7 @@ export default function EditClubPage() {
   };
 
   const handleLogoUploaded = (logoUrl: string) => {
+    console.log('handleLogoUploaded called with:', logoUrl);
     setFormData(prev => ({ ...prev, logoPath: logoUrl }));
   };
 

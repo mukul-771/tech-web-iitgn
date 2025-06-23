@@ -22,6 +22,10 @@ export function LogoUpload({
   onLogoUploaded,
   onLogoRemoved
 }: LogoUploadProps) {
+  // Clean the club ID (defensive measure against malformed IDs like "metis:1")
+  const cleanClubId = clubId.split(':')[0];
+  console.log('LogoUpload render - clubId:', clubId, 'cleanClubId:', cleanClubId, 'currentLogoUrl:', currentLogoUrl);
+  
   const [isUploading, setIsUploading] = useState(false);
   const [isDragOver, setIsDragOver] = useState(false);
   const [previewUrl, setPreviewUrl] = useState<string | null>(currentLogoUrl || null);
@@ -68,7 +72,7 @@ export function LogoUpload({
       // Upload file
       const formData = new FormData();
       formData.append("file", file);
-      formData.append("clubId", clubId);
+      formData.append("clubId", cleanClubId);
       formData.append("clubType", clubType);
 
       const response = await fetch("/api/admin/clubs/upload-logo", {
@@ -98,7 +102,7 @@ export function LogoUpload({
 
     try {
       const response = await fetch(
-        `/api/admin/clubs/upload-logo?clubId=${clubId}&clubType=${clubType}`,
+        `/api/admin/clubs/upload-logo?clubId=${cleanClubId}&clubType=${clubType}`,
         {
           method: "DELETE",
         }

@@ -16,6 +16,14 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
+    const formData = await request.formData();
+    const clubId = formData.get('clubId') as string;
+    
+    // Clean the club ID (remove any trailing characters like :1)
+    const cleanClubId = clubId?.split(':')[0];
+    
+    console.log('Logo upload request:', { originalId: clubId, cleanId: cleanClubId });
+
     return NextResponse.json({ message: "Logo uploaded successfully" });
 
   } catch (error) {
@@ -36,7 +44,13 @@ export async function DELETE(request: NextRequest) {
     }
 
     const { searchParams } = new URL(request.url);
+    const clubId = searchParams.get("clubId");
     const filePath = searchParams.get("filePath");
+    
+    // Clean the club ID (remove any trailing characters like :1)
+    const cleanClubId = clubId?.split(':')[0];
+    
+    console.log('Logo delete request:', { originalId: clubId, cleanId: cleanClubId, filePath });
 
     if (!filePath) {
       return NextResponse.json({ error: "File path is required" }, { status: 400 });

@@ -12,8 +12,8 @@ const updateClubSchema = z.object({
   type: z.enum(["club", "hobby-group", "technical-council-group"]).optional(),
   category: z.string().min(1).optional(),
   email: z.string().email().optional(),
-  members: z.string().optional().nullable(),
-  established: z.string().optional().nullable(),
+  members: z.string().optional().transform(val => val === "" ? undefined : val),
+  established: z.string().optional().transform(val => val === "" ? undefined : val),
   achievements: z.array(z.string()).optional().default([]),
   projects: z.array(z.string()).optional().default([]),
   team: z.array(z.object({
@@ -21,7 +21,7 @@ const updateClubSchema = z.object({
     role: z.string(),
     email: z.string().email()
   })).optional().default([]),
-  logoPath: z.string().optional().nullable()
+  logoPath: z.string().optional().transform(val => val === "" ? undefined : val)
 });
 
 // Check if user is admin

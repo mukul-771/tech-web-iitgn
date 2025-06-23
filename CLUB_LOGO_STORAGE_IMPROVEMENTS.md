@@ -53,8 +53,16 @@ const updateClubSchema = z.object({
 ### Logo Upload Component Enhancements
 - **Prominent Current Logo Display**: 96x96px preview with professional styling
 - **Enhanced Upload UI**: Better visual feedback, detailed guidelines
+- **Smart Logo Detection**: Shows current logo or "No Logo Set" placeholder
+- **Error Handling**: Graceful fallback for broken/missing images
+- **Debug Mode**: Development environment shows logo URL debugging info
 - **Next.js Optimization**: Fixed Image component warnings
 - **Responsive Design**: Works across all screen sizes
+
+### Form Input Improvements
+- **Category Field**: Changed from restrictive dropdown to flexible text input
+- **Better UX**: Added helpful placeholder examples for category field
+- **Simplified Interface**: More intuitive and user-friendly form controls
 
 ### Blob Storage System (`clubs-blob-storage.ts`)
 ```typescript
@@ -95,9 +103,16 @@ try {
 ## Results
 
 ### ✅ **Club Logo Experience**
-- Current logo prominently displayed with professional styling
+- Current logo prominently displayed with professional styling or clear "No Logo Set" indicator
+- Smart logo detection and fallback handling for missing/broken images
 - Clear upload instructions and visual feedback
+- Debug information in development mode for troubleshooting
 - Better user experience across all devices
+
+### ✅ **Form Input Improvements**
+- Category field now uses flexible text input instead of restrictive dropdown
+- Helpful placeholder examples guide users on category formatting
+- More intuitive and user-friendly form controls
 
 ### ✅ **Club Update Functionality**
 - "Failed to update club" 500 errors resolved
@@ -127,9 +142,11 @@ try {
 
 ## Expected Outcome
 The club management system should now work reliably with:
-- Beautiful, professional logo upload experience
+- Beautiful, professional logo upload experience with current logo preview
+- Flexible text input for club categories instead of restrictive dropdown
+- Smart logo detection showing current logo or clear "No Logo Set" indicator
 - No more "Failed to update club" errors
 - Robust operation in both development and production
 - Better error reporting and debugging capabilities
 
-The system handles malformed URLs, validation edge cases, storage failures, and provides comprehensive logging for any future issues.
+The system handles malformed URLs, validation edge cases, storage failures, provides comprehensive logging, and offers a much more user-friendly interface for club management.

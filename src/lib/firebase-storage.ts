@@ -126,6 +126,27 @@ export async function uploadImageToFirebase(
     };
   } catch (error) {
     console.error('Error optimizing and uploading image:', error);
-    throw new Error('Failed to optimize and upload image');
+    
+    // Provide more specific error information
+    if (error instanceof Error) {
+      console.error('Error details:', {
+        message: error.message,
+        stack: error.stack,
+        name: error.name
+      });
+      
+      // Check for specific Firebase errors
+      if (error.message.includes('PERMISSION_DENIED')) {
+        throw new Error('Firebase Storage permission denied. Please check Firebase Storage rules.');
+      } else if (error.message.includes('not found')) {
+        throw new Error('Firebase Storage bucket not found. Please check your Firebase configuration.');
+      } else if (error.message.includes('Bucket is requester pays')) {
+        throw new Error('Firebase Storage bucket requires payment. Please check your Firebase billing settings.');
+      } else if (error.message.includes('Service account')) {
+        throw new Error('Firebase service account authentication failed. Please check your service account key.');
+      }
+    }
+    
+    throw new Error(`Failed to optimize and upload image: ${error instanceof Error ? error.message : 'Unknown error'}`);
   }
 }

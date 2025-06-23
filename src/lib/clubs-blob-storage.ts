@@ -1,4 +1,4 @@
-import { put, head } from '@vercel/blob';
+import { put, list } from '@vercel/blob';
 import { Club, defaultClubsData } from './clubs-data';
 
 const BLOB_TOKEN = process.env.BLOB_READ_WRITE_TOKEN;
@@ -52,17 +52,24 @@ export async function getAllClubs(): Promise<Record<string, Club>> {
       }
 
       try {
-        const blobInfo = await head(CLUBS_BLOB_URL, { token: BLOB_TOKEN });
+        // List all blobs to find our clubs data file
+        const { blobs } = await list({
+          token: BLOB_TOKEN,
+          prefix: 'clubs-data'
+        });
 
-        if (!blobInfo) {
-          console.log('Clubs blob not found, initializing with default data.');
+        // Find the clubs data blob
+        const clubsBlob = blobs.find(blob => blob.pathname === CLUBS_BLOB_URL);
+        
+        if (!clubsBlob) {
+          console.log('Clubs blob not found, initializing with default data');
           await saveAllClubs(defaultClubsData);
           return defaultClubsData;
         }
 
-        const response = await fetch(blobInfo.url, {
+        // Fetch the blob content
+        const response = await fetch(clubsBlob.url, {
           headers: {
-            'Authorization': `Bearer ${BLOB_TOKEN}`,
             'Cache-Control': 'no-cache, no-store, must-revalidate',
             'Pragma': 'no-cache',
             'Expires': '0',
@@ -70,18 +77,21 @@ export async function getAllClubs(): Promise<Record<string, Club>> {
         });
 
         if (!response.ok) {
-          throw new Error(`Failed to fetch from blob: ${response.status} ${response.statusText}`);
+          throw new Error(`Failed to fetch clubs data: ${response.status} ${response.statusText}`);
         }
 
-        return await response.json();
+        const data = await response.json();
+        console.log('Successfully loaded clubs data from blob');
+        return data;
+
       } catch (error) {
-        console.error('Error in getAllClubs (production):', error);
-        // Fallback to default data if any error occurs during blob interaction
+        console.error('Error loading clubs from blob:', error);
+        console.log('Falling back to default data');
         return defaultClubsData;
       }
     }
   } catch (error) {
-    console.error('Error reading clubs:', error);
+    console.error('Error in getAllClubs:', error);
     return defaultClubsData;
   }
 }
@@ -121,6 +131,22 @@ export async function saveAllClubs(clubs: Record<string, Club>): Promise<void> {
       }
 
       try {
+        // Delete existing blob first if it exists
+        try {
+          const { blobs } = await list({
+            token: BLOB_TOKEN,
+            prefix: 'clubs-data'
+          });
+          
+          const existingBlob = blobs.find(blob => blob.pathname === CLUBS_BLOB_URL);
+          if (existingBlob) {
+            console.log('Found existing clubs blob, it will be overwritten');
+          }
+        } catch (listError) {
+          console.log('Could not list existing blobs:', listError);
+        }
+
+        // Upload new data
         const blob = await put(CLUBS_BLOB_URL, JSON.stringify(clubs, null, 2), {
           access: 'public',
           token: BLOB_TOKEN,
@@ -128,7 +154,7 @@ export async function saveAllClubs(clubs: Record<string, Club>): Promise<void> {
           addRandomSuffix: false, // Ensure we overwrite the same blob
         });
 
-        console.log('Clubs data saved successfully (blob):', blob.url);
+        console.log('Clubs data saved successfully to blob:', blob.url);
       } catch (blobError) {
         console.error('Vercel Blob save failed:', blobError);
         throw new Error(`Blob storage failed: ${blobError instanceof Error ? blobError.message : 'Unknown error'}`);

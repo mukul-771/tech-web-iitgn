@@ -19,7 +19,7 @@ import {
 } from "lucide-react";
 import { TeamMember } from "@/lib/team-data";
 import { getAllTeamMembers, deleteTeamMember } from "@/lib/team-firebase";
-import { FirebaseImage } from "@/components/ui/firebase-image";
+import { TeamMemberImage } from "@/components/ui/team-member-image";
 
 export default function TeamManagementPage() {
   const { data: session, status } = useSession();
@@ -217,22 +217,16 @@ export default function TeamManagementPage() {
                       <div className="flex items-start space-x-3">
                         {/* Profile Photo */}
                         <div className="flex-shrink-0">
-                          {member.photoPath ? (
-                            <FirebaseImage
-                              src={member.photoPath}
-                              alt={member.name}
-                              width={member.isSecretary ? 60 : 48}
-                              height={member.isSecretary ? 60 : 48}
-                              className={`object-cover rounded-lg ${member.isSecretary ? 'w-15 h-15' : 'w-12 h-12'}`}
-                              unoptimized
-                            />
-                          ) : (
-                            <div className={`${
-                              member.isSecretary ? 'w-15 h-15' : 'w-12 h-12'
-                            } rounded-lg bg-gradient-to-r ${member.gradientFrom} ${member.gradientTo} flex items-center justify-center text-white font-bold`}>
-                              {member.initials}
-                            </div>
-                          )}
+                          <TeamMemberImage
+                            src={member.photoPath}
+                            alt={member.name}
+                            initials={member.initials}
+                            gradientFrom={member.gradientFrom}
+                            gradientTo={member.gradientTo}
+                            width={member.isSecretary ? 60 : 48}
+                            height={member.isSecretary ? 60 : 48}
+                            className={`rounded-lg ${member.isSecretary ? 'w-15 h-15' : 'w-12 h-12'}`}
+                          />
                         </div>
 
                         {/* Member Info */}

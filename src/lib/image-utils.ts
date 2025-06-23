@@ -21,20 +21,29 @@ export function sanitizeFirebaseUrl(url: string | null | undefined): string {
         processedUrl = decodeURIComponent(url);
       }
       
+      // Parse the URL to properly encode the path
+      const urlObj = new URL(processedUrl);
+      
+      // Re-encode the pathname to ensure proper encoding of spaces and special characters
+      const pathParts = urlObj.pathname.split('/');
+      const encodedPath = pathParts.map(part => 
+        part === '' ? '' : encodeURIComponent(decodeURIComponent(part))
+      ).join('/');
+      urlObj.pathname = encodedPath;
+      
       // Ensure the URL has the alt=media parameter which is REQUIRED for direct image access
-      if (!processedUrl.includes("alt=media")) {
-        // Add query parameters to ensure the URL is directly accessible
-        const separator = processedUrl.includes("?") ? "&" : "?";
-        return `${processedUrl}${separator}alt=media`;
+      if (!urlObj.searchParams.has('alt') || urlObj.searchParams.get('alt') !== 'media') {
+        urlObj.searchParams.set('alt', 'media');
       }
       
-      return processedUrl;
+      return urlObj.toString();
     }
     
     // For other URLs, just return as-is
     return url;
-  } catch {
-    // If decoding fails for any reason, return the original
+  } catch (error) {
+    console.error('Error sanitizing Firebase URL:', error, 'Original URL:', url);
+    // If URL parsing fails for any reason, return the original
     return url || "";
   }
 }
@@ -62,16 +71,26 @@ export function ensureDirectAccessUrl(url: string | null | undefined): string {
         processedUrl = decodeURIComponent(url);
       }
       
+      // Parse the URL to properly encode the path
+      const urlObj = new URL(processedUrl);
+      
+      // Re-encode the pathname to ensure proper encoding of spaces and special characters
+      const pathParts = urlObj.pathname.split('/');
+      const encodedPath = pathParts.map(part => 
+        part === '' ? '' : encodeURIComponent(decodeURIComponent(part))
+      ).join('/');
+      urlObj.pathname = encodedPath;
+      
       // Make sure the URL has the alt=media parameter needed for direct access
-      if (!processedUrl.includes("alt=media")) {
-        const separator = processedUrl.includes("?") ? "&" : "?";
-        return `${processedUrl}${separator}alt=media`;
+      if (!urlObj.searchParams.has('alt') || urlObj.searchParams.get('alt') !== 'media') {
+        urlObj.searchParams.set('alt', 'media');
       }
       
-      return processedUrl;
+      return urlObj.toString();
     }
     return url;
-  } catch {
+  } catch (error) {
+    console.error('Error ensuring direct access URL:', error, 'Original URL:', url);
     return url || "";
   }
 }

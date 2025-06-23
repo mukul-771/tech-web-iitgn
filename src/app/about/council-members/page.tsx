@@ -1,10 +1,9 @@
 "use client";
 
 import { motion } from "framer-motion";
-import { cn } from "@/lib/utils";
 import { useEffect, useState } from "react";
 import { TeamMember } from "@/lib/team-data";
-import { FirebaseImage } from "@/components/ui/firebase-image";
+import { TeamMemberImage } from "@/components/ui/team-member-image";
 
 export default function CouncilMembersPage() {
   const [teamMembers, setTeamMembers] = useState<TeamMember[]>([]);
@@ -98,30 +97,16 @@ export default function CouncilMembersPage() {
                       className="bg-white dark:bg-gray-800 rounded-xl p-6 text-center transition-all duration-300 hover:scale-105 shadow-lg hover:shadow-xl border border-gray-200 dark:border-gray-700"
                     >
                       <div className="relative mb-6">
-                        <div className={cn(
-                          "h-[200px] w-[200px] rounded-xl bg-gradient-to-r mx-auto flex items-center justify-center text-white font-bold text-3xl shadow-lg overflow-hidden",
-                          member.gradientFrom,
-                          member.gradientTo
-                        )}>
-                          {member.photoPath ? (
-                            <FirebaseImage
-                              src={member.photoPath}
-                              alt={member.name}
-                              width={200}
-                              height={200}
-                              className="w-[200px] h-[200px] object-cover rounded-xl"
-                              unoptimized
-                            />
-                          ) : (
-                            <div className={cn(
-                              "absolute inset-0 bg-gradient-to-r flex items-center justify-center",
-                              member.gradientFrom,
-                              member.gradientTo
-                            )}>
-                              {member.initials}
-                            </div>
-                          )}
-                        </div>
+                        <TeamMemberImage
+                          src={member.photoPath}
+                          alt={member.name}
+                          initials={member.initials}
+                          gradientFrom={member.gradientFrom}
+                          gradientTo={member.gradientTo}
+                          width={200}
+                          height={200}
+                          className="h-[200px] w-[200px] rounded-xl mx-auto"
+                        />
                       </div>
                       <h3 className="font-bold text-lg mb-2 font-space-grotesk text-gray-800 dark:text-white">{member.name}</h3>
                       <p className="text-sm font-semibold mb-4 text-gray-600 dark:text-gray-300">

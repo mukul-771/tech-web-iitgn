@@ -4,7 +4,7 @@ import Link from "next/link"
 import { Button } from "@/components/ui/button"
 import { getAllTeamMembers, TeamMember } from "@/lib/team-firebase"
 import { TechCube3D } from "@/components/ui/tech-cube-3d"
-import { FirebaseImage } from "@/components/ui/firebase-image"
+import { TeamMemberImage } from "@/components/ui/team-member-image";
 
 export const metadata: Metadata = {
   title: "About Us - Technical Council IITGN",
@@ -131,20 +131,17 @@ export default async function AboutPage() {
                 <div className="flex justify-center">
                   <div className="glass rounded-2xl p-4 sm:p-6 md:p-8 text-center transition-all duration-300 hover:scale-105 max-w-sm sm:max-w-md md:max-w-lg">
                     <div className="relative mb-4 sm:mb-6">
-                      {secretary.photoPath ? (
-                        <FirebaseImage
-                          src={secretary.photoPath}
-                          alt={secretary.name}
-                          width={300}
-                          height={300}
-                          className="w-[200px] h-[200px] sm:w-[250px] sm:h-[250px] md:w-[300px] md:h-[300px] object-cover rounded-xl mx-auto"
-                          unoptimized
-                        />
-                      ) : (
-                        <div className={`w-[200px] h-[200px] sm:w-[250px] sm:h-[250px] md:w-[300px] md:h-[300px] rounded-xl bg-gradient-to-r ${secretary.gradientFrom} ${secretary.gradientTo} flex items-center justify-center text-white font-bold text-4xl sm:text-5xl md:text-6xl mx-auto`}>
-                          {secretary.initials}
-                        </div>
-                      )}
+                      <TeamMemberImage
+                        src={secretary.photoPath}
+                        alt={secretary.name}
+                        initials={secretary.initials}
+                        gradientFrom={secretary.gradientFrom}
+                        gradientTo={secretary.gradientTo}
+                        width={300}
+                        height={300}
+                        className="w-[200px] h-[200px] sm:w-[250px] sm:h-[250px] md:w-[300px] md:h-[300px] mx-auto"
+                        isSecretary={true}
+                      />
                       <div className="absolute inset-0 rounded-xl bg-gradient-to-r from-blue-600/30 to-purple-600/30 scale-105 opacity-0 group-hover:opacity-100 transition-all duration-300" />
                     </div>
                     <h3 className="font-bold text-lg sm:text-xl md:text-2xl mb-2 font-space-grotesk">{secretary.name}</h3>
@@ -177,20 +174,17 @@ export default async function AboutPage() {
                   return (
                     <div key={coordinator.id} className="glass rounded-2xl p-3 sm:p-4 lg:p-6 text-center transition-all duration-300 hover:scale-105 w-full">
                       <div className="relative mb-3 sm:mb-4 lg:mb-6">
-                        {coordinator.photoPath ? (
-                          <FirebaseImage
-                            src={coordinator.photoPath}
-                            alt={coordinator.name}
-                            width={200}
-                            height={200}
-                            className="w-[120px] h-[120px] sm:w-[150px] sm:h-[150px] md:w-[160px] md:h-[160px] lg:w-[180px] lg:h-[180px] xl:w-[200px] xl:h-[200px] object-cover rounded-xl mx-auto"
-                            unoptimized
-                          />
-                        ) : (
-                          <div className={`w-[120px] h-[120px] sm:w-[150px] sm:h-[150px] md:w-[160px] md:h-[160px] lg:w-[180px] lg:h-[180px] xl:w-[200px] xl:h-[200px] rounded-xl bg-gradient-to-r ${coordinator.gradientFrom} ${coordinator.gradientTo} flex items-center justify-center text-white font-bold text-xl sm:text-2xl md:text-2xl lg:text-3xl mx-auto`}>
-                            {coordinator.initials}
-                          </div>
-                        )}
+                        <TeamMemberImage
+                          src={coordinator.photoPath}
+                          alt={coordinator.name}
+                          initials={coordinator.initials}
+                          gradientFrom={coordinator.gradientFrom}
+                          gradientTo={coordinator.gradientTo}
+                          width={200}
+                          height={200}
+                          className="w-[120px] h-[120px] sm:w-[150px] sm:h-[150px] md:w-[160px] md:h-[160px] lg:w-[180px] lg:h-[180px] xl:w-[200px] xl:h-[200px] mx-auto"
+                          isSecretary={false}
+                        />
                         <div className={`absolute inset-0 rounded-xl bg-gradient-to-r ${coordinator.gradientFrom}/30 ${coordinator.gradientTo}/30 scale-105 opacity-0 group-hover:opacity-100 transition-all duration-300`} />
                       </div>
                       <h3 className="font-bold text-xs sm:text-sm md:text-base lg:text-lg mb-1 font-space-grotesk">{coordinator.name}</h3>

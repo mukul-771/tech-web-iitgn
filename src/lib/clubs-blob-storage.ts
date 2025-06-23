@@ -71,8 +71,13 @@ export async function getAllClubs(): Promise<Record<string, Club>> {
       } catch {
         console.log('Clubs blob not found, initializing with default data');
         // Initialize blob with default data
-        await saveAllClubs(defaultClubsData);
-        return defaultClubsData;
+        try {
+          await saveAllClubs(defaultClubsData);
+          return defaultClubsData;
+        } catch (saveError) {
+          console.error('Failed to initialize blob with default data:', saveError);
+          return defaultClubsData;
+        }
       }
     }
   } catch (error) {
@@ -115,13 +120,18 @@ export async function saveAllClubs(clubs: Record<string, Club>): Promise<void> {
         throw new Error('BLOB_READ_WRITE_TOKEN not found');
       }
 
-      const blob = await put(CLUBS_BLOB_URL, JSON.stringify(clubs, null, 2), {
-        access: 'public',
-        token: BLOB_TOKEN,
-        contentType: 'application/json',
-      });
+      try {
+        const blob = await put(CLUBS_BLOB_URL, JSON.stringify(clubs, null, 2), {
+          access: 'public',
+          token: BLOB_TOKEN,
+          contentType: 'application/json',
+        });
 
-      console.log('Clubs data saved successfully (blob):', blob.url);
+        console.log('Clubs data saved successfully (blob):', blob.url);
+      } catch (blobError) {
+        console.error('Vercel Blob save failed:', blobError);
+        throw new Error(`Blob storage failed: ${blobError instanceof Error ? blobError.message : 'Unknown error'}`);
+      }
     }
   } catch (error) {
     console.error('Error saving clubs:', {

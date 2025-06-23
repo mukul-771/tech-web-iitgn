@@ -12,16 +12,16 @@ const updateClubSchema = z.object({
   type: z.enum(["club", "hobby-group", "technical-council-group"]).optional(),
   category: z.string().min(1).optional(),
   email: z.string().email().optional(),
-  members: z.string().optional(),
-  established: z.string().optional(),
-  achievements: z.array(z.string()).optional(),
-  projects: z.array(z.string()).optional(),
+  members: z.string().optional().nullable(),
+  established: z.string().optional().nullable(),
+  achievements: z.array(z.string()).optional().default([]),
+  projects: z.array(z.string()).optional().default([]),
   team: z.array(z.object({
     name: z.string(),
     role: z.string(),
     email: z.string().email()
-  })).optional(),
-  logoPath: z.string().optional()
+  })).optional().default([]),
+  logoPath: z.string().optional().nullable()
 });
 
 // Check if user is admin
@@ -70,18 +70,29 @@ export async function PUT(
     }
 
     const resolvedParams = await params;
+    const clubId = resolvedParams.id;
+    
+    // Clean the club ID (remove any trailing characters like :1)
+    const cleanClubId = clubId.split(':')[0];
+    
+    console.log('Club update request:', { originalId: clubId, cleanId: cleanClubId });
+    
     const body = await request.json();
+    console.log('Request body keys:', Object.keys(body));
 
     // Validate request body
     const validatedData = updateClubSchema.parse(body);
+    console.log('Validation passed');
 
     // Update club
-    const updatedClub = await updateClub(resolvedParams.id, validatedData);
+    const updatedClub = await updateClub(cleanClubId, validatedData);
 
     if (!updatedClub) {
+      console.log('Club not found after update attempt');
       return NextResponse.json({ error: "Club not found" }, { status: 404 });
     }
 
+    console.log('Club updated successfully');
     return NextResponse.json(updatedClub);
   } catch (error) {
     console.error("Error updating club:", {

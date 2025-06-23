@@ -2,39 +2,129 @@ import sharp from 'sharp';
 
 export async function convertToSupportedFormat(buffer: Buffer): Promise<{ buffer: Buffer; format: string }> {
   try {
-    // Try to get metadata
-    const metadata = await sharp(buffer).metadata();
-    console.log('Original image metadata:', metadata);
+    console.log('Starting image format conversion...');
     
-    // If it's already a supported format and not corrupted, return as is
-    const supportedFormats = ['jpeg', 'png', 'webp'];
-    if (metadata.format && supportedFormats.includes(metadata.format)) {
-      return { buffer, format: metadata.format };
+    // First, try to create a Sharp instance with error handling
+    let sharpInstance;
+    try {
+      sharpInstance = sharp(buffer, { 
+        failOnError: false,  // Don't fail on minor errors
+        unlimited: true,     // Allow large images
+        sequentialRead: true // Better for some formats
+      });
+    } catch (sharpCreateError) {
+      console.error('Failed to create Sharp instance:', sharpCreateError);
+      throw new Error('Unable to process this image file. Please try a different image.');
     }
     
-    // Convert unsupported formats to JPEG
-    console.log(`Converting from ${metadata.format} to JPEG`);
-    const convertedBuffer = await sharp(buffer)
-      .rotate() // Auto-rotate based on EXIF
-      .jpeg({ quality: 85, progressive: true })
-      .toBuffer();
+    // Try to get metadata with retries
+    let metadata;
+    let metadataAttempts = 0;
+    const maxMetadataAttempts = 3;
+    
+    while (metadataAttempts < maxMetadataAttempts) {
+      try {
+        metadata = await sharpInstance.metadata();
+        console.log('Image metadata retrieved:', {
+          format: metadata.format,
+          width: metadata.width,
+          height: metadata.height,
+          size: metadata.size,
+          channels: metadata.channels
+        });
+        break;
+      } catch (metadataError) {
+        metadataAttempts++;
+        console.error(`Metadata attempt ${metadataAttempts} failed:`, metadataError);
+        
+        if (metadataAttempts >= maxMetadataAttempts) {
+          // If we can't read metadata, try force conversion
+          console.log('Metadata reading failed, attempting force conversion...');
+          return await forceConvertToJPEG(buffer);
+        }
+        
+        // Wait a bit before retry
+        await new Promise(resolve => setTimeout(resolve, 100));
+      }
+    }
+    
+    // If it's already a supported format, try to just normalize it
+    const supportedFormats = ['jpeg', 'png', 'webp'];
+    if (metadata && metadata.format && supportedFormats.includes(metadata.format)) {
+      console.log(`Image is already in supported format: ${metadata.format}`);
       
-    return { buffer: convertedBuffer, format: 'jpeg' };
+      // Try to normalize the image (remove problematic metadata, fix orientation)
+      try {
+        const normalizedBuffer = await sharp(buffer)
+          .rotate() // Auto-rotate based on EXIF
+          .toBuffer();
+        
+        return { buffer: normalizedBuffer, format: metadata.format };
+      } catch (normalizeError) {
+        console.error('Normalization failed, trying conversion:', normalizeError);
+        // Fall through to conversion
+      }
+    }
+    
+    // Convert to JPEG as fallback
+    console.log(`Converting from ${metadata?.format || 'unknown'} to JPEG`);
+    return await convertToJPEG(buffer);
     
   } catch (error) {
     console.error('Error in format conversion:', error);
     
-    // Last resort: try to force convert to JPEG
+    // Last resort: force convert to JPEG
     try {
       console.log('Attempting force conversion to JPEG...');
-      const forceConvertedBuffer = await sharp(buffer, { failOnError: false })
-        .jpeg({ quality: 85 })
-        .toBuffer();
-      return { buffer: forceConvertedBuffer, format: 'jpeg' };
+      return await forceConvertToJPEG(buffer);
     } catch (forceError) {
       console.error('Force conversion also failed:', forceError);
-      throw new Error('Unable to process this image. Please try a different image file.');
+      throw new Error('Unable to process this image. The file may be corrupted or in an unsupported format. Please try a different image.');
     }
+  }
+}
+
+async function convertToJPEG(buffer: Buffer): Promise<{ buffer: Buffer; format: string }> {
+  try {
+    const convertedBuffer = await sharp(buffer)
+      .rotate() // Auto-rotate based on EXIF
+      .jpeg({ 
+        quality: 85, 
+        progressive: true,
+        force: false // Don't force if it's already JPEG
+      })
+      .toBuffer();
+      
+    return { buffer: convertedBuffer, format: 'jpeg' };
+  } catch (error) {
+    console.error('Standard JPEG conversion failed:', error);
+    throw error;
+  }
+}
+
+async function forceConvertToJPEG(buffer: Buffer): Promise<{ buffer: Buffer; format: string }> {
+  try {
+    console.log('Attempting force conversion with minimal processing...');
+    
+    const convertedBuffer = await sharp(buffer, { 
+      failOnError: false,
+      unlimited: true,
+      sequentialRead: true,
+      pages: 1 // Only process first page/frame
+    })
+    .flatten({ background: '#ffffff' }) // Flatten to white background
+    .jpeg({ 
+      quality: 85,
+      progressive: true,
+      force: true // Force JPEG output
+    })
+    .toBuffer();
+    
+    console.log('Force conversion successful');
+    return { buffer: convertedBuffer, format: 'jpeg' };
+  } catch (error) {
+    console.error('Force conversion failed:', error);
+    throw new Error('Image file cannot be processed. Please try saving the image in a different format (JPEG or PNG) first.');
   }
 }
 

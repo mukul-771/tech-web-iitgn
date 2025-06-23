@@ -27,7 +27,7 @@ export default function UploadTestPage() {
       const formData = new FormData();
       formData.append('file', file);
 
-      const response = await fetch('/api/admin/test-upload', {
+      const response = await fetch('/api/admin/analyze-image', {
         method: 'POST',
         body: formData,
       });
@@ -84,7 +84,7 @@ export default function UploadTestPage() {
       </div>
 
       <div className="mb-6">
-        <h2 className="text-lg font-semibold mb-2">Image Upload Test</h2>
+        <h2 className="text-lg font-semibold mb-2">Image Analysis Test</h2>
         <input
           type="file"
           accept="image/*"
@@ -93,7 +93,7 @@ export default function UploadTestPage() {
           className="mb-2"
         />
         <p className="text-sm text-gray-600">
-          This will test image optimization without actually uploading to Firebase
+          This will analyze the image file and test different Sharp configurations to identify the exact issue
         </p>
       </div>
 

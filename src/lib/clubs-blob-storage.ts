@@ -125,6 +125,7 @@ export async function saveAllClubs(clubs: Record<string, Club>): Promise<void> {
           access: 'public',
           token: BLOB_TOKEN,
           contentType: 'application/json',
+          addRandomSuffix: false, // Ensure we overwrite the same blob
         });
 
         console.log('Clubs data saved successfully (blob):', blob.url);

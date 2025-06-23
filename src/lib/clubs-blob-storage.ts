@@ -52,32 +52,32 @@ export async function getAllClubs(): Promise<Record<string, Club>> {
       }
 
       try {
-        // Check if blob exists
-        await head(CLUBS_BLOB_URL, { token: BLOB_TOKEN });
-        
-        // Fetch from blob
-        const response = await fetch(`https://blob.vercel-storage.com/${CLUBS_BLOB_URL}`, {
-          headers: {
-            'Authorization': `Bearer ${BLOB_TOKEN}`,
-          },
-        });
-        
-        if (!response.ok) {
-          throw new Error(`Failed to fetch from blob: ${response.status}`);
-        }
-        
-        const data = await response.json();
-        return data;
-      } catch {
-        console.log('Clubs blob not found, initializing with default data');
-        // Initialize blob with default data
-        try {
+        const blobInfo = await head(CLUBS_BLOB_URL, { token: BLOB_TOKEN });
+
+        if (!blobInfo) {
+          console.log('Clubs blob not found, initializing with default data.');
           await saveAllClubs(defaultClubsData);
           return defaultClubsData;
-        } catch (saveError) {
-          console.error('Failed to initialize blob with default data:', saveError);
-          return defaultClubsData;
         }
+
+        const response = await fetch(blobInfo.url, {
+          headers: {
+            'Authorization': `Bearer ${BLOB_TOKEN}`,
+            'Cache-Control': 'no-cache, no-store, must-revalidate',
+            'Pragma': 'no-cache',
+            'Expires': '0',
+          },
+        });
+
+        if (!response.ok) {
+          throw new Error(`Failed to fetch from blob: ${response.status} ${response.statusText}`);
+        }
+
+        return await response.json();
+      } catch (error) {
+        console.error('Error in getAllClubs (production):', error);
+        // Fallback to default data if any error occurs during blob interaction
+        return defaultClubsData;
       }
     }
   } catch (error) {

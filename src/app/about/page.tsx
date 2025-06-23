@@ -172,7 +172,7 @@ export default async function AboutPage() {
               )}
 
               {/* Coordinators Grid */}
-              <div className="grid gap-6 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5 max-w-7xl mx-auto justify-items-center">
+              <div className="grid gap-4 lg:gap-6 grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5 max-w-7xl mx-auto justify-items-center">
                 {coordinators.map((coordinator, index) => {
                   // Define color schemes for coordinators
                   const colorSchemes = [
@@ -185,8 +185,8 @@ export default async function AboutPage() {
                   const colorScheme = colorSchemes[index % colorSchemes.length];
 
                   return (
-                    <div key={coordinator.id} className="glass rounded-2xl p-4 lg:p-6 text-center transition-all duration-300 hover:scale-105 w-full max-w-[280px]">
-                      <div className="relative mb-4 lg:mb-6">
+                    <div key={coordinator.id} className="glass rounded-2xl p-3 lg:p-4 text-center transition-all duration-300 hover:scale-105 w-full max-w-[240px]">
+                      <div className="relative mb-3 lg:mb-4">
                         <TeamMemberImage
                           src={coordinator.photoPath}
                           alt={coordinator.name}
@@ -195,19 +195,19 @@ export default async function AboutPage() {
                           gradientTo={coordinator.gradientTo}
                           width={200}
                           height={200}
-                          className="w-[160px] h-[160px] sm:w-[180px] sm:h-[180px] lg:w-[200px] lg:h-[200px] mx-auto"
+                          className="w-[140px] h-[140px] sm:w-[160px] sm:h-[160px] lg:w-[180px] lg:h-[180px] mx-auto"
                           isSecretary={false}
                         />
                         <div className={`absolute inset-0 rounded-xl bg-gradient-to-r ${coordinator.gradientFrom}/30 ${coordinator.gradientTo}/30 scale-105 opacity-0 group-hover:opacity-100 transition-all duration-300`} />
                       </div>
-                      <h3 className="font-bold text-sm md:text-base lg:text-lg mb-2 font-space-grotesk">{coordinator.name}</h3>
-                      <p className={`text-xs md:text-sm font-semibold text-${colorScheme.text} dark:text-${colorScheme.text.replace('600', '400')} mb-3`}>
+                      <h3 className="font-bold text-xs sm:text-sm lg:text-base mb-1 lg:mb-2 font-space-grotesk">{coordinator.name}</h3>
+                      <p className={`text-xs lg:text-sm font-semibold text-${colorScheme.text} dark:text-${colorScheme.text.replace('600', '400')} mb-2 lg:mb-3`}>
                         {coordinator.position}
                       </p>
-                      <div className="space-y-2">
+                      <div className="space-y-1 lg:space-y-2">
                         <a
                           href={`mailto:${coordinator.email}`}
-                          className="inline-flex items-center text-xs text-muted-foreground hover:text-blue-600 dark:hover:text-blue-400 transition-colors duration-200 bg-gray-50 dark:bg-gray-800/50 px-3 py-2 rounded-lg hover:bg-blue-50 dark:hover:bg-blue-900/30 break-all max-w-full"
+                          className="inline-flex items-center text-xs text-muted-foreground hover:text-blue-600 dark:hover:text-blue-400 transition-colors duration-200 bg-gray-50 dark:bg-gray-800/50 px-2 lg:px-3 py-1 lg:py-2 rounded-lg hover:bg-blue-50 dark:hover:bg-blue-900/30 break-all max-w-full"
                         >
                           <span className="truncate">{coordinator.email}</span>
                         </a>

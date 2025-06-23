@@ -2,19 +2,61 @@ import sharp from 'sharp';
 
 export async function convertToSupportedFormat(buffer: Buffer): Promise<{ buffer: Buffer; format: string }> {
   try {
-    console.log('Starting image format conversion...');
+    console.log('Starting image format conversion...', { bufferSize: buffer.length });
     
-    // First, try to create a Sharp instance with error handling
-    let sharpInstance;
-    try {
-      sharpInstance = sharp(buffer, { 
-        failOnError: false,  // Don't fail on minor errors
-        unlimited: true,     // Allow large images
-        sequentialRead: true // Better for some formats
-      });
-    } catch (sharpCreateError) {
-      console.error('Failed to create Sharp instance:', sharpCreateError);
-      throw new Error('Unable to process this image file. Please try a different image.');
+    // First, validate the buffer
+    if (!buffer || buffer.length === 0) {
+      throw new Error('Empty or invalid image buffer');
+    }
+    
+    // Check file signatures first
+    const validation = validateImageFile(buffer);
+    if (!validation.isValid) {
+      throw new Error(validation.error || 'Invalid image file');
+    }
+    
+    // Try multiple Sharp configurations to handle problematic images
+    const sharpConfigs = [
+      { 
+        failOnError: false,
+        unlimited: true,
+        sequentialRead: true,
+        density: 72
+      },
+      { 
+        failOnError: false,
+        unlimited: true,
+        sequentialRead: false,
+        pages: 1
+      },
+      { 
+        failOnError: false,
+        unlimited: false,
+        sequentialRead: true
+      }
+    ];
+    
+    let sharpInstance: sharp.Sharp | undefined;
+    let configUsed = -1;
+    
+    for (let i = 0; i < sharpConfigs.length; i++) {
+      try {
+        sharpInstance = sharp(buffer, sharpConfigs[i]);
+        // Test if we can actually use this instance
+        await sharpInstance.metadata();
+        configUsed = i;
+        console.log(`Sharp instance created successfully with config ${i}`);
+        break;
+      } catch (sharpCreateError) {
+        console.error(`Sharp config ${i} failed:`, sharpCreateError);
+        if (i === sharpConfigs.length - 1) {
+          throw new Error('Unable to process this image file with any Sharp configuration. Please try a different image.');
+        }
+      }
+    }
+    
+    if (!sharpInstance) {
+      throw new Error('Failed to create a working Sharp instance');
     }
     
     // Try to get metadata with retries
@@ -30,7 +72,8 @@ export async function convertToSupportedFormat(buffer: Buffer): Promise<{ buffer
           width: metadata.width,
           height: metadata.height,
           size: metadata.size,
-          channels: metadata.channels
+          channels: metadata.channels,
+          configUsed: configUsed
         });
         break;
       } catch (metadataError) {
@@ -106,22 +149,56 @@ async function forceConvertToJPEG(buffer: Buffer): Promise<{ buffer: Buffer; for
   try {
     console.log('Attempting force conversion with minimal processing...');
     
-    const convertedBuffer = await sharp(buffer, { 
-      failOnError: false,
-      unlimited: true,
-      sequentialRead: true,
-      pages: 1 // Only process first page/frame
-    })
-    .flatten({ background: '#ffffff' }) // Flatten to white background
-    .jpeg({ 
-      quality: 85,
-      progressive: true,
-      force: true // Force JPEG output
-    })
-    .toBuffer();
+    // Try multiple approaches for maximum compatibility
+    const forceConfigs = [
+      // Most permissive config
+      { 
+        failOnError: false,
+        unlimited: true,
+        sequentialRead: true,
+        pages: 1,
+        density: 72
+      },
+      // Alternative config
+      { 
+        failOnError: false,
+        unlimited: false,
+        sequentialRead: false,
+        pages: 1
+      },
+      // Minimal config
+      { 
+        failOnError: false,
+        pages: 1
+      }
+    ];
     
-    console.log('Force conversion successful');
-    return { buffer: convertedBuffer, format: 'jpeg' };
+    for (let i = 0; i < forceConfigs.length; i++) {
+      try {
+        console.log(`Trying force conversion config ${i}...`);
+        
+        const convertedBuffer = await sharp(buffer, forceConfigs[i])
+          .flatten({ background: '#ffffff' }) // Flatten to white background
+          .jpeg({ 
+            quality: 85,
+            progressive: true,
+            force: true // Force JPEG output
+          })
+          .toBuffer();
+        
+        console.log(`Force conversion successful with config ${i}`);
+        return { buffer: convertedBuffer, format: 'jpeg' };
+        
+      } catch (configError) {
+        console.error(`Force config ${i} failed:`, configError);
+        if (i === forceConfigs.length - 1) {
+          throw configError;
+        }
+      }
+    }
+    
+    throw new Error('All force conversion attempts failed');
+    
   } catch (error) {
     console.error('Force conversion failed:', error);
     throw new Error('Image file cannot be processed. Please try saving the image in a different format (JPEG or PNG) first.');

@@ -75,6 +75,31 @@ export default function UploadTestPage() {
     }
   };
 
+  const handleEmergencyUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (!file) return;
+
+    setIsLoading(true);
+    setTestResult('');
+
+    try {
+      const formData = new FormData();
+      formData.append('file', file);
+
+      const response = await fetch('/api/admin/emergency-upload', {
+        method: 'POST',
+        body: formData,
+      });
+
+      const result = await response.json();
+      setTestResult(JSON.stringify(result, null, 2));
+    } catch (error) {
+      setTestResult(`Emergency upload error: ${error}`);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
   if (status === 'loading') {
     return <div className="p-8">Loading...</div>;
   }
@@ -135,6 +160,47 @@ export default function UploadTestPage() {
         />
         <p className="text-sm text-gray-600">
           This will test the complete upload pipeline including Firebase Storage
+        </p>
+      </div>
+
+      <div className="mb-6">
+        <h2 className="text-lg font-semibold mb-2">Diagnostic Tools</h2>
+        <div className="space-x-2 mb-2">
+          <button
+            onClick={() => window.open('/api/admin/sharp-diagnostics', '_blank')}
+            className="bg-purple-500 text-white px-4 py-2 rounded hover:bg-purple-600"
+          >
+            Sharp Diagnostics
+          </button>
+          <button
+            onClick={() => window.open('/api/admin/debug-auth', '_blank')}
+            className="bg-indigo-500 text-white px-4 py-2 rounded hover:bg-indigo-600"
+          >
+            Auth Debug
+          </button>
+          <button
+            onClick={() => window.open('/api/admin/test-firebase', '_blank')}
+            className="bg-cyan-500 text-white px-4 py-2 rounded hover:bg-cyan-600"
+          >
+            Firebase Test
+          </button>
+        </div>
+        <p className="text-sm text-gray-600">
+          Click these buttons to open diagnostic endpoints in new tabs
+        </p>
+      </div>
+
+      <div className="mb-6">
+        <h2 className="text-lg font-semibold mb-2">Emergency Upload (Bypass Sharp)</h2>
+        <input
+          type="file"
+          accept="image/*"
+          onChange={handleEmergencyUpload}
+          disabled={isLoading}
+          className="mb-2"
+        />
+        <p className="text-sm text-gray-600">
+          This bypasses all image processing and uploads directly to Firebase - use only if regular upload fails
         </p>
       </div>
 

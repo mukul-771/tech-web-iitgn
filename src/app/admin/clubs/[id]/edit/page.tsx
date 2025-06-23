@@ -33,14 +33,22 @@ export default function EditClubPage() {
   const cleanClubId = clubId?.split(':')[0] || clubId;
   console.log('EditClubPage - cleanClubId:', cleanClubId);
 
-  // If the URL contains a malformed ID, redirect to the clean URL
+  // If the URL contains a malformed ID, redirect to the clean URL IMMEDIATELY
   useEffect(() => {
     if (clubId && clubId.includes(':') && cleanClubId !== clubId) {
       console.log('Detected malformed URL, redirecting to clean URL');
-      router.replace(`/admin/clubs/${cleanClubId}/edit`);
+      // Use window.location.href for a complete page reload to break any caching
+      window.location.href = `/admin/clubs/${cleanClubId}/edit`;
       return;
     }
-  }, [clubId, cleanClubId, router]);
+  }, [clubId, cleanClubId]);
+
+  // EMERGENCY: If we somehow still have a malformed clubId, don't proceed
+  if (clubId && clubId.includes(':')) {
+    console.error('EMERGENCY: Still have malformed clubId after cleaning:', clubId);
+    window.location.href = `/admin/clubs/${cleanClubId}/edit`;
+    return null;
+  }
 
   const [isLoading, setIsLoading] = useState(false);
   const [isLoadingData, setIsLoadingData] = useState(true);
@@ -68,7 +76,18 @@ export default function EditClubPage() {
         // Use the cleaned club ID consistently
         console.log('Data fetch - using cleanClubId:', cleanClubId);
         
-        const response = await fetch(`/api/admin/clubs/${cleanClubId}`);
+        // Add cache-busting and aggressive headers
+        const fetchUrl = `/api/admin/clubs/${cleanClubId}?cache=${Date.now()}&v=${Math.random()}`;
+        console.log('Fetching data from URL:', fetchUrl);
+        
+        const response = await fetch(fetchUrl, {
+          method: 'GET',
+          headers: {
+            'Cache-Control': 'no-cache, no-store, must-revalidate',
+            'Pragma': 'no-cache',
+            'Expires': '0'
+          }
+        });
         if (!response.ok) {
           throw new Error("Failed to fetch club");
         }
@@ -211,14 +230,16 @@ export default function EditClubPage() {
       console.log('Form submission - original clubId:', clubId, 'using cleanClubId:', cleanClubId);
       console.log('About to fetch URL:', `/api/admin/clubs/${cleanClubId}`);
 
-      const fetchUrl = `/api/admin/clubs/${cleanClubId}?t=${Date.now()}`;
-      console.log('Actual fetch URL being used with timestamp:', fetchUrl);
+      const fetchUrl = `/api/admin/clubs/${cleanClubId}?cache=${Date.now()}&v=${Math.random()}&bustall=true`;
+      console.log('Actual fetch URL being used with aggressive cache busting:', fetchUrl);
 
       const response = await fetch(fetchUrl, {
         method: "PUT",
         headers: {
           "Content-Type": "application/json",
-          "Cache-Control": "no-cache",
+          "Cache-Control": "no-cache, no-store, must-revalidate",
+          "Pragma": "no-cache",
+          "Expires": "0"
         },
         body: JSON.stringify(clubData),
       });

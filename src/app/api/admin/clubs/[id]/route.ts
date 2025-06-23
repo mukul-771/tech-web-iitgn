@@ -45,7 +45,10 @@ export async function GET(
     
     // Clean the club ID (remove any trailing characters like :1)
     const cleanClubId = resolvedParams.id.split(':')[0];
-    console.log('GET Club request:', { originalId: resolvedParams.id, cleanId: cleanClubId });
+    console.log('GET Club request - originalId:', resolvedParams.id, 'cleanId:', cleanClubId, 'URL:', request.url);
+    console.log('GET Club request - Full URL with query params:', request.url);
+    console.log('GET Club request - User-Agent:', request.headers.get('user-agent'));
+    console.log('GET Club request - Cache-Control:', request.headers.get('cache-control'));
     
     const club = await getClubById(cleanClubId);
 
@@ -80,7 +83,10 @@ export async function PUT(
     // Clean the club ID (remove any trailing characters like :1)
     const cleanClubId = clubId.split(':')[0];
     
-    console.log('Club update request:', { originalId: clubId, cleanId: cleanClubId });
+    console.log('PUT Club request - originalId:', clubId, 'cleanId:', cleanClubId, 'URL:', request.url);
+    console.log('PUT Club request - Full URL with query params:', request.url);
+    console.log('PUT Club request - User-Agent:', request.headers.get('user-agent'));
+    console.log('PUT Club request - Cache-Control:', request.headers.get('cache-control'));
     
     const body = await request.json();
     console.log('Request body keys:', Object.keys(body));

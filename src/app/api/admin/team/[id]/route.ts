@@ -11,19 +11,36 @@ export async function PUT(
   try {
     const session = await getServerSession(authOptions);
     
-    if (!session?.user?.email) {
+    // Check if user is authenticated and is an admin
+    const isAuthenticated = session?.user?.email;
+    const isAdmin = isAuthenticated && (
+      session?.user?.email?.endsWith('@iitgn.ac.in') || 
+      session?.user?.email === 'mukulmee771@gmail.com'
+    );
+    
+    if (!isAuthenticated || !isAdmin) {
+      console.log('Unauthorized access attempt. Email:', session?.user?.email, 'Is admin:', isAdmin);
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
     const { id } = await params;
     const data = await request.json();
 
+    console.log('Updating team member:', id, 'with data:', data);
+
     // Read the current team data
     const teamDataPath = path.join(process.cwd(), 'data', 'team.json');
+    
+    if (!fs.existsSync(teamDataPath)) {
+      console.error('Team data file not found:', teamDataPath);
+      return NextResponse.json({ error: 'Team data file not found' }, { status: 500 });
+    }
+
     const teamData = JSON.parse(fs.readFileSync(teamDataPath, 'utf8'));
 
     // Check if the team member exists
     if (!teamData[id]) {
+      console.log('Team member not found:', id, 'Available IDs:', Object.keys(teamData));
       return NextResponse.json({ error: 'Team member not found' }, { status: 404 });
     }
 
@@ -37,6 +54,7 @@ export async function PUT(
     // Write back to the file
     fs.writeFileSync(teamDataPath, JSON.stringify(teamData, null, 2));
 
+    console.log('Team member updated successfully:', id);
     return NextResponse.json({ 
       success: true, 
       message: 'Team member updated successfully',
@@ -55,7 +73,14 @@ export async function DELETE(
   try {
     const session = await getServerSession(authOptions);
     
-    if (!session?.user?.email) {
+    // Check if user is authenticated and is an admin
+    const isAuthenticated = session?.user?.email;
+    const isAdmin = isAuthenticated && (
+      session?.user?.email?.endsWith('@iitgn.ac.in') || 
+      session?.user?.email === 'mukulmee771@gmail.com'
+    );
+    
+    if (!isAuthenticated || !isAdmin) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 

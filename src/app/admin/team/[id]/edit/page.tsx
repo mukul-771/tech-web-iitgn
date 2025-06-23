@@ -167,6 +167,8 @@ export default function EditTeamMemberPage({ params }: { params: Promise<{ id: s
 
     try {
       // Call the API to update the team member
+      console.log('Sending update request for member:', memberId, 'with data:', formData);
+      
       const response = await fetch(`/api/admin/team/${memberId}`, {
         method: 'PUT',
         headers: {
@@ -175,8 +177,12 @@ export default function EditTeamMemberPage({ params }: { params: Promise<{ id: s
         body: JSON.stringify(formData),
       });
 
+      console.log('Response status:', response.status);
+
       if (!response.ok) {
-        throw new Error('Failed to update team member');
+        const errorData = await response.json();
+        console.error('Update failed:', errorData);
+        throw new Error(errorData.error || 'Failed to update team member');
       }
 
       alert("Team member updated successfully!");

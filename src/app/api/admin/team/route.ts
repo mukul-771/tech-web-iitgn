@@ -8,7 +8,14 @@ export async function GET() {
   try {
     const session = await getServerSession(authOptions);
     
-    if (!session?.user?.email) {
+    // Check if user is authenticated and is an admin
+    const isAuthenticated = session?.user?.email;
+    const isAdmin = isAuthenticated && (
+      session?.user?.email?.endsWith('@iitgn.ac.in') || 
+      session?.user?.email === 'mukulmee771@gmail.com'
+    );
+    
+    if (!isAuthenticated || !isAdmin) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
@@ -26,7 +33,14 @@ export async function POST(request: NextRequest) {
   try {
     const session = await getServerSession(authOptions);
     
-    if (!session?.user?.email) {
+    // Check if user is authenticated and is an admin
+    const isAuthenticated = session?.user?.email;
+    const isAdmin = isAuthenticated && (
+      session?.user?.email?.endsWith('@iitgn.ac.in') || 
+      session?.user?.email === 'mukulmee771@gmail.com'
+    );
+    
+    if (!isAuthenticated || !isAdmin) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 

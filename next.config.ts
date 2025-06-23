@@ -28,9 +28,8 @@ const nextConfig: NextConfig = {
         pathname: '/**',
       },
     ],
+    unoptimized: true, // Disable image optimization to avoid Sharp issues
   },
-  // Production optimizations
-  serverExternalPackages: ['sharp'],
   // Ensure static files are properly handled
   trailingSlash: false,
   // Optimize for production

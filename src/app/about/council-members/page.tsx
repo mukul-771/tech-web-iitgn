@@ -87,14 +87,14 @@ export default function CouncilMembersPage() {
                   {category.name}
                 </h2>
 
-                <div className="grid gap-8 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 max-w-7xl mx-auto justify-items-center">
+                <div className="grid gap-8 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5 max-w-7xl mx-auto justify-items-center">
                   {categoryMembers.map((member, index) => (
                     <motion.div
                       key={member.name}
                       initial={{ opacity: 0, scale: 0.9 }}
                       animate={{ opacity: 1, scale: 1 }}
                       transition={{ duration: 0.5, delay: index * 0.1 }}
-                      className="bg-white dark:bg-gray-800 rounded-xl p-6 text-center transition-all duration-300 hover:scale-105 shadow-lg hover:shadow-xl border border-gray-200 dark:border-gray-700 w-full max-w-sm"
+                      className="bg-white dark:bg-gray-800 rounded-xl p-6 text-center transition-all duration-300 hover:scale-105 shadow-lg hover:shadow-xl border border-gray-200 dark:border-gray-700 w-full max-w-[280px]"
                     >
                       <div className="relative mb-6">
                         <TeamMemberImage

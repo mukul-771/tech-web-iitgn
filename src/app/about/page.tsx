@@ -172,7 +172,7 @@ export default async function AboutPage() {
               )}
 
               {/* Coordinators Grid */}
-              <div className="grid gap-6 grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 max-w-7xl mx-auto">
+              <div className="grid gap-6 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5 max-w-7xl mx-auto justify-items-center">
                 {coordinators.map((coordinator, index) => {
                   // Define color schemes for coordinators
                   const colorSchemes = [
@@ -185,7 +185,7 @@ export default async function AboutPage() {
                   const colorScheme = colorSchemes[index % colorSchemes.length];
 
                   return (
-                    <div key={coordinator.id} className="glass rounded-2xl p-4 lg:p-6 text-center transition-all duration-300 hover:scale-105 w-full">
+                    <div key={coordinator.id} className="glass rounded-2xl p-4 lg:p-6 text-center transition-all duration-300 hover:scale-105 w-full max-w-[280px]">
                       <div className="relative mb-4 lg:mb-6">
                         <TeamMemberImage
                           src={coordinator.photoPath}
@@ -195,7 +195,7 @@ export default async function AboutPage() {
                           gradientTo={coordinator.gradientTo}
                           width={200}
                           height={200}
-                          className="w-[140px] h-[140px] sm:w-[160px] sm:h-[160px] md:w-[180px] md:h-[180px] lg:w-[200px] lg:h-[200px] mx-auto"
+                          className="w-[160px] h-[160px] sm:w-[180px] sm:h-[180px] lg:w-[200px] lg:h-[200px] mx-auto"
                           isSecretary={false}
                         />
                         <div className={`absolute inset-0 rounded-xl bg-gradient-to-r ${coordinator.gradientFrom}/30 ${coordinator.gradientTo}/30 scale-105 opacity-0 group-hover:opacity-100 transition-all duration-300`} />

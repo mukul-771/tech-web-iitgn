@@ -2,7 +2,7 @@ import { Metadata } from "next"
 import { Target, Eye, MapPin, BookOpen } from "lucide-react"
 import Link from "next/link"
 import { Button } from "@/components/ui/button"
-import { getAllTeamMembers, TeamMember } from "@/lib/team-firebase"
+import { defaultTeamData, TeamMember } from "@/lib/team-data"
 import { TechCube3D } from "@/components/ui/tech-cube-3d"
 import { TeamMemberImage } from "@/components/ui/team-member-image";
 
@@ -12,9 +12,20 @@ export const metadata: Metadata = {
 }
 
 export default async function AboutPage() {
-  // Get team data from the admin system
-  const teamData = await getAllTeamMembers();
-  const teamMembers = Array.isArray(teamData) ? teamData as TeamMember[] : Object.values(teamData) as TeamMember[];
+  // Get team data from JSON file
+  let teamMembers: TeamMember[] = [];
+  try {
+    const fs = await import('fs/promises');
+    const path = await import('path');
+    const teamDataPath = path.join(process.cwd(), 'data', 'team.json');
+    const teamDataFile = await fs.readFile(teamDataPath, 'utf-8');
+    const teamData = JSON.parse(teamDataFile);
+    teamMembers = Object.values(teamData) as TeamMember[];
+  } catch (error) {
+    console.error('Error loading team data:', error);
+    // Fallback to default data
+    teamMembers = Object.values(defaultTeamData) as TeamMember[];
+  }
 
   // Get leadership team (secretary)
   const secretary = teamMembers.find(member => member.category === "leadership");

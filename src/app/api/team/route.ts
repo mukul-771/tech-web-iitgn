@@ -1,10 +1,13 @@
 import { NextResponse } from "next/server";
-import { getAllTeamMembers } from "@/lib/team-firebase";
+import fs from 'fs';
+import path from 'path';
 
 export async function GET() {
   try {
-    const teamMembers = await getAllTeamMembers();
-    return NextResponse.json(teamMembers);
+    // Load team data from JSON file
+    const teamDataPath = path.join(process.cwd(), 'data', 'team.json');
+    const teamData = JSON.parse(fs.readFileSync(teamDataPath, 'utf8'));
+    return NextResponse.json(teamData);
   } catch (error) {
     console.error("Error fetching team members:", error);
     return NextResponse.json(

@@ -1,5 +1,20 @@
 import sharp from 'sharp';
 import { v4 as uuidv4 } from 'uuid';
+import { getStorage } from 'firebase-admin/storage';
+import { initializeApp, getApps, cert } from 'firebase-admin/app';
+
+// Initialize Firebase Admin if not already initialized
+if (!getApps().length) {
+  try {
+    const serviceAccount = JSON.parse(process.env.FIREBASE_SERVICE_ACCOUNT_KEY || '{}');
+    initializeApp({
+      credential: cert(serviceAccount),
+      storageBucket: process.env.NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET
+    });
+  } catch (error) {
+    console.error('Firebase Admin initialization error:', error);
+  }
+}
 
 export interface UploadResult {
   url: string;
@@ -74,13 +89,40 @@ export async function uploadImageToFirebase(
         extension = 'jpg';
     }
     console.log('Image optimized:', { size: optimizedBuffer.length, contentType, extension });
+    
     // Generate filename with correct extension
     const fileName = generateFileName(originalName.replace(/\.[^/.]+$/, `.${extension}`));
+    const filePath = `${folder}/${fileName}`;
+    
+    // Upload to Firebase Storage
+    const storage = getStorage();
+    const bucket = storage.bucket();
+    const file = bucket.file(filePath);
+    
+    console.log('Uploading to Firebase:', { fileName, filePath, bucket: bucket.name });
+    
+    // Upload the file
+    await file.save(optimizedBuffer, {
+      metadata: {
+        contentType,
+        metadata: {
+          originalName,
+          uploadedAt: new Date().toISOString(),
+        }
+      },
+      public: true, // Make file publicly accessible
+    });
+    
+    console.log('File uploaded successfully:', filePath);
+    
+    // Get the public URL
+    const publicUrl = `https://storage.googleapis.com/${bucket.name}/${filePath}`;
+    
     return {
-      url: '',
+      url: publicUrl,
       filename: fileName,
       size: optimizedBuffer.length,
-      path: `${folder}/${fileName}`,
+      path: filePath,
     };
   } catch (error) {
     console.error('Error optimizing and uploading image:', error);

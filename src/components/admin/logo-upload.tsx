@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useRef } from "react";
+import { useState, useRef, useEffect } from "react";
 import Image from "next/image";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
@@ -26,6 +26,17 @@ export function LogoUpload({
   const [isDragOver, setIsDragOver] = useState(false);
   const [previewUrl, setPreviewUrl] = useState<string | null>(currentLogoUrl || null);
   const fileInputRef = useRef<HTMLInputElement>(null);
+
+  // Sync preview URL with current logo URL prop changes
+  useEffect(() => {
+    console.log('LogoUpload: currentLogoUrl changed to:', currentLogoUrl);
+    setPreviewUrl(currentLogoUrl || null);
+  }, [currentLogoUrl]);
+
+  const handleImageError = () => {
+    console.log('Logo image failed to load:', previewUrl);
+    setPreviewUrl(null);
+  };
 
   const handleFileSelect = async (file: File) => {
     if (!file) return;
@@ -140,8 +151,15 @@ export function LogoUpload({
     <div className="space-y-4">
       <Label className="text-base font-semibold">Club Logo</Label>
 
+      {/* Debug Information (remove in production) */}
+      {process.env.NODE_ENV === 'development' && (
+        <div className="text-xs text-gray-500 bg-gray-100 dark:bg-gray-800 p-2 rounded">
+          Debug: currentLogoUrl = {currentLogoUrl || 'null'}, previewUrl = {previewUrl || 'null'}
+        </div>
+      )}
+
       {/* Current Logo Display - More Prominent */}
-      {previewUrl && (
+      {previewUrl ? (
         <Card className="glass border-2 border-blue-200 dark:border-blue-800">
           <CardContent className="p-6">
             <div className="flex flex-col items-center gap-4 sm:flex-row sm:items-start">
@@ -152,6 +170,7 @@ export function LogoUpload({
                   width={96}
                   height={96}
                   className="w-24 h-24 object-contain rounded-xl border-2 border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 p-2"
+                  onError={handleImageError}
                 />
                 <div className="absolute -top-2 -right-2">
                   <div className="bg-green-100 dark:bg-green-900 text-green-800 dark:text-green-200 px-2 py-1 rounded-full text-xs font-medium">
@@ -181,6 +200,24 @@ export function LogoUpload({
                 <X className="h-4 w-4 mr-1" />
                 Remove
               </Button>
+            </div>
+          </CardContent>
+        </Card>
+      ) : (
+        <Card className="glass border border-gray-300 dark:border-gray-600">
+          <CardContent className="p-6">
+            <div className="flex items-center gap-4">
+              <div className="w-24 h-24 rounded-xl border-2 border-dashed border-gray-300 dark:border-gray-600 bg-gray-50 dark:bg-gray-800 flex items-center justify-center">
+                <ImageIcon className="h-8 w-8 text-gray-400" />
+              </div>
+              <div>
+                <p className="text-lg font-semibold text-gray-900 dark:text-gray-100">
+                  No Logo Set
+                </p>
+                <p className="text-sm text-muted-foreground mt-1">
+                  Upload a logo using the area below
+                </p>
+              </div>
             </div>
           </CardContent>
         </Card>

@@ -11,7 +11,7 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { ArrowLeft, Plus, Trash2 } from "lucide-react";
-import { clubCategories, clubTypes, Club } from "@/lib/clubs-data";
+import { clubTypes, Club } from "@/lib/clubs-data";
 
 interface TeamMember {
   name: string;
@@ -305,18 +305,13 @@ export default function EditClubPage() {
                 </div>
                 <div>
                   <Label htmlFor="category">Category *</Label>
-                  <Select value={formData.category} onValueChange={(value) => handleInputChange("category", value)}>
-                    <SelectTrigger>
-                      <SelectValue />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {clubCategories.map((category) => (
-                        <SelectItem key={category} value={category}>
-                          {category}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
+                  <Input
+                    id="category"
+                    value={formData.category}
+                    onChange={(e) => handleInputChange("category", e.target.value)}
+                    placeholder="e.g., Software Development, Gaming & Sports Technology"
+                    required
+                  />
                 </div>
                 <div>
                   <Label htmlFor="established">Established Year</Label>

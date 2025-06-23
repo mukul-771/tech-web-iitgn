@@ -3,17 +3,7 @@ import { NextResponse } from "next/server";
 
 export default withAuth(
   function middleware(req) {
-    const token = req.nextauth.token;
-    const isAdmin = token?.email && (
-      token.email.endsWith('@iitgn.ac.in') || 
-      token.email === 'mukulmee771@gmail.com'
-    );
-
-    if (!isAdmin) {
-      return NextResponse.redirect(new URL('/admin/login', req.url));
-    }
-
-    // EMERGENCY FIX: Redirect malformed club URLs
+    // EMERGENCY FIX: Redirect malformed club URLs BEFORE authentication check
     const url = req.nextUrl.pathname;
     const malformedClubMatch = url.match(/\/admin\/clubs\/([^\/]+):(\d+)(\/.*)?/);
     if (malformedClubMatch) {
@@ -32,6 +22,16 @@ export default withAuth(
       const cleanUrl = `/api/admin/clubs/${cleanId}${remainingPath}`;
       console.log('MIDDLEWARE: Redirecting malformed API URL from', url, 'to', cleanUrl);
       return NextResponse.redirect(new URL(cleanUrl, req.url));
+    }
+
+    const token = req.nextauth.token;
+    const isAdmin = token?.email && (
+      token.email.endsWith('@iitgn.ac.in') || 
+      token.email === 'mukulmee771@gmail.com'
+    );
+
+    if (!isAdmin) {
+      return NextResponse.redirect(new URL('/admin/login', req.url));
     }
 
     return NextResponse.next();

@@ -209,11 +209,16 @@ export default function EditClubPage() {
 
       // Use the cleaned club ID consistently for form submission
       console.log('Form submission - original clubId:', clubId, 'using cleanClubId:', cleanClubId);
+      console.log('About to fetch URL:', `/api/admin/clubs/${cleanClubId}`);
 
-      const response = await fetch(`/api/admin/clubs/${cleanClubId}`, {
+      const fetchUrl = `/api/admin/clubs/${cleanClubId}?t=${Date.now()}`;
+      console.log('Actual fetch URL being used with timestamp:', fetchUrl);
+
+      const response = await fetch(fetchUrl, {
         method: "PUT",
         headers: {
           "Content-Type": "application/json",
+          "Cache-Control": "no-cache",
         },
         body: JSON.stringify(clubData),
       });

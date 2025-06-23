@@ -43,13 +43,6 @@ export default function EditClubPage() {
     }
   }, [clubId, cleanClubId]);
 
-  // EMERGENCY: If we somehow still have a malformed clubId, don't proceed
-  if (clubId && clubId.includes(':')) {
-    console.error('EMERGENCY: Still have malformed clubId after cleaning:', clubId);
-    window.location.href = `/admin/clubs/${cleanClubId}/edit`;
-    return null;
-  }
-
   const [isLoading, setIsLoading] = useState(false);
   const [isLoadingData, setIsLoadingData] = useState(true);
   const [club, setClub] = useState<Club | null>(null);
@@ -67,6 +60,14 @@ export default function EditClubPage() {
   const [achievements, setAchievements] = useState<string[]>([""]);
   const [projects, setProjects] = useState<string[]>([""]);
   const [team, setTeam] = useState<TeamMember[]>([{ name: "", role: "", email: "" }]);
+
+  // EMERGENCY: If we somehow still have a malformed clubId, don't proceed
+  useEffect(() => {
+    if (clubId && clubId.includes(':')) {
+      console.error('EMERGENCY: Still have malformed clubId after cleaning:', clubId);
+      window.location.href = `/admin/clubs/${cleanClubId}/edit`;
+    }
+  }, [clubId, cleanClubId]);
 
   useEffect(() => {
     const fetchClubData = async () => {

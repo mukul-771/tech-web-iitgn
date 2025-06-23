@@ -1,12 +1,10 @@
 import { NextResponse } from "next/server";
-import fs from 'fs';
-import path from 'path';
+import { getAllTeamMembers } from '@/lib/team-storage';
 
 export async function GET() {
   try {
-    // Load team data from JSON file
-    const teamDataPath = path.join(process.cwd(), 'data', 'team.json');
-    const teamData = JSON.parse(fs.readFileSync(teamDataPath, 'utf8'));
+    // Load team data from KV storage
+    const teamData = await getAllTeamMembers();
     return NextResponse.json(teamData);
   } catch (error) {
     console.error("Error fetching team members:", error);

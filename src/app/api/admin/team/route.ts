@@ -1,8 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getServerSession } from 'next-auth';
 import { authOptions } from '@/lib/auth';
-import fs from 'fs';
-import path from 'path';
+import { getAllTeamMembers, createTeamMember, migrateTeamDataToKV } from '@/lib/team-storage';
 
 export async function GET() {
   try {
@@ -19,9 +18,11 @@ export async function GET() {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
-    // Load team data from JSON file
-    const teamDataPath = path.join(process.cwd(), 'data', 'team.json');
-    const teamData = JSON.parse(fs.readFileSync(teamDataPath, 'utf8'));
+    // Ensure data is migrated to KV
+    await migrateTeamDataToKV();
+
+    // Load team data from KV storage
+    const teamData = await getAllTeamMembers();
     return NextResponse.json(teamData);
   } catch (error) {
     console.error('Error fetching team members:', error);
@@ -45,22 +46,12 @@ export async function POST(request: NextRequest) {
     }
 
     const data = await request.json();
-    
-    // Generate ID from name (lowercase, spaces to hyphens)
-    const id = data.name.toLowerCase().replace(/\s+/g, '-').replace(/[^a-z0-9-]/g, '');
-    
-    // Read the current team data
-    const teamDataPath = path.join(process.cwd(), 'data', 'team.json');
-    const teamData = JSON.parse(fs.readFileSync(teamDataPath, 'utf8'));
 
-    // Check if team member already exists
-    if (teamData[id]) {
-      return NextResponse.json({ error: 'Team member with this name already exists' }, { status: 400 });
-    }
-
-    // Create new team member
-    const newMember = {
-      id,
+    // Ensure data is migrated to KV
+    await migrateTeamDataToKV();
+    
+    // Create team member in KV storage
+    const newMember = await createTeamMember({
       name: data.name,
       position: data.position,
       email: data.email,
@@ -70,16 +61,8 @@ export async function POST(request: NextRequest) {
       category: data.category,
       photoPath: data.photoPath || '',
       isSecretary: data.category === 'leadership' && data.position.toLowerCase().includes('secretary'),
-      isCoordinator: data.category === 'coordinator',
-      createdAt: new Date().toISOString(),
-      updatedAt: new Date().toISOString()
-    };
-
-    // Add to team data
-    teamData[id] = newMember;
-
-    // Write back to the file
-    fs.writeFileSync(teamDataPath, JSON.stringify(teamData, null, 2));
+      isCoordinator: data.category === 'coordinator'
+    });
 
     return NextResponse.json({ 
       success: true,

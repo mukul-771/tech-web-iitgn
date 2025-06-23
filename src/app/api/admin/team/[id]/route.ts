@@ -1,8 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getServerSession } from 'next-auth';
 import { authOptions } from '@/lib/auth';
-import fs from 'fs';
-import path from 'path';
+import { updateTeamMember, deleteTeamMember } from '@/lib/team-storage';
 
 export async function PUT(
   request: NextRequest,
@@ -28,38 +27,26 @@ export async function PUT(
 
     console.log('Updating team member:', id, 'with data:', data);
 
-    // Read the current team data
-    const teamDataPath = path.join(process.cwd(), 'data', 'team.json');
-    
-    if (!fs.existsSync(teamDataPath)) {
-      console.error('Team data file not found:', teamDataPath);
-      return NextResponse.json({ error: 'Team data file not found' }, { status: 500 });
+    try {
+      const updatedMember = await updateTeamMember(id, data);
+      
+      console.log('Team member updated successfully:', id);
+      return NextResponse.json({ 
+        success: true, 
+        message: 'Team member updated successfully',
+        data: updatedMember
+      });
+    } catch (error) {
+      console.error('Error updating team member in storage:', error);
+      
+      // Check if it's a "not found" error
+      if (error instanceof Error && error.message === 'Team member not found') {
+        console.log('Team member not found:', id);
+        return NextResponse.json({ error: 'Team member not found' }, { status: 404 });
+      }
+      
+      return NextResponse.json({ error: 'Failed to update team member' }, { status: 500 });
     }
-
-    const teamData = JSON.parse(fs.readFileSync(teamDataPath, 'utf8'));
-
-    // Check if the team member exists
-    if (!teamData[id]) {
-      console.log('Team member not found:', id, 'Available IDs:', Object.keys(teamData));
-      return NextResponse.json({ error: 'Team member not found' }, { status: 404 });
-    }
-
-    // Update the team member data
-    teamData[id] = {
-      ...teamData[id],
-      ...data,
-      updatedAt: new Date().toISOString()
-    };
-
-    // Write back to the file
-    fs.writeFileSync(teamDataPath, JSON.stringify(teamData, null, 2));
-
-    console.log('Team member updated successfully:', id);
-    return NextResponse.json({ 
-      success: true, 
-      message: 'Team member updated successfully',
-      data: teamData[id]
-    });
   } catch (error) {
     console.error('Error updating team member:', error);
     return NextResponse.json({ error: 'Failed to update team member' }, { status: 500 });
@@ -86,25 +73,23 @@ export async function DELETE(
 
     const { id } = await params;
 
-    // Read the current team data
-    const teamDataPath = path.join(process.cwd(), 'data', 'team.json');
-    const teamData = JSON.parse(fs.readFileSync(teamDataPath, 'utf8'));
-
-    // Check if the team member exists
-    if (!teamData[id]) {
-      return NextResponse.json({ error: 'Team member not found' }, { status: 404 });
+    try {
+      await deleteTeamMember(id);
+      
+      return NextResponse.json({ 
+        success: true, 
+        message: 'Team member deleted successfully'
+      });
+    } catch (error) {
+      console.error('Error deleting team member from storage:', error);
+      
+      // Check if it's a "not found" error
+      if (error instanceof Error && error.message === 'Team member not found') {
+        return NextResponse.json({ error: 'Team member not found' }, { status: 404 });
+      }
+      
+      return NextResponse.json({ error: 'Failed to delete team member' }, { status: 500 });
     }
-
-    // Delete the team member
-    delete teamData[id];
-
-    // Write back to the file
-    fs.writeFileSync(teamDataPath, JSON.stringify(teamData, null, 2));
-
-    return NextResponse.json({ 
-      success: true, 
-      message: 'Team member deleted successfully'
-    });
   } catch (error) {
     console.error('Error deleting team member:', error);
     return NextResponse.json({ error: 'Failed to delete team member' }, { status: 500 });

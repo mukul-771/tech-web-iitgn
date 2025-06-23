@@ -7,7 +7,6 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Label } from "@/components/ui/label";
 import { X, Image as ImageIcon, Loader2 } from "lucide-react";
 import Image from "next/image";
-import { ensureDirectAccessUrl } from "@/lib/image-utils";
 
 interface TeamPhotoUploadProps {
   memberId: string;
@@ -27,7 +26,7 @@ export function TeamPhotoUpload({
   const { data: session, status } = useSession();
   const [isUploading, setIsUploading] = useState(false);
   const [isDragOver, setIsDragOver] = useState(false);
-  const [previewUrl, setPreviewUrl] = useState<string | null>(currentPhotoUrl ? ensureDirectAccessUrl(currentPhotoUrl) : null);
+  const [previewUrl, setPreviewUrl] = useState<string | null>(currentPhotoUrl || null);
   const [uploadProgress, setUploadProgress] = useState<number | null>(null);
   const [uploadError, setUploadError] = useState<string | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -93,15 +92,12 @@ export function TeamPhotoUpload({
     reader.readAsDataURL(file);
 
     try {
-      // Use the existing admin upload API route
-      const formData = new FormData();
-      formData.append('file', file);
-      formData.append('memberId', memberId);
-      formData.append('isSecretary', isSecretary.toString());
-
-      const response = await fetch('/api/admin/team/upload-photo', {
+      // Use Vercel Blob storage via our upload API
+      const filename = `team/${memberId}-${Date.now()}.${file.name.split('.').pop()}`;
+      
+      const response = await fetch(`/api/upload?filename=${encodeURIComponent(filename)}`, {
         method: 'POST',
-        body: formData,
+        body: file,
       });
 
       if (!response.ok) {
@@ -110,14 +106,13 @@ export function TeamPhotoUpload({
       }
 
       const result = await response.json();
-      const accessibleUrl = ensureDirectAccessUrl(result.url);
-      setPreviewUrl(accessibleUrl);
-      onPhotoUploaded(accessibleUrl);
+      setPreviewUrl(result.url);
+      onPhotoUploaded(result.url);
       setUploadProgress(100);
       setIsUploading(false);
     } catch (error) {
       setUploadError(error instanceof Error ? error.message : "Failed to upload photo");
-      setPreviewUrl(currentPhotoUrl ? ensureDirectAccessUrl(currentPhotoUrl) : null);
+      setPreviewUrl(currentPhotoUrl || null);
       setIsUploading(false);
       setUploadProgress(null);
     }

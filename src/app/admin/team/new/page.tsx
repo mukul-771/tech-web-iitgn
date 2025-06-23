@@ -18,7 +18,6 @@ import {
   isSecretaryPosition,
   isCoordinatorPosition
 } from "@/lib/team-data";
-import { createTeamMember } from "@/lib/team-firebase";
 
 interface FormData {
   name: string;
@@ -132,9 +131,11 @@ export default function NewTeamMemberPage() {
     setIsLoading(true);
 
     try {
-      // Remove id, createdAt, updatedAt if present
+      // For now, just show success message
+      // In a real app, you'd want to save to a backend/database
       const { name, email, position, category, initials, gradientFrom, gradientTo, photoPath, isSecretary, isCoordinator } = formData;
-      await createTeamMember({
+      
+      console.log("Team member data:", {
         name,
         email,
         position,
@@ -146,6 +147,8 @@ export default function NewTeamMemberPage() {
         isSecretary,
         isCoordinator,
       });
+      
+      alert("Team member created successfully! Note: This is temporary without a backend.");
       router.push("/admin/team");
     } catch (error) {
       console.error("Error creating team member:", error);

@@ -17,8 +17,7 @@ import {
   Star,
   User
 } from "lucide-react";
-import { TeamMember } from "@/lib/team-data";
-import { getAllTeamMembers, deleteTeamMember } from "@/lib/team-firebase";
+import { TeamMember, defaultTeamData } from "@/lib/team-data";
 import { TeamMemberImage } from "@/components/ui/team-member-image";
 
 export default function TeamManagementPage() {
@@ -43,15 +42,18 @@ export default function TeamManagementPage() {
     try {
       setIsLoading(true);
       setError(null);
-      const data = await getAllTeamMembers();
-      // If Firestore returns an array, convert to object keyed by id for compatibility
-      const membersObj = Array.isArray(data)
-        ? Object.fromEntries(data.map((m) => [m.id, m]))
-        : data;
-      setTeamMembers(membersObj);
+      // Load team data from JSON file
+      const response = await fetch('/data/team.json');
+      if (!response.ok) {
+        throw new Error('Failed to fetch team data');
+      }
+      const data = await response.json();
+      setTeamMembers(data);
     } catch (error) {
       console.error("Error fetching team members:", error);
       setError(error instanceof Error ? error.message : "Failed to fetch team members");
+      // Fallback to default data
+      setTeamMembers(defaultTeamData);
     } finally {
       setIsLoading(false);
     }
@@ -62,12 +64,14 @@ export default function TeamManagementPage() {
       return;
     }
     try {
-      await deleteTeamMember(memberId);
+      // For now, just remove from local state
+      // In a real app, you'd want to update the JSON file via an API
       setTeamMembers(prev => {
         const updated = { ...prev };
         delete updated[memberId];
         return updated;
       });
+      alert("Team member removed from view. Note: This is temporary without a backend.");
     } catch (error) {
       console.error("Error deleting team member:", error);
       alert("Failed to delete team member");

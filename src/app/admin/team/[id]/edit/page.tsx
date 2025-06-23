@@ -19,7 +19,6 @@ import {
   isSecretaryPosition,
   isCoordinatorPosition
 } from "@/lib/team-data";
-import { getAllTeamMembers, updateTeamMember, deleteTeamMember } from "@/lib/team-firebase";
 
 interface FormData {
   name: string;
@@ -86,14 +85,14 @@ export default function EditTeamMemberPage({ params }: { params: Promise<{ id: s
   const fetchMember = async () => {
     try {
       setIsLoading(true);
-      // Use Firestore SDK to get all members and find the one with memberId
-      const allMembers = await getAllTeamMembers();
-      let memberData: TeamMember | undefined;
-      if (Array.isArray(allMembers)) {
-        memberData = (allMembers as TeamMember[]).find((m) => m.id === memberId);
-      } else {
-        memberData = Object.values(allMembers).find((m) => (m as TeamMember).id === memberId) as TeamMember | undefined;
+      // Load team data from JSON file
+      const response = await fetch('/data/team.json');
+      if (!response.ok) {
+        throw new Error('Failed to fetch team data');
       }
+      const allMembers = await response.json();
+      const memberData = allMembers[memberId];
+      
       if (!memberData) throw new Error("Team member not found");
       setMember(memberData);
       setFormData({
@@ -167,7 +166,10 @@ export default function EditTeamMemberPage({ params }: { params: Promise<{ id: s
     setIsSaving(true);
 
     try {
-      await updateTeamMember(memberId, formData);
+      // For now, just show success message
+      // In a real app, you'd want to save to a backend/database
+      console.log("Updating team member:", memberId, formData);
+      alert("Team member updated successfully! Note: This is temporary without a backend.");
       router.push("/admin/team");
     } catch (error) {
       console.error("Error updating team member:", error);
@@ -183,7 +185,10 @@ export default function EditTeamMemberPage({ params }: { params: Promise<{ id: s
     }
 
     try {
-      await deleteTeamMember(memberId);
+      // For now, just show success message
+      // In a real app, you'd want to delete from a backend/database
+      console.log("Deleting team member:", memberId);
+      alert("Team member deleted successfully! Note: This is temporary without a backend.");
       router.push("/admin/team");
     } catch (error) {
       console.error("Error deleting team member:", error);

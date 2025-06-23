@@ -1,6 +1,6 @@
 "use client";
 
-import { FirebaseImage } from "./firebase-image";
+import Image from "next/image";
 import { useState } from "react";
 
 interface TeamMemberImageProps {
@@ -58,15 +58,14 @@ export function TeamMemberImage({
         </div>
       ) : (
         <div className="relative">
-          <FirebaseImage
-            src={src}
+          <Image
+            src={src || "/placeholder-avatar.svg"}
             alt={alt}
             width={width}
             height={height}
             className="w-full h-full object-cover rounded-xl"
             onLoad={handleImageLoad}
             onError={handleImageError}
-            fallback="" // We handle fallback ourselves
             unoptimized
           />
           {/* Show gradient overlay if image is loading or failed */}

@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/button"
 import { defaultTeamData, TeamMember } from "@/lib/team-data"
 import { TechCube3D } from "@/components/ui/tech-cube-3d"
 import { TeamMemberImage } from "@/components/ui/team-member-image";
+import { getAllTeamMembers } from "@/lib/team-storage";
 
 export const metadata: Metadata = {
   title: "About Us - Technical Council IITGN",
@@ -12,17 +13,13 @@ export const metadata: Metadata = {
 }
 
 export default async function AboutPage() {
-  // Get team data from JSON file
+  // Get team data from Blob storage (same source as admin panel)
   let teamMembers: TeamMember[] = [];
   try {
-    const fs = await import('fs/promises');
-    const path = await import('path');
-    const teamDataPath = path.join(process.cwd(), 'data', 'team.json');
-    const teamDataFile = await fs.readFile(teamDataPath, 'utf-8');
-    const teamData = JSON.parse(teamDataFile);
+    const teamData = await getAllTeamMembers();
     teamMembers = Object.values(teamData) as TeamMember[];
   } catch (error) {
-    console.error('Error loading team data:', error);
+    console.error('Error loading team data from storage:', error);
     // Fallback to default data
     teamMembers = Object.values(defaultTeamData) as TeamMember[];
   }

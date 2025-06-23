@@ -1,16 +1,14 @@
 import { NextResponse } from "next/server";
-import fs from 'fs';
-import path from 'path';
+import { getAllTeamMembers, TeamMember } from '@/lib/team-storage';
 
 export async function GET() {
   try {
-    // Load team data from JSON file
-    const teamDataPath = path.join(process.cwd(), 'data', 'team.json');
-    const teamData = JSON.parse(fs.readFileSync(teamDataPath, 'utf8'));
+    // Load team data from Blob storage
+    const teamData = await getAllTeamMembers();
     const teamMembers = Object.values(teamData);
     
     // Filter for leadership (secretary and coordinators)
-    const leadership = teamMembers.filter((member: any) => 
+    const leadership = teamMembers.filter((member: TeamMember) => 
       member.isSecretary || member.isCoordinator || member.category === 'leadership'
     );
 

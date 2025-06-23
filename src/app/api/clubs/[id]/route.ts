@@ -8,7 +8,12 @@ export async function GET(
 ) {
   try {
     const resolvedParams = await params;
-    const club = await getClubById(resolvedParams.id);
+    
+    // Clean the club ID (remove any trailing characters like :1)
+    const cleanClubId = resolvedParams.id.split(':')[0];
+    console.log('GET Public Club request:', { originalId: resolvedParams.id, cleanId: cleanClubId });
+    
+    const club = await getClubById(cleanClubId);
 
     if (!club) {
       return NextResponse.json({ error: "Club not found" }, { status: 404 });

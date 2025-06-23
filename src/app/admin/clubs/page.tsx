@@ -54,7 +54,11 @@ export default function ClubsAdminPage() {
     }
 
     try {
-      const response = await fetch(`/api/admin/clubs/${clubId}`, {
+      // Clean the club ID (defensive measure against malformed IDs like "metis:1")
+      const cleanClubId = clubId.split(':')[0];
+      console.log('Delete club - clubId:', clubId, 'cleanClubId:', cleanClubId);
+      
+      const response = await fetch(`/api/admin/clubs/${cleanClubId}`, {
         method: "DELETE",
       });
 

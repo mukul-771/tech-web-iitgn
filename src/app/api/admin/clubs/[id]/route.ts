@@ -42,7 +42,12 @@ export async function GET(
     }
 
     const resolvedParams = await params;
-    const club = await getClubById(resolvedParams.id);
+    
+    // Clean the club ID (remove any trailing characters like :1)
+    const cleanClubId = resolvedParams.id.split(':')[0];
+    console.log('GET Club request:', { originalId: resolvedParams.id, cleanId: cleanClubId });
+    
+    const club = await getClubById(cleanClubId);
 
     if (!club) {
       return NextResponse.json({ error: "Club not found" }, { status: 404 });
@@ -131,7 +136,12 @@ export async function DELETE(
     }
 
     const resolvedParams = await params;
-    const success = await deleteClub(resolvedParams.id);
+    
+    // Clean the club ID (remove any trailing characters like :1)
+    const cleanClubId = resolvedParams.id.split(':')[0];
+    console.log('DELETE Club request:', { originalId: resolvedParams.id, cleanId: cleanClubId });
+    
+    const success = await deleteClub(cleanClubId);
 
     if (!success) {
       return NextResponse.json({ error: "Club not found" }, { status: 404 });

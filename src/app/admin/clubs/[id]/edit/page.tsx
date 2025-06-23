@@ -26,6 +26,21 @@ export default function EditClubPage() {
   
   console.log('EditClubPage - params:', params);
   console.log('EditClubPage - clubId:', clubId);
+  console.log('EditClubPage - clubId type:', typeof clubId);
+  console.log('EditClubPage - clubId includes colon:', clubId?.includes(':'));
+  
+  // Clean the club ID immediately to prevent any malformed usage
+  const cleanClubId = clubId?.split(':')[0] || clubId;
+  console.log('EditClubPage - cleanClubId:', cleanClubId);
+
+  // If the URL contains a malformed ID, redirect to the clean URL
+  useEffect(() => {
+    if (clubId && clubId.includes(':') && cleanClubId !== clubId) {
+      console.log('Detected malformed URL, redirecting to clean URL');
+      router.replace(`/admin/clubs/${cleanClubId}/edit`);
+      return;
+    }
+  }, [clubId, cleanClubId, router]);
 
   const [isLoading, setIsLoading] = useState(false);
   const [isLoadingData, setIsLoadingData] = useState(true);
@@ -50,9 +65,8 @@ export default function EditClubPage() {
       try {
         setIsLoadingData(true);
         
-        // Clean the club ID (defensive measure against malformed IDs like "metis:1")
-        const cleanClubId = clubId.split(':')[0];
-        console.log('Data fetch - clubId:', clubId, 'cleanClubId:', cleanClubId);
+        // Use the cleaned club ID consistently
+        console.log('Data fetch - using cleanClubId:', cleanClubId);
         
         const response = await fetch(`/api/admin/clubs/${cleanClubId}`);
         if (!response.ok) {
@@ -90,8 +104,10 @@ export default function EditClubPage() {
       }
     };
 
-    fetchClubData();
-  }, [clubId, router]);
+    if (cleanClubId) {
+      fetchClubData();
+    }
+  }, [cleanClubId, router]);
 
   const handleInputChange = (field: string, value: string) => {
     setFormData(prev => ({ ...prev, [field]: value }));
@@ -191,9 +207,8 @@ export default function EditClubPage() {
         team: validTeam
       };
 
-      // Clean the club ID (defensive measure against malformed IDs like "metis:1")
-      const cleanClubId = clubId.split(':')[0];
-      console.log('Form submission - clubId:', clubId, 'cleanClubId:', cleanClubId);
+      // Use the cleaned club ID consistently for form submission
+      console.log('Form submission - original clubId:', clubId, 'using cleanClubId:', cleanClubId);
 
       const response = await fetch(`/api/admin/clubs/${cleanClubId}`, {
         method: "PUT",
@@ -353,7 +368,7 @@ export default function EditClubPage() {
 
               {/* Logo Upload */}
               <LogoUpload
-                clubId={clubId}
+                clubId={cleanClubId}
                 clubType={formData.type}
                 currentLogoUrl={formData.logoPath}
                 onLogoUploaded={handleLogoUploaded}

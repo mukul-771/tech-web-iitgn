@@ -1,11 +1,12 @@
-import { kv } from '@vercel/kv';
+import { put, list, del } from '@vercel/blob';
 import { promises as fs } from 'fs';
 import path from 'path';
 
-// Check if we're in development and KV is not available
+// Check if we're in development and Blob is not available
 const isDev = process.env.NODE_ENV === 'development';
-const isKVAvailable = process.env.KV_REST_API_URL && process.env.KV_REST_API_TOKEN;
+const isBlobAvailable = process.env.BLOB_READ_WRITE_TOKEN;
 const TEAM_JSON_PATH = path.join(process.cwd(), 'data', 'team.json');
+const TEAM_BLOB_FILENAME = 'team-data.json';
 
 export interface TeamMember {
   id: string;
@@ -27,13 +28,11 @@ export interface TeamData {
   [id: string]: TeamMember;
 }
 
-const TEAM_DATA_KEY = 'team_data';
-
 export async function getAllTeamMembers(): Promise<TeamData> {
   try {
-    // If in development and KV is not available, fallback to JSON file
-    if (isDev && !isKVAvailable) {
-      console.log('Development mode: KV not available, loading team data from JSON file');
+    // If in development and Blob is not available, fallback to JSON file
+    if (isDev && !isBlobAvailable) {
+      console.log('Development mode: Blob not available, loading team data from JSON file');
       try {
         const data = await fs.readFile(TEAM_JSON_PATH, 'utf8');
         return JSON.parse(data);
@@ -43,15 +42,27 @@ export async function getAllTeamMembers(): Promise<TeamData> {
       }
     }
     
-    const data = await kv.get<TeamData>(TEAM_DATA_KEY);
-    
-    // If no data exists in KV, return empty object
-    if (!data) {
-      console.log('No team data found in KV storage, returning empty object');
-      return {};
+    // Try to fetch from Vercel Blob
+    try {
+      const { blobs } = await list({ prefix: TEAM_BLOB_FILENAME });
+      if (blobs.length === 0) {
+        console.log('No team data found in Blob storage, returning empty object');
+        return {};
+      }
+      
+      const response = await fetch(blobs[0].url);
+      const data = await response.json();
+      return data;
+    } catch (error) {
+      console.warn('Failed to fetch from Blob storage, trying JSON fallback:', error);
+      // Fallback to JSON file
+      try {
+        const data = await fs.readFile(TEAM_JSON_PATH, 'utf8');
+        return JSON.parse(data);
+      } catch {
+        return {};
+      }
     }
-    
-    return data;
   } catch (error) {
     console.error('Error fetching team data:', error);
     throw error;
@@ -157,40 +168,58 @@ export async function deleteTeamMember(id: string): Promise<void> {
 
 // Helper function to save team data
 async function saveTeamData(data: TeamData): Promise<void> {
-  if (isDev && !isKVAvailable) {
-    console.log('Development mode: KV not available, saving team data to JSON file');
+  if (isDev && !isBlobAvailable) {
+    console.log('Development mode: Blob not available, saving team data to JSON file');
     await fs.writeFile(TEAM_JSON_PATH, JSON.stringify(data, null, 2), 'utf8');
     return;
   }
   
-  await kv.set(TEAM_DATA_KEY, data);
+  try {
+    // Delete existing blob if it exists
+    const { blobs } = await list({ prefix: TEAM_BLOB_FILENAME });
+    for (const blob of blobs) {
+      await del(blob.url);
+    }
+    
+    // Upload new data to Blob
+    const jsonString = JSON.stringify(data, null, 2);
+    const blob = new Blob([jsonString], { type: 'application/json' });
+    await put(TEAM_BLOB_FILENAME, blob, {
+      access: 'public',
+    });
+    
+    console.log('Team data saved to Blob storage');
+  } catch (error) {
+    console.error('Error saving to Blob storage:', error);
+    throw error;
+  }
 }
 
-// Migration function to move data from JSON to KV
+// Migration function to move data from JSON to Blob
 export async function migrateTeamDataToKV(): Promise<void> {
   try {
-    // Skip migration in development when KV is not available
-    if (isDev && !isKVAvailable) {
-      console.log('Development mode: KV not available, skipping migration');
+    // Skip migration in development when Blob is not available
+    if (isDev && !isBlobAvailable) {
+      console.log('Development mode: Blob not available, skipping migration');
       return;
     }
     
-    // Check if data already exists in KV
-    const existingData = await kv.get<TeamData>(TEAM_DATA_KEY);
-    if (existingData && Object.keys(existingData).length > 0) {
-      console.log('Team data already exists in KV, skipping migration');
+    // Check if data already exists in Blob
+    const { blobs } = await list({ prefix: TEAM_BLOB_FILENAME });
+    if (blobs.length > 0) {
+      console.log('Team data already exists in Blob storage, skipping migration');
       return;
     }
     
-    // Try to load from JSON file (fallback)
+    // Try to load from JSON file and migrate
     try {
       const data = await fs.readFile(TEAM_JSON_PATH, 'utf8');
       const jsonData = JSON.parse(data);
-      await kv.set(TEAM_DATA_KEY, jsonData);
-      console.log('Successfully migrated team data from JSON to KV');
+      await saveTeamData(jsonData);
+      console.log('Successfully migrated team data from JSON to Blob storage');
     } catch {
-      console.log('Could not read JSON file, initializing empty team data in KV');
-      await kv.set(TEAM_DATA_KEY, {});
+      console.log('Could not read JSON file, initializing empty team data in Blob storage');
+      await saveTeamData({});
     }
   } catch (error) {
     console.error('Error during team data migration:', error);

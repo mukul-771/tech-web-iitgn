@@ -1,14 +1,12 @@
 "use client";
 
 import { useEffect, useState, useRef } from "react";
+import { useSession } from "next-auth/react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Label } from "@/components/ui/label";
 import { X, Image as ImageIcon, Loader2 } from "lucide-react";
 import Image from "next/image";
-import { storage } from "@/lib/firebase-config";
-import { ref, uploadBytesResumable, getDownloadURL } from "firebase/storage";
-import { auth as firebaseAuth } from "@/lib/firebase-config";
 import { ensureDirectAccessUrl } from "@/lib/image-utils";
 
 interface TeamPhotoUploadProps {
@@ -26,22 +24,13 @@ export function TeamPhotoUpload({
   onPhotoUploaded,
   onPhotoRemoved
 }: TeamPhotoUploadProps) {
+  const { data: session, status } = useSession();
   const [isUploading, setIsUploading] = useState(false);
   const [isDragOver, setIsDragOver] = useState(false);
   const [previewUrl, setPreviewUrl] = useState<string | null>(currentPhotoUrl ? ensureDirectAccessUrl(currentPhotoUrl) : null);
   const [uploadProgress, setUploadProgress] = useState<number | null>(null);
   const [uploadError, setUploadError] = useState<string | null>(null);
-  const [firebaseUser, setFirebaseUser] = useState<unknown>(null);
-  const [checkingAuth, setCheckingAuth] = useState(true);
   const fileInputRef = useRef<HTMLInputElement>(null);
-
-  useEffect(() => {
-    const unsubscribe = firebaseAuth?.onAuthStateChanged((user) => {
-      setFirebaseUser(user);
-      setCheckingAuth(false);
-    });
-    return () => unsubscribe && unsubscribe();
-  }, []);
 
   useEffect(() => {
     setPreviewUrl(currentPhotoUrl ? ensureDirectAccessUrl(currentPhotoUrl) : null);
@@ -53,16 +42,31 @@ export function TeamPhotoUpload({
     if (!file) return;
     setUploadError(null);
 
-    if (checkingAuth) {
+    // Check NextAuth session instead of Firebase auth
+    if (status === "loading") {
       setUploadError("Checking authentication, please wait...");
       return;
     }
-    if (!firebaseUser) {
-      setUploadError("You must be signed in to upload. Please log in as an admin.");
+    
+    if (status === "unauthenticated") {
+      setUploadError("You are not signed in. Please log in first.");
       setIsUploading(false);
       setUploadProgress(null);
       return;
     }
+    
+    if (!session?.user?.email) {
+      setUploadError("No user email found in session. Please log out and log in again.");
+      setIsUploading(false);
+      setUploadProgress(null);
+      return;
+    }
+
+    console.log("Authentication check passed:", { 
+      status, 
+      userEmail: session.user.email,
+      sessionExists: !!session 
+    });
 
     // Validate file type
     const allowedTypes = ["image/jpeg", "image/jpg", "image/png", "image/webp"];
@@ -80,37 +84,37 @@ export function TeamPhotoUpload({
 
     setIsUploading(true);
     setUploadProgress(0);
+    
     // Create preview immediately
     const reader = new FileReader();
     reader.onload = (e) => {
       setPreviewUrl(e.target?.result as string);
     };
     reader.readAsDataURL(file);
+
     try {
-      if (!storage) throw new Error("Firebase Storage not initialized");
-      const storageRef = ref(storage, `team/${memberId}/${file.name}`);
-      const uploadTask = uploadBytesResumable(storageRef, file);
-      uploadTask.on(
-        'state_changed',
-        (snapshot) => {
-          const progress = (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
-          setUploadProgress(progress);
-        },
-        (error) => {
-          setUploadError(error.message || String(error));
-          setIsUploading(false);
-          setUploadProgress(null);
-        },
-        async () => {
-          const url = await getDownloadURL(uploadTask.snapshot.ref);
-          setUploadProgress(null);
-          // Ensure the URL has the alt=media parameter needed for direct access
-          const accessibleUrl = ensureDirectAccessUrl(url);
-          setPreviewUrl(accessibleUrl);
-          onPhotoUploaded(accessibleUrl);
-          setIsUploading(false);
-        }
-      );
+      // Use the existing admin upload API route
+      const formData = new FormData();
+      formData.append('file', file);
+      formData.append('memberId', memberId);
+      formData.append('isSecretary', isSecretary.toString());
+
+      const response = await fetch('/api/admin/team/upload-photo', {
+        method: 'POST',
+        body: formData,
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json().catch(() => ({}));
+        throw new Error(errorData.error || `Upload failed: ${response.statusText}`);
+      }
+
+      const result = await response.json();
+      const accessibleUrl = ensureDirectAccessUrl(result.url);
+      setPreviewUrl(accessibleUrl);
+      onPhotoUploaded(accessibleUrl);
+      setUploadProgress(100);
+      setIsUploading(false);
     } catch (error) {
       setUploadError(error instanceof Error ? error.message : "Failed to upload photo");
       setPreviewUrl(currentPhotoUrl ? ensureDirectAccessUrl(currentPhotoUrl) : null);
@@ -166,7 +170,7 @@ export function TeamPhotoUpload({
   return (
     <div className="space-y-4">
       <Label>Profile Photo</Label>
-      {checkingAuth ? (
+      {status === "loading" ? (
         <div className="text-blue-500 text-sm">Checking authentication...</div>
       ) : uploadError && (
         <div className="text-red-500 text-sm">Upload error: {uploadError}</div>

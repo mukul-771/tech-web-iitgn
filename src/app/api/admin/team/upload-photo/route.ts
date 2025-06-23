@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import { uploadImageToFirebase } from "@/lib/firebase-storage";
-import { updateTeamMember } from "@/lib/team-firebase";
+import { updateTeamMember } from "@/lib/team-firebase-admin";
 import { validateImageFile, convertToSupportedFormat } from "@/lib/image-format-utils";
 import fs from 'fs';
 import path from 'path';
@@ -98,20 +98,40 @@ export async function POST(request: NextRequest) {
     const fileExtension = file.name.split('.').pop()?.toLowerCase() || 'jpg';
     const safeFileName = `${memberId}-${timestamp}.${fileExtension}`;
 
+    console.log('Starting Firebase upload...', { safeFileName, folder });
+
     // Upload to Firebase Storage (using processed image buffer)
-    const result = await uploadImageToFirebase(
-      processedImage.buffer, 
-      safeFileName, 
-      folder, 
-      {
-        quality: 85,
-        maxWidth: 800,
-        maxHeight: 800
-      }
-    );
+    let result;
+    try {
+      result = await uploadImageToFirebase(
+        processedImage.buffer, 
+        safeFileName, 
+        folder, 
+        {
+          quality: 85,
+          maxWidth: 800,
+          maxHeight: 800
+        }
+      );
+      console.log('Firebase upload successful:', { url: result.url, path: result.path });
+    } catch (uploadError) {
+      console.error('Firebase upload failed:', uploadError);
+      return NextResponse.json({ 
+        error: `Firebase upload failed: ${uploadError instanceof Error ? uploadError.message : 'Unknown error'}`
+      }, { status: 500 });
+    }
 
     // Update the team member's photo URL in the database
-    await updateTeamMember(memberId, { photoPath: result.url });
+    try {
+      console.log('Updating team member...', { memberId, photoPath: result.url });
+      await updateTeamMember(memberId, { photoPath: result.url });
+      console.log('Team member updated successfully');
+    } catch (updateError) {
+      console.error('Team member update failed:', updateError);
+      return NextResponse.json({ 
+        error: `Team member update failed: ${updateError instanceof Error ? updateError.message : 'Unknown error'}`
+      }, { status: 500 });
+    }
 
     return NextResponse.json({ 
       success: true, 

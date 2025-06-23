@@ -100,6 +100,56 @@ export default function UploadTestPage() {
     }
   };
 
+  const handleSimpleUploadTest = async (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (!file) return;
+
+    setIsLoading(true);
+    setTestResult('');
+
+    try {
+      const formData = new FormData();
+      formData.append('file', file);
+
+      const response = await fetch('/api/admin/simple-upload-test', {
+        method: 'POST',
+        body: formData,
+      });
+
+      const result = await response.json();
+      setTestResult(JSON.stringify(result, null, 2));
+    } catch (error) {
+      setTestResult(`Simple upload test error: ${error}`);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const handleSimpleUploadTestNoDB = async (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (!file) return;
+
+    setIsLoading(true);
+    setTestResult('');
+
+    try {
+      const formData = new FormData();
+      formData.append('file', file);
+
+      const response = await fetch('/api/admin/simple-upload-test-nodb', {
+        method: 'POST',
+        body: formData,
+      });
+
+      const result = await response.json();
+      setTestResult(JSON.stringify(result, null, 2));
+    } catch (error) {
+      setTestResult(`Simple upload test (no DB update) error: ${error}`);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
   if (status === 'loading') {
     return <div className="p-8">Loading...</div>;
   }
@@ -201,6 +251,34 @@ export default function UploadTestPage() {
         />
         <p className="text-sm text-gray-600">
           This bypasses all image processing and uploads directly to Firebase - use only if regular upload fails
+        </p>
+      </div>
+
+      <div className="mb-6">
+        <h2 className="text-lg font-semibold mb-2">Simple Upload Test</h2>
+        <input
+          type="file"
+          accept="image/*"
+          onChange={handleSimpleUploadTest}
+          disabled={isLoading}
+          className="mb-2"
+        />
+        <p className="text-sm text-gray-600">
+          This performs a simple upload test to the server
+        </p>
+      </div>
+
+      <div className="mb-6">
+        <h2 className="text-lg font-semibold mb-2">Simple Upload Test (No DB Update)</h2>
+        <input
+          type="file"
+          accept="image/*"
+          onChange={handleSimpleUploadTestNoDB}
+          disabled={isLoading}
+          className="mb-2"
+        />
+        <p className="text-sm text-gray-600">
+          Tests the complete upload pipeline without updating team member database - isolates Firebase Storage issues
         </p>
       </div>
 

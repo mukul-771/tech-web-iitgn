@@ -3,6 +3,7 @@ import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import { getClubById, updateClub, deleteClub } from "@/lib/clubs-blob-storage";
 import { z } from "zod";
+import { revalidatePath } from "next/cache";
 
 // Validation schema for club updates
 const updateClubSchema = z.object({
@@ -103,6 +104,15 @@ export async function PUT(
       return NextResponse.json({ error: "Club not found" }, { status: 404 });
     }
 
+    // Revalidate the path for the updated club
+    revalidatePath(`/admin/clubs/${cleanClubId}`);
+
+    // Revalidate paths to clear cache and ensure fresh data
+    revalidatePath(`/admin/clubs`);
+    revalidatePath(`/admin/clubs/${cleanClubId}/edit`);
+    revalidatePath(`/clubs`);
+    revalidatePath(`/clubs/${cleanClubId}`);
+
     console.log('Club updated successfully');
     return NextResponse.json(updatedClub);
   } catch (error) {
@@ -152,6 +162,12 @@ export async function DELETE(
     if (!success) {
       return NextResponse.json({ error: "Club not found" }, { status: 404 });
     }
+
+    // Revalidate paths to clear cache
+    revalidatePath(`/admin/clubs`);
+    revalidatePath(`/admin/clubs/${cleanClubId}/edit`);
+    revalidatePath(`/clubs`);
+    revalidatePath(`/clubs/${cleanClubId}`);
 
     return NextResponse.json({ message: "Club deleted successfully" });
   } catch (error) {

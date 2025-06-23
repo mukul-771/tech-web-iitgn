@@ -190,7 +190,11 @@ export default function ClubsAdminPage() {
                       <Button
                         variant="ghost"
                         size="sm"
-                        onClick={() => router.push(`/admin/clubs/${club.id}/edit`)}
+                        onClick={() => {
+                          const cleanClubId = club.id.split(':')[0];
+                          console.log('Edit button clicked (technical clubs) - club.id:', club.id, 'cleanClubId:', cleanClubId);
+                          router.push(`/admin/clubs/${cleanClubId}/edit`);
+                        }}
                       >
                         <Edit className="h-4 w-4" />
                       </Button>
@@ -237,7 +241,11 @@ export default function ClubsAdminPage() {
                       <Button
                         variant="ghost"
                         size="sm"
-                        onClick={() => router.push(`/admin/clubs/${group.id}/edit`)}
+                        onClick={() => {
+                          const cleanClubId = group.id.split(':')[0];
+                          console.log('Edit button clicked (technical council groups) - group.id:', group.id, 'cleanClubId:', cleanClubId);
+                          router.push(`/admin/clubs/${cleanClubId}/edit`);
+                        }}
                       >
                         <Edit className="h-4 w-4" />
                       </Button>
@@ -284,7 +292,11 @@ export default function ClubsAdminPage() {
                       <Button
                         variant="ghost"
                         size="sm"
-                        onClick={() => router.push(`/admin/clubs/${club.id}/edit`)}
+                        onClick={() => {
+                          const cleanClubId = club.id.split(':')[0];
+                          console.log('Edit button clicked (hobby groups) - club.id:', club.id, 'cleanClubId:', cleanClubId);
+                          router.push(`/admin/clubs/${cleanClubId}/edit`);
+                        }}
                       >
                         <Edit className="h-4 w-4" />
                       </Button>

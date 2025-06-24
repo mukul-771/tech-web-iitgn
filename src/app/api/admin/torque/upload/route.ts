@@ -1,8 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
-import { promises as fs } from "fs";
-import path from "path";
+import { put } from "@vercel/blob";
 
 // Check if user is admin
 async function checkAdminAuth() {
@@ -41,27 +40,21 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: "File size too large. Maximum size is 50MB" }, { status: 400 });
     }
 
-    // Create uploads directory if it doesn't exist
-    const uploadsDir = path.join(process.cwd(), "public", "torque", "magazines");
-    try {
-      await fs.access(uploadsDir);
-    } catch {
-      await fs.mkdir(uploadsDir, { recursive: true });
-    }
-
     // Generate unique filename
     const timestamp = Date.now();
     const originalName = file.name.replace(/[^a-zA-Z0-9.-]/g, '_');
     const fileName = `torque-${year}-${timestamp}-${originalName}`;
-    const filePath = path.join(uploadsDir, fileName);
 
-    // Save file
-    const buffer = Buffer.from(await file.arrayBuffer());
-    await fs.writeFile(filePath, buffer);
+    // Upload to Vercel Blob
+    const arrayBuffer = await file.arrayBuffer();
+    const blob = await put(fileName, arrayBuffer, {
+      access: "public",
+      contentType: file.type,
+    });
 
     // Return file info
     return NextResponse.json({
-      filePath: `/torque/magazines/${fileName}`,
+      filePath: blob.url, // Use blob URL
       fileName: fileName,
       fileSize: file.size
     });

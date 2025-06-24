@@ -2,7 +2,6 @@ import { NextRequest, NextResponse } from 'next/server';
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import { getAllHackathons, createHackathon } from '@/lib/hackathons-storage';
-import { Hackathon } from '@/lib/hackathons-data';
 
 // Check if user is admin
 async function checkAdminAuth() {

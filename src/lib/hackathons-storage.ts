@@ -1,74 +1,53 @@
-import { promises as fs } from 'fs';
-import path from 'path';
-import { Hackathon, defaultHackathonsData } from './hackathons-data';
+import { put, list } from '@vercel/blob';
+import { Hackathon } from './hackathons-data';
 
-const DATA_DIR = path.join(process.cwd(), 'data');
-const HACKATHONS_FILE = path.join(DATA_DIR, 'hackathons.json');
+// Store hackathons as JSON in Vercel Blob
+const HACKATHONS_BLOB_PATH = 'hackathons-data.json';
 
-// Ensure data directory exists
-async function ensureDataDir(): Promise<void> {
-  try {
-    await fs.access(DATA_DIR);
-  } catch {
-    await fs.mkdir(DATA_DIR, { recursive: true });
-  }
-}
-
-// Get all hackathons
+// Get all hackathons from Vercel Blob
 export async function getAllHackathons(): Promise<Record<string, Hackathon>> {
   try {
-    await ensureDataDir();
-    const data = await fs.readFile(HACKATHONS_FILE, 'utf-8');
-    return JSON.parse(data);
+    const { blobs } = await list({ prefix: HACKATHONS_BLOB_PATH });
+    
+    if (blobs.length === 0) {
+      // If no data exists, return empty object
+      return {};
+    }
+    
+    const response = await fetch(blobs[0].url);
+    if (!response.ok) {
+      throw new Error(`Failed to fetch hackathons data: ${response.statusText}`);
+    }
+    
+    const data = await response.json();
+    return data || {};
   } catch (error) {
-    console.log('Hackathons file not found, creating with default data');
-    await saveAllHackathons(defaultHackathonsData);
-    return defaultHackathonsData;
+    console.error('Error fetching hackathons from blob:', error);
+    // Return empty object if there's an error (first time setup)
+    return {};
   }
 }
 
-// Get hackathons for public display (array format)
-export async function getHackathonsForDisplay(): Promise<Hackathon[]> {
-  const hackathons = await getAllHackathons();
-  return Object.values(hackathons).sort((a, b) => 
-    new Date(b.updatedAt).getTime() - new Date(a.updatedAt).getTime()
-  );
+// Save all hackathons to Vercel Blob
+export async function saveAllHackathons(hackathons: Record<string, Hackathon>): Promise<void> {
+  try {
+    await put(HACKATHONS_BLOB_PATH, JSON.stringify(hackathons, null, 2), {
+      access: 'public',
+      contentType: 'application/json',
+      allowOverwrite: true, // Allow overwriting existing data
+    });
+    
+    console.log('Hackathons data saved successfully to Vercel Blob');
+  } catch (error) {
+    console.error('Error saving hackathons to blob:', error);
+    throw new Error(`Failed to save hackathons data: ${error instanceof Error ? error.message : 'Unknown error'}`);
+  }
 }
 
 // Get hackathon by ID
 export async function getHackathonById(id: string): Promise<Hackathon | null> {
   const hackathons = await getAllHackathons();
   return hackathons[id] || null;
-}
-
-// Save all hackathons with atomic write operation
-export async function saveAllHackathons(hackathons: Record<string, Hackathon>): Promise<void> {
-  try {
-    await ensureDataDir();
-    
-    // Create temporary file for atomic write
-    const tempFile = `${HACKATHONS_FILE}.tmp`;
-    const data = JSON.stringify(hackathons, null, 2);
-    
-    // Write to temporary file first
-    await fs.writeFile(tempFile, data);
-    
-    // Atomically move temp file to final location
-    await fs.rename(tempFile, HACKATHONS_FILE);
-    
-    console.log('Hackathons data saved successfully');
-  } catch (error) {
-    console.error('Error saving hackathons:', error);
-    
-    // Clean up temp file if it exists
-    try {
-      await fs.unlink(`${HACKATHONS_FILE}.tmp`);
-    } catch {
-      // Ignore cleanup errors
-    }
-    
-    throw new Error('Failed to save hackathons data');
-  }
 }
 
 // Create new hackathon
@@ -103,7 +82,7 @@ export async function createHackathon(hackathon: Omit<Hackathon, 'id' | 'created
   return newHackathon;
 }
 
-// Update hackathon
+// Update existing hackathon
 export async function updateHackathon(id: string, updates: Partial<Omit<Hackathon, 'id' | 'createdAt'>>): Promise<Hackathon> {
   const hackathons = await getAllHackathons();
   
@@ -135,6 +114,12 @@ export async function deleteHackathon(id: string): Promise<void> {
   await saveAllHackathons(hackathons);
 }
 
+// Get hackathons for public display (sorted by date)
+export async function getHackathonsForDisplay(): Promise<Hackathon[]> {
+  const hackathons = await getAllHackathons();
+  return Object.values(hackathons).sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
+}
+
 // Get hackathons by status
 export async function getHackathonsByStatus(status: Hackathon['status']): Promise<Hackathon[]> {
   const hackathons = await getHackathonsForDisplay();
@@ -151,61 +136,33 @@ export async function getCompletedHackathons(): Promise<Hackathon[]> {
   return getHackathonsByStatus('completed');
 }
 
-// Search hackathons
-export async function searchHackathons(query: string): Promise<Hackathon[]> {
-  const hackathons = await getHackathonsForDisplay();
-  const lowercaseQuery = query.toLowerCase();
-  
-  return hackathons.filter(hackathon => 
-    hackathon.name.toLowerCase().includes(lowercaseQuery) ||
-    hackathon.description.toLowerCase().includes(lowercaseQuery) ||
-    hackathon.category.toLowerCase().includes(lowercaseQuery)
-  );
+// Get ongoing hackathons
+export async function getOngoingHackathons(): Promise<Hackathon[]> {
+  return getHackathonsByStatus('ongoing');
 }
 
-// Get hackathons by category
-export async function getHackathonsByCategory(category: string): Promise<Hackathon[]> {
-  const hackathons = await getHackathonsForDisplay();
-  return hackathons.filter(hackathon => hackathon.category === category);
-}
-
-// Get hackathon statistics
-export async function getHackathonStats(): Promise<{
-  total: number;
-  upcoming: number;
-  ongoing: number;
-  completed: number;
-  totalParticipants: number;
-  totalPrizePool: number;
-}> {
-  const hackathons = await getHackathonsForDisplay();
-  
-  const stats = {
-    total: hackathons.length,
-    upcoming: hackathons.filter(h => h.status === 'upcoming').length,
-    ongoing: hackathons.filter(h => h.status === 'ongoing').length,
-    completed: hackathons.filter(h => h.status === 'completed').length,
-    totalParticipants: 0,
-    totalPrizePool: 0
-  };
-  
-  hackathons.forEach(hackathon => {
-    // Calculate total participants
-    if (hackathon.currentParticipants) {
-      const participants = parseInt(hackathon.currentParticipants.replace(/[^0-9]/g, ''));
-      if (!isNaN(participants)) {
-        stats.totalParticipants += participants;
-      }
+// Migrate data from file system to Vercel Blob (one-time operation)
+export async function migrateFromFileSystem(): Promise<boolean> {
+  try {
+    // Try to read from the local hackathons.json file
+    const fs = await import('fs').then(m => m.promises);
+    const path = await import('path');
+    
+    const dataDir = path.join(process.cwd(), 'data');
+    const hackathonsFile = path.join(dataDir, 'hackathons.json');
+    
+    const fileContent = await fs.readFile(hackathonsFile, 'utf8');
+    const fileData = JSON.parse(fileContent);
+    
+    if (Object.keys(fileData).length > 0) {
+      await saveAllHackathons(fileData);
+      console.log(`Migrated ${Object.keys(fileData).length} hackathons to Vercel Blob`);
+      return true;
     }
     
-    // Calculate total prize pool
-    hackathon.prizes.forEach(prize => {
-      const amount = parseInt(prize.amount.replace(/[^0-9]/g, ''));
-      if (!isNaN(amount)) {
-        stats.totalPrizePool += amount;
-      }
-    });
-  });
-  
-  return stats;
+    return false;
+  } catch (error) {
+    console.log('No file system data to migrate or migration failed:', error);
+    return false;
+  }
 }

@@ -46,6 +46,7 @@ async function storeMetadata(id: string, data: TorqueMagazineData): Promise<void
     await put(metadataPath, JSON.stringify(data, null, 2), {
       access: 'public',
       contentType: 'application/json',
+      allowOverwrite: true, // Allow overwriting existing metadata files
     });
   } catch (error) {
     console.error(`Failed to store metadata for magazine ${id}:`, error);

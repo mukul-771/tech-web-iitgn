@@ -121,9 +121,9 @@ export async function createMagazine(magazine: TorqueMagazineInput): Promise<Tor
   const id = generateMagazineId();
   const now = new Date().toISOString();
   
-  // If this magazine is set as latest, unset all others
+  // If this magazine is set as latest, unset all others first
   if (magazine.isLatest) {
-    await setLatestMagazine(id);
+    await unsetAllLatest();
   }
   
   const newMagazine: TorqueMagazineData = {
@@ -143,8 +143,8 @@ export async function updateMagazine(id: string, updates: Partial<TorqueMagazine
   if (!existing) return null;
   
   // If setting this as latest, unset all others first
-  if (updates.isLatest) {
-    await setLatestMagazine(id);
+  if (updates.isLatest === true) {
+    await unsetAllLatest();
   }
   
   const updated: TorqueMagazineData = {
@@ -167,17 +167,24 @@ export async function setLatestMagazine(targetId: string): Promise<void> {
     throw new Error(`Magazine with ID ${targetId} not found`);
   }
   
-  // Update all magazines to not be latest, except the target
+  // First, unset all magazines as latest
+  await unsetAllLatest();
+  
+  // Then set the target as latest
+  const updated = { ...target, isLatest: true, updatedAt: new Date().toISOString() };
+  await storeMetadata(targetId, updated);
+}
+
+// Helper function to unset all magazines as latest
+async function unsetAllLatest(): Promise<void> {
+  const magazines = await listAllMetadata();
+  
   for (const mag of magazines) {
-    if (mag.id !== targetId && mag.isLatest) {
+    if (mag.isLatest) {
       const updated = { ...mag, isLatest: false, updatedAt: new Date().toISOString() };
       await storeMetadata(mag.id, updated);
     }
   }
-  
-  // Set target as latest
-  const updated = { ...target, isLatest: true, updatedAt: new Date().toISOString() };
-  await storeMetadata(targetId, updated);
 }
 
 // Delete magazine and all its files
@@ -219,4 +226,34 @@ export async function deleteMagazine(id: string): Promise<boolean> {
     console.error(`Error deleting magazine ${id}:`, error);
     return false;
   }
+}
+
+// Validate and fix latest magazine consistency
+export async function ensureOnlyOneLatest(): Promise<void> {
+  const magazines = await listAllMetadata();
+  const latestMagazines = magazines.filter(mag => mag.isLatest);
+  
+  if (latestMagazines.length > 1) {
+    console.warn(`Found ${latestMagazines.length} magazines marked as latest. Fixing...`);
+    
+    // Keep the most recently updated one as latest
+    const mostRecent = latestMagazines.sort((a, b) => 
+      new Date(b.updatedAt).getTime() - new Date(a.updatedAt).getTime()
+    )[0];
+    
+    // Unset all others
+    await unsetAllLatest();
+    
+    // Set the most recent as latest
+    const updated = { ...mostRecent, isLatest: true, updatedAt: new Date().toISOString() };
+    await storeMetadata(mostRecent.id, updated);
+    
+    console.log(`Set magazine "${mostRecent.title}" (${mostRecent.year}) as the latest`);
+  }
+}
+
+// Get count of magazines marked as latest (for debugging)
+export async function getLatestCount(): Promise<number> {
+  const magazines = await listAllMetadata();
+  return magazines.filter(mag => mag.isLatest).length;
 }

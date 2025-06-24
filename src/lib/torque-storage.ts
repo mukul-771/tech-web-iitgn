@@ -91,33 +91,36 @@ export async function deleteMagazine(id: string): Promise<boolean> {
     return false;
   }
   
-  // Delete the PDF file from Vercel Blob
+  // Delete the PDF file from Vercel Blob using its full URL
   try {
-    // If filePath is a Vercel Blob URL, extract the key
-    const filePath = magazines[id].filePath;
-    if (filePath && filePath.startsWith('https://')) {
-      // The key is usually the filename at the end of the URL
-      const key = filePath.split('/').pop();
-      if (key) await del(key);
+    const fileUrl = magazines[id].filePath;
+    if (fileUrl) {
+      await del(fileUrl);
     }
   } catch (error) {
-    console.warn('Could not delete magazine file from Vercel Blob:', error);
+    // Log a warning if the blob deletion fails but continue to remove metadata
+    console.warn(`Could not delete file '${magazines[id].filePath}' from Vercel Blob:`, error);
   }
 
   delete magazines[id];
-  // In-memory only; in production, delete from DB
+  // In-memory only; in production, this would be a database deletion
   return true;
 }
 
 // Generate magazine ID
 function generateMagazineId(year: string, title: string): string {
-  const baseId = `torque-${year}-${title
+  const safeTitle = title
     .toLowerCase()
-    .replace(/[^a-z0-9\s]/g, '')
-    .replace(/\s+/g, '-')
-    .substring(0, 30)}`;
+    .replace(/[^a-z0-9\s]/g, '') // remove special characters
+    .replace(/\s+/g, '-') // replace spaces with hyphens
+    .substring(0, 30);
+
+  const baseId = `torque-${year}-${safeTitle}`;
   
-  return baseId;
+  // Add a random suffix to prevent ID collisions
+  const randomSuffix = Math.random().toString(36).substring(2, 8);
+  
+  return `${baseId}-${randomSuffix}`;
 }
 
 // Get magazines for public display

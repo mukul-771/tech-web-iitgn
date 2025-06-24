@@ -73,6 +73,7 @@ export async function POST(request: NextRequest) {
       access: 'public',
       token: process.env.BLOB_READ_WRITE_TOKEN,
       addRandomSuffix: false, // Ensure consistent file naming
+      allowOverwrite: true, // Allow overwriting existing logos
     });
 
     console.log('Logo uploaded successfully:', { url: blob.url, fileName });

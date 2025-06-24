@@ -95,6 +95,7 @@ export async function POST(request: NextRequest) {
       access: 'public',
       token: token,
       addRandomSuffix: false,
+      allowOverwrite: true, // Allow overwriting existing logos
     });
 
     console.log('Upload successful:', {

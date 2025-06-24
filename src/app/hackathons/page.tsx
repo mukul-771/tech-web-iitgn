@@ -5,7 +5,7 @@ import { Calendar, MapPin, Users, Trophy, Clock, ExternalLink, ArrowRight } from
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
-import { getHackathonsForDisplay, getHackathonStats } from "@/lib/hackathons-storage"
+import { getHackathonsForDisplay, getBasicHackathonStats } from "@/lib/hackathons-storage"
 
 export const metadata: Metadata = {
   title: "Hackathons - Technical Council IITGN",
@@ -18,7 +18,7 @@ export default async function HackathonsPage() {
   
   try {
     hackathons = await getHackathonsForDisplay();
-    stats = await getHackathonStats();
+    stats = await getBasicHackathonStats();
   } catch (error) {
     console.error('Error loading hackathons data:', error);
     // Continue with empty data for build-time rendering

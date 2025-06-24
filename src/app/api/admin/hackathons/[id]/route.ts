@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import { getHackathonById, updateHackathon, deleteHackathon } from '@/lib/hackathons-storage';
+import { expandBasicHackathon } from '@/lib/hackathons-data';
 
 // Check if user is admin
 async function checkAdminAuth() {
@@ -24,7 +25,7 @@ export async function GET(
       );
     }
     
-    return NextResponse.json(hackathon);
+    return NextResponse.json(expandBasicHackathon(hackathon));
   } catch (error) {
     console.error('Error fetching hackathon:', error);
     return NextResponse.json(

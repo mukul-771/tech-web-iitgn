@@ -61,6 +61,51 @@ export interface Winner {
   prize: string;
 }
 
+// Basic hackathon interface for simple storage (matches current Blob structure)
+export interface BasicHackathon {
+  id: string;
+  name: string;
+  description: string;
+  longDescription: string;
+  date: string;
+  location: string;
+  category: string;
+  status: "upcoming" | "ongoing" | "completed" | "cancelled";
+  registrationUrl?: string;
+  createdAt: string;
+  updatedAt: string;
+}
+
+// Convert BasicHackathon to full Hackathon with defaults
+export function expandBasicHackathon(basic: BasicHackathon): Hackathon {
+  return {
+    id: basic.id,
+    name: basic.name,
+    description: basic.description,
+    longDescription: basic.longDescription,
+    date: basic.date,
+    registrationDeadline: '',
+    location: basic.location,
+    duration: '',
+    maxParticipants: '',
+    currentParticipants: '',
+    prizes: [],
+    organizers: [],
+    registrationLink: basic.registrationUrl,
+    status: basic.status,
+    category: basic.category,
+    requirements: [],
+    schedule: [],
+    sponsors: [],
+    winners: [],
+    logoPath: '',
+    bannerPath: '',
+    gallery: [],
+    createdAt: basic.createdAt,
+    updatedAt: basic.updatedAt,
+  };
+}
+
 // Hackathon categories
 export const hackathonCategories = [
   "Web Development",

@@ -1,11 +1,11 @@
 import { put, list } from '@vercel/blob';
-import { Hackathon } from './hackathons-data';
+import { BasicHackathon } from './hackathons-data';
 
 // Store hackathons as JSON in Vercel Blob
 const HACKATHONS_BLOB_PATH = 'hackathons-data.json';
 
 // Get all hackathons from Vercel Blob
-export async function getAllHackathons(): Promise<Record<string, Hackathon>> {
+export async function getAllHackathons(): Promise<Record<string, BasicHackathon>> {
   try {
     const { blobs } = await list({ prefix: HACKATHONS_BLOB_PATH });
     
@@ -29,7 +29,7 @@ export async function getAllHackathons(): Promise<Record<string, Hackathon>> {
 }
 
 // Save all hackathons to Vercel Blob
-export async function saveAllHackathons(hackathons: Record<string, Hackathon>): Promise<void> {
+export async function saveAllHackathons(hackathons: Record<string, BasicHackathon>): Promise<void> {
   try {
     await put(HACKATHONS_BLOB_PATH, JSON.stringify(hackathons, null, 2), {
       access: 'public',
@@ -37,7 +37,7 @@ export async function saveAllHackathons(hackathons: Record<string, Hackathon>): 
       allowOverwrite: true, // Allow overwriting existing data
     });
     
-    console.log('Hackathons data saved successfully to Vercel Blob');
+    console.log('BasicHackathons data saved successfully to Vercel Blob');
   } catch (error) {
     console.error('Error saving hackathons to blob:', error);
     throw new Error(`Failed to save hackathons data: ${error instanceof Error ? error.message : 'Unknown error'}`);
@@ -45,13 +45,13 @@ export async function saveAllHackathons(hackathons: Record<string, Hackathon>): 
 }
 
 // Get hackathon by ID
-export async function getHackathonById(id: string): Promise<Hackathon | null> {
+export async function getHackathonById(id: string): Promise<BasicHackathon | null> {
   const hackathons = await getAllHackathons();
   return hackathons[id] || null;
 }
 
 // Create new hackathon
-export async function createHackathon(hackathon: Omit<Hackathon, 'id' | 'createdAt' | 'updatedAt'>): Promise<Hackathon> {
+export async function createHackathon(hackathon: Omit<BasicHackathon, 'id' | 'createdAt' | 'updatedAt'>): Promise<BasicHackathon> {
   const hackathons = await getAllHackathons();
   
   // Generate ID from name
@@ -69,37 +69,37 @@ export async function createHackathon(hackathon: Omit<Hackathon, 'id' | 'created
   }
   
   const now = new Date().toISOString();
-  const newHackathon: Hackathon = {
+  const newBasicHackathon: BasicHackathon = {
     ...hackathon,
     id: uniqueId,
     createdAt: now,
     updatedAt: now,
   };
   
-  hackathons[uniqueId] = newHackathon;
+  hackathons[uniqueId] = newBasicHackathon;
   await saveAllHackathons(hackathons);
   
-  return newHackathon;
+  return newBasicHackathon;
 }
 
 // Update existing hackathon
-export async function updateHackathon(id: string, updates: Partial<Omit<Hackathon, 'id' | 'createdAt'>>): Promise<Hackathon> {
+export async function updateHackathon(id: string, updates: Partial<Omit<BasicHackathon, 'id' | 'createdAt'>>): Promise<BasicHackathon> {
   const hackathons = await getAllHackathons();
   
   if (!hackathons[id]) {
-    throw new Error('Hackathon not found');
+    throw new Error('BasicHackathon not found');
   }
   
-  const updatedHackathon: Hackathon = {
+  const updatedBasicHackathon: BasicHackathon = {
     ...hackathons[id],
     ...updates,
     updatedAt: new Date().toISOString(),
   };
   
-  hackathons[id] = updatedHackathon;
+  hackathons[id] = updatedBasicHackathon;
   await saveAllHackathons(hackathons);
   
-  return updatedHackathon;
+  return updatedBasicHackathon;
 }
 
 // Delete hackathon
@@ -107,7 +107,7 @@ export async function deleteHackathon(id: string): Promise<void> {
   const hackathons = await getAllHackathons();
   
   if (!hackathons[id]) {
-    throw new Error('Hackathon not found');
+    throw new Error('BasicHackathon not found');
   }
   
   delete hackathons[id];
@@ -115,7 +115,7 @@ export async function deleteHackathon(id: string): Promise<void> {
 }
 
 // Get hackathons for public display (sorted by date)
-export async function getHackathonsForDisplay(): Promise<Hackathon[]> {
+export async function getHackathonsForDisplay(): Promise<BasicHackathon[]> {
   try {
     const hackathons = await getAllHackathons();
     
@@ -134,8 +134,8 @@ export async function getHackathonsForDisplay(): Promise<Hackathon[]> {
     }
     
     // Filter out any invalid entries and sort by date
-    const validHackathons = hackathonArray.filter(h => h && h.date);
-    return validHackathons.sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
+    const validBasicHackathons = hackathonArray.filter(h => h && h.date);
+    return validBasicHackathons.sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
   } catch (error) {
     console.error('Error in getHackathonsForDisplay:', error);
     return [];
@@ -143,34 +143,34 @@ export async function getHackathonsForDisplay(): Promise<Hackathon[]> {
 }
 
 // Get hackathons by status
-export async function getHackathonsByStatus(status: Hackathon['status']): Promise<Hackathon[]> {
+export async function getHackathonsByStatus(status: BasicHackathon['status']): Promise<BasicHackathon[]> {
   const hackathons = await getHackathonsForDisplay();
   return hackathons.filter(hackathon => hackathon.status === status);
 }
 
 // Get upcoming hackathons
-export async function getUpcomingHackathons(): Promise<Hackathon[]> {
+export async function getUpcomingHackathons(): Promise<BasicHackathon[]> {
   return getHackathonsByStatus('upcoming');
 }
 
 // Get completed hackathons
-export async function getCompletedHackathons(): Promise<Hackathon[]> {
+export async function getCompletedHackathons(): Promise<BasicHackathon[]> {
   return getHackathonsByStatus('completed');
 }
 
 // Get ongoing hackathons
-export async function getOngoingHackathons(): Promise<Hackathon[]> {
+export async function getOngoingHackathons(): Promise<BasicHackathon[]> {
   return getHackathonsByStatus('ongoing');
 }
 
 // Get hackathon statistics
-export async function getHackathonStats() {
+export async function getBasicHackathonStats() {
   try {
     const hackathons = await getHackathonsForDisplay();
     
     // Ensure hackathons is an array
     if (!Array.isArray(hackathons)) {
-      console.error('getHackathonStats: hackathons is not an array:', hackathons);
+      console.error('getBasicHackathonStats: hackathons is not an array:', hackathons);
       return { total: 0, upcoming: 0, totalParticipants: 0, totalPrizePool: 0 };
     }
     
@@ -205,7 +205,7 @@ export async function getHackathonStats() {
       totalPrizePool
     };
   } catch (error) {
-    console.error('Error in getHackathonStats:', error);
+    console.error('Error in getBasicHackathonStats:', error);
     return { total: 0, upcoming: 0, totalParticipants: 0, totalPrizePool: 0 };
   }
 }

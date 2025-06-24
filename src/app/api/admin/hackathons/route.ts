@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import { getAllHackathons, createHackathon } from '@/lib/hackathons-storage';
+import { expandBasicHackathon } from '@/lib/hackathons-data';
 
 // Check if user is admin
 async function checkAdminAuth() {
@@ -17,9 +18,11 @@ export async function GET() {
     }
 
     const hackathons = await getAllHackathons();
-    const hackathonsArray = Object.values(hackathons).sort((a, b) => 
-      new Date(b.updatedAt).getTime() - new Date(a.updatedAt).getTime()
-    );
+    const hackathonsArray = Object.values(hackathons)
+      .map(expandBasicHackathon)
+      .sort((a, b) => 
+        new Date(b.updatedAt).getTime() - new Date(a.updatedAt).getTime()
+      );
     return NextResponse.json(hackathonsArray);
   } catch (error) {
     console.error('Error fetching hackathons:', error);

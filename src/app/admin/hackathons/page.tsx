@@ -271,7 +271,7 @@ export default function AdminHackathonsPage() {
                   </div>
                   <div className="mt-4">
                     <Badge variant="outline">{hackathon.category}</Badge>
-                    {hackathon.prizes.length > 0 && (
+                    {hackathon.prizes && hackathon.prizes.length > 0 && (
                       <span className="ml-2 text-sm text-muted-foreground">
                         {hackathon.prizes.length} prize{hackathon.prizes.length !== 1 ? 's' : ''}
                       </span>

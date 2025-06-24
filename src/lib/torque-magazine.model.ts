@@ -14,6 +14,37 @@ export interface ITorqueMagazine extends Document {
   updatedAt: string;
 }
 
+// Plain type for creation (no Mongoose methods)
+export type TorqueMagazineInput = {
+  year: string;
+  title: string;
+  description: string;
+  pages: number;
+  articles: number;
+  featured: string;
+  filePath: string;
+  coverPhoto?: string;
+  isLatest: boolean;
+  createdAt?: string;
+  updatedAt?: string;
+};
+
+// Plain type for data returned from .lean() and API
+export type TorqueMagazineData = {
+  _id: string;
+  year: string;
+  title: string;
+  description: string;
+  pages: number;
+  articles: number;
+  featured: string;
+  filePath: string;
+  coverPhoto?: string;
+  isLatest: boolean;
+  createdAt: string;
+  updatedAt: string;
+};
+
 const TorqueMagazineSchema = new Schema<ITorqueMagazine>({
   year: { type: String, required: true },
   title: { type: String, required: true },

@@ -1,32 +1,34 @@
 import { del } from '@vercel/blob';
 import { dbConnect } from './mongodb';
-import { TorqueMagazine, ITorqueMagazine } from './torque-magazine.model';
+import { TorqueMagazine, TorqueMagazineInput, TorqueMagazineData } from './torque-magazine.model';
 
 // Get all magazines
-export async function getAllMagazines(): Promise<Record<string, ITorqueMagazine>> {
+export async function getAllMagazines(): Promise<Record<string, TorqueMagazineData>> {
   await dbConnect();
-  const mags = await TorqueMagazine.find({}).lean();
-  const result: Record<string, ITorqueMagazine> = {};
+  const mags = (await TorqueMagazine.find({}).lean()) as unknown as TorqueMagazineData[];
+  const result: Record<string, TorqueMagazineData> = {};
   mags.forEach((mag) => {
-    result[mag._id.toString()] = mag;
+    result[String(mag._id)] = { ...mag, _id: String(mag._id) };
   });
   return result;
 }
 
 // Get single magazine by ID
-export async function getMagazineById(id: string): Promise<ITorqueMagazine | null> {
+export async function getMagazineById(id: string): Promise<TorqueMagazineData | null> {
   await dbConnect();
-  return TorqueMagazine.findById(id).lean();
+  const mag = (await TorqueMagazine.findById(id).lean()) as TorqueMagazineData | null;
+  return mag ? { ...mag, _id: String(mag._id) } : null;
 }
 
 // Get latest magazine
-export async function getLatestMagazine(): Promise<ITorqueMagazine | null> {
+export async function getLatestMagazine(): Promise<TorqueMagazineData | null> {
   await dbConnect();
-  return TorqueMagazine.findOne({ isLatest: true }).lean();
+  const mag = (await TorqueMagazine.findOne({ isLatest: true }).lean()) as TorqueMagazineData | null;
+  return mag ? { ...mag, _id: String(mag._id) } : null;
 }
 
 // Create new magazine (metadata only)
-export async function createMagazine(magazine: Omit<ITorqueMagazine, '_id' | 'createdAt' | 'updatedAt'>): Promise<ITorqueMagazine> {
+export async function createMagazine(magazine: TorqueMagazineInput): Promise<TorqueMagazineData> {
   await dbConnect();
   if (magazine.isLatest) {
     await TorqueMagazine.updateMany({}, { isLatest: false });
@@ -37,21 +39,22 @@ export async function createMagazine(magazine: Omit<ITorqueMagazine, '_id' | 'cr
     createdAt: now,
     updatedAt: now,
   });
-  return newMag.toObject();
+  const obj = newMag.toObject() as TorqueMagazineData;
+  return { ...obj, _id: String(obj._id) };
 }
 
 // Update existing magazine (metadata only)
-export async function updateMagazine(id: string, updates: Partial<Omit<ITorqueMagazine, '_id' | 'createdAt'>>): Promise<ITorqueMagazine | null> {
+export async function updateMagazine(id: string, updates: Partial<TorqueMagazineInput>): Promise<TorqueMagazineData | null> {
   await dbConnect();
   if (updates.isLatest) {
     await TorqueMagazine.updateMany({}, { isLatest: false });
   }
-  const updated = await TorqueMagazine.findByIdAndUpdate(
+  const updated = (await TorqueMagazine.findByIdAndUpdate(
     id,
     { ...updates, updatedAt: new Date().toISOString() },
     { new: true }
-  ).lean();
-  return updated;
+  ).lean()) as TorqueMagazineData | null;
+  return updated ? { ...updated, _id: String(updated._id) } : null;
 }
 
 // Set latest magazine (unsets all others)
@@ -108,9 +111,9 @@ export async function getMagazinesForDisplay(): Promise<Array<{
   coverPhoto?: string;
 }>> {
   await dbConnect();
-  const mags = await TorqueMagazine.find({}).sort({ year: -1 }).lean();
+  const mags = (await TorqueMagazine.find({}).sort({ year: -1 }).lean()) as unknown as TorqueMagazineData[];
   return mags.map((mag) => ({
-    id: mag._id.toString(),
+    id: String(mag._id),
     year: mag.year,
     title: mag.title,
     description: mag.description,

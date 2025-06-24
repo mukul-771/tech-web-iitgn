@@ -12,7 +12,7 @@ export async function GET() {
 
     // Return only public information
     const publicMagazine = {
-      id: latestMagazine.id,
+      id: latestMagazine._id,
       year: latestMagazine.year,
       title: latestMagazine.title,
       description: latestMagazine.description,

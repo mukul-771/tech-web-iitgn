@@ -51,11 +51,24 @@ export async function getHackathonById(id: string): Promise<BasicHackathon | nul
 }
 
 // Create new hackathon
-export async function createHackathon(hackathon: Omit<BasicHackathon, 'id' | 'createdAt' | 'updatedAt'>): Promise<BasicHackathon> {
+export async function createHackathon(hackathonInput: Record<string, unknown>): Promise<BasicHackathon> {
   const hackathons = await getAllHackathons();
   
+  // Extract only BasicHackathon properties from the input
+  const basicHackathonData: Omit<BasicHackathon, 'id' | 'createdAt' | 'updatedAt'> = {
+    name: String(hackathonInput.name || ''),
+    description: String(hackathonInput.description || ''),
+    longDescription: String(hackathonInput.longDescription || ''),
+    date: String(hackathonInput.date || ''),
+    location: String(hackathonInput.location || ''),
+    category: String(hackathonInput.category || ''),
+    status: String(hackathonInput.status || 'upcoming') as "upcoming" | "ongoing" | "completed" | "cancelled",
+    registrationUrl: hackathonInput.registrationLink ? String(hackathonInput.registrationLink) : 
+                     hackathonInput.registrationUrl ? String(hackathonInput.registrationUrl) : undefined,
+  };
+  
   // Generate ID from name
-  const id = hackathon.name.toLowerCase()
+  const id = basicHackathonData.name.toLowerCase()
     .replace(/[^a-z0-9\s]/g, '')
     .replace(/\s+/g, '-')
     .substring(0, 50);
@@ -70,7 +83,7 @@ export async function createHackathon(hackathon: Omit<BasicHackathon, 'id' | 'cr
   
   const now = new Date().toISOString();
   const newBasicHackathon: BasicHackathon = {
-    ...hackathon,
+    ...basicHackathonData,
     id: uniqueId,
     createdAt: now,
     updatedAt: now,
@@ -83,16 +96,31 @@ export async function createHackathon(hackathon: Omit<BasicHackathon, 'id' | 'cr
 }
 
 // Update existing hackathon
-export async function updateHackathon(id: string, updates: Partial<Omit<BasicHackathon, 'id' | 'createdAt'>>): Promise<BasicHackathon> {
+export async function updateHackathon(id: string, updates: Record<string, unknown>): Promise<BasicHackathon> {
   const hackathons = await getAllHackathons();
   
   if (!hackathons[id]) {
     throw new Error('BasicHackathon not found');
   }
   
+  // Extract only BasicHackathon properties from updates
+  const basicUpdates: Partial<BasicHackathon> = {};
+  
+  if (updates.name !== undefined) basicUpdates.name = String(updates.name);
+  if (updates.description !== undefined) basicUpdates.description = String(updates.description);
+  if (updates.longDescription !== undefined) basicUpdates.longDescription = String(updates.longDescription);
+  if (updates.date !== undefined) basicUpdates.date = String(updates.date);
+  if (updates.location !== undefined) basicUpdates.location = String(updates.location);
+  if (updates.category !== undefined) basicUpdates.category = String(updates.category);
+  if (updates.status !== undefined) basicUpdates.status = String(updates.status) as "upcoming" | "ongoing" | "completed" | "cancelled";
+  if (updates.registrationLink !== undefined || updates.registrationUrl !== undefined) {
+    basicUpdates.registrationUrl = updates.registrationLink ? String(updates.registrationLink) : 
+                                   updates.registrationUrl ? String(updates.registrationUrl) : undefined;
+  }
+  
   const updatedBasicHackathon: BasicHackathon = {
     ...hackathons[id],
-    ...updates,
+    ...basicUpdates,
     updatedAt: new Date().toISOString(),
   };
   

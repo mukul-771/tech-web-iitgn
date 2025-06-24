@@ -7,7 +7,7 @@ export async function GET() {
     const latestMagazine = await getLatestMagazine();
     
     if (!latestMagazine) {
-      return NextResponse.json({ error: "No latest magazine found" }, { status: 404 });
+      return NextResponse.json(null);
     }
 
     // Return only public information

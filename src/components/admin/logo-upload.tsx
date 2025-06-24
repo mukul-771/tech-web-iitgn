@@ -72,13 +72,21 @@ export function LogoUpload({
       };
       reader.readAsDataURL(file);
 
-      // Upload file
+      // Upload file - temporarily using debug endpoint for better error info
       const formData = new FormData();
       formData.append("file", file);
       formData.append("clubId", cleanClubId);
       formData.append("clubType", clubType);
 
-      const response = await fetch("/api/admin/clubs/upload-logo", {
+      console.log('Uploading with debug endpoint:', {
+        cleanClubId,
+        clubType,
+        fileName: file.name,
+        fileSize: file.size,
+        fileType: file.type
+      });
+
+      const response = await fetch("/api/debug-upload", {
         method: "POST",
         body: formData,
       });

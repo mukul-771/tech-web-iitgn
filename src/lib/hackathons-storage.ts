@@ -161,9 +161,25 @@ export async function getHackathonsForDisplay(): Promise<BasicHackathon[]> {
       return [];
     }
     
-    // Filter out any invalid entries and sort by date
-    const validBasicHackathons = hackathonArray.filter(h => h && h.date);
-    return validBasicHackathons.sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
+    // Filter out any invalid entries, clean the data, and sort by date
+    const validBasicHackathons = hackathonArray
+      .filter(h => h && h.date)
+      .map(h => ({
+        id: h.id,
+        name: h.name,
+        description: h.description,
+        longDescription: h.longDescription,
+        date: h.date,
+        location: h.location,
+        category: h.category,
+        status: h.status,
+        registrationUrl: h.registrationUrl,
+        createdAt: h.createdAt,
+        updatedAt: h.updatedAt,
+      } as BasicHackathon))
+      .sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
+    
+    return validBasicHackathons;
   } catch (error) {
     console.error('Error in getHackathonsForDisplay:', error);
     return [];

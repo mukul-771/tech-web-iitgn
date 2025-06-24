@@ -13,13 +13,26 @@ export const metadata: Metadata = {
 }
 
 export default async function HackathonsPage() {
-  const hackathons = await getHackathonsForDisplay();
-  const stats = await getHackathonStats();
+  let hackathons: any[] = [];
+  let stats = { total: 0, upcoming: 0, totalParticipants: 0, totalPrizePool: 0 };
+  
+  try {
+    hackathons = await getHackathonsForDisplay();
+    stats = await getHackathonStats();
+  } catch (error) {
+    console.error('Error loading hackathons data:', error);
+    // Continue with empty data for build-time rendering
+  }
+
+  // Ensure hackathons is an array
+  if (!Array.isArray(hackathons)) {
+    hackathons = [];
+  }
 
   // Categorize hackathons by status
-  const upcomingHackathons = hackathons.filter(h => h.status === 'upcoming');
-  const ongoingHackathons = hackathons.filter(h => h.status === 'ongoing');
-  const previousHackathons = hackathons.filter(h => h.status === 'completed');
+  const upcomingHackathons = hackathons.filter(h => h && h.status === 'upcoming');
+  const ongoingHackathons = hackathons.filter(h => h && h.status === 'ongoing');
+  const previousHackathons = hackathons.filter(h => h && h.status === 'completed');
 
   const getStatusColor = (status: string) => {
     switch (status) {
@@ -98,7 +111,7 @@ export default async function HackathonsPage() {
             <div className="px-3 py-1 rounded-full text-xs font-medium bg-gradient-to-r from-purple-600/10 to-blue-600/10 text-purple-600 dark:text-purple-400 border border-purple-600/20 w-fit">
               {hackathon.category}
             </div>
-            {hackathon.prizes.length > 0 && (
+            {hackathon.prizes && hackathon.prizes.length > 0 && (
               <div className="flex items-center gap-2 text-sm text-muted-foreground">
                 <Trophy className="h-4 w-4 text-yellow-500" />
                 <span>{hackathon.prizes.length} prize{hackathon.prizes.length !== 1 ? 's' : ''}</span>

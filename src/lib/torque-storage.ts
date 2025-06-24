@@ -1,3 +1,4 @@
+import { del } from '@vercel/blob';
 import { promises as fs } from 'fs';
 import path from 'path';
 import { TorqueMagazine, defaultTorqueData, TorqueStats, defaultTorqueStats } from './torque-data';
@@ -53,18 +54,15 @@ async function initializeTorqueStatsFile() {
   }
 }
 
+// In-memory store for demo (replace with DB in production)
+let magazinesStore: Record<string, TorqueMagazine> | null = null;
+
 // Get all magazines
 export async function getAllMagazines(): Promise<Record<string, TorqueMagazine>> {
-  try {
-    await ensureDataDir();
-    await initializeTorqueFile();
-    
-    const data = await fs.readFile(TORQUE_FILE, 'utf-8');
-    return JSON.parse(data);
-  } catch (error) {
-    console.error('Error reading magazines:', error);
-    return defaultTorqueData;
-  }
+  if (magazinesStore) return magazinesStore;
+  // fallback to default data if not initialized
+  magazinesStore = { ...defaultTorqueData };
+  return magazinesStore;
 }
 
 // Get single magazine by ID
@@ -160,24 +158,23 @@ export async function deleteMagazine(id: string): Promise<boolean> {
     return false;
   }
   
-  // Delete the PDF file if it exists
+  // Delete the PDF file from Vercel Blob
   try {
-    const filePath = path.join(process.cwd(), 'public', magazines[id].filePath);
-    await fs.unlink(filePath);
+    // If filePath is a Vercel Blob URL, extract the key
+    const filePath = magazines[id].filePath;
+    if (filePath && filePath.startsWith('https://')) {
+      // The key is usually the filename at the end of the URL
+      const key = filePath.split('/').pop();
+      if (key) await del(key);
+    }
   } catch (error) {
-    console.warn('Could not delete magazine file:', error);
+    console.warn('Could not delete magazine file from Vercel Blob:', error);
   }
-  
-  // Delete the cover photo if it exists
-  try {
-    await deleteCoverPhoto(id);
-  } catch (error) {
-    console.warn('Could not delete cover photo:', error);
-  }
-  
+
+  // TODO: Delete cover photo from Vercel Blob if needed
+
   delete magazines[id];
-  await saveAllMagazines(magazines);
-  
+  // In-memory only; in production, delete from DB
   return true;
 }
 

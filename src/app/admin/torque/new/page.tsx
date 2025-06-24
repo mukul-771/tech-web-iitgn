@@ -119,7 +119,10 @@ export default function NewMagazinePage() {
         articles: parseInt(formData.articles) || 0,
         featured: formData.featured,
         filePath: pdfUrl,
+        fileName: selectedFile.name,
+        fileSize: selectedFile.size,
         coverPhoto: coverPhotoUrl,
+        coverPhotoFileName: selectedCoverPhoto?.name,
         isLatest: formData.isLatest
       };
       const response = await fetch("/api/admin/torque", {

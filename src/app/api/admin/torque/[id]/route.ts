@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
-import { getMagazineById, updateMagazine, deleteMagazine, setLatestMagazine } from "@/lib/torque-storage";
+import { getMagazineById, updateMagazine, deleteMagazine } from "@/lib/torque-storage";
 import { z } from "zod";
 
 // Validation schema for magazine updates

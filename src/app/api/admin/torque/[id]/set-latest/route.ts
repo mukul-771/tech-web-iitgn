@@ -21,11 +21,7 @@ export async function POST(
     }
 
     const resolvedParams = await params;
-    const success = await setLatestMagazine(resolvedParams.id);
-
-    if (!success) {
-      return NextResponse.json({ error: "Magazine not found" }, { status: 404 });
-    }
+    await setLatestMagazine(resolvedParams.id);
 
     return NextResponse.json({ message: "Magazine set as latest successfully" });
   } catch (error) {

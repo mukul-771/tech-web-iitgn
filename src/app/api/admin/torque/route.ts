@@ -1,9 +1,8 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
-import { getAllMagazines, createMagazine } from "@/lib/torque-storage";
+import { getAllMagazines, createMagazine, TorqueMagazineInput } from "@/lib/torque-storage";
 import { z } from "zod";
-import { TorqueMagazineInput } from "@/lib/torque-magazine.model";
 
 // Validation schema for magazine creation
 const createMagazineSchema = z.object({
@@ -14,7 +13,10 @@ const createMagazineSchema = z.object({
   articles: z.number().min(1, "Articles must be at least 1"),
   featured: z.string().min(1, "Featured article is required"),
   filePath: z.string().min(1, "File path is required"),
+  fileName: z.string().min(1, "File name is required"),
+  fileSize: z.number().min(1, "File size is required"),
   coverPhoto: z.string().optional(),
+  coverPhotoFileName: z.string().optional(),
   isLatest: z.boolean().optional().default(false)
 });
 

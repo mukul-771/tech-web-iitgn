@@ -1,4 +1,4 @@
-import { NextRequest, NextResponse } from 'next/server';
+import { NextResponse } from 'next/server';
 import { getHackathonsForDisplay } from '@/lib/hackathons-storage';
 import { getHackathonsVisibility } from '@/lib/site-settings';
 

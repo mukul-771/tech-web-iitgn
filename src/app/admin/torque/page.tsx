@@ -8,12 +8,12 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Plus, Edit, Trash2, Download, Star, BookOpen, FileText, Calendar } from "lucide-react";
-import { TorqueMagazine } from "@/lib/torque-data";
+import { TorqueMagazineData } from "@/lib/torque-storage";
 
 export default function TorqueAdminPage() {
   const { data: session, status } = useSession();
   const router = useRouter();
-  const [magazines, setMagazines] = useState<Record<string, TorqueMagazine>>({});
+  const [magazines, setMagazines] = useState<Record<string, TorqueMagazineData>>({});
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 

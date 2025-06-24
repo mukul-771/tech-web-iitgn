@@ -85,6 +85,7 @@ export default function NewMagazinePage() {
     const filename = `${pathPrefix}/${Date.now()}-${file.name}`;
     const result = await upload(filename, file, {
       access: 'public',
+      handleUploadUrl: '/api/vercel/blob/upload',
     });
     return result.url;
   };

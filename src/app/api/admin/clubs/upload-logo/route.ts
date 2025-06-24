@@ -25,7 +25,14 @@ export async function POST(request: NextRequest) {
     // Clean the club ID (remove any trailing characters like :1)
     const cleanClubId = clubId?.split(':')[0];
     
-    console.log('Logo upload request:', { originalId: clubId, cleanId: cleanClubId, fileName: file?.name });
+    console.log('Logo upload request:', { 
+      originalId: clubId, 
+      cleanId: cleanClubId, 
+      fileName: file?.name,
+      fileSize: file?.size,
+      fileType: file?.type,
+      hasToken: !!process.env.BLOB_READ_WRITE_TOKEN
+    });
 
     if (!file) {
       return NextResponse.json({ error: "No file provided" }, { status: 400 });
@@ -33,6 +40,11 @@ export async function POST(request: NextRequest) {
 
     if (!cleanClubId) {
       return NextResponse.json({ error: "Club ID is required" }, { status: 400 });
+    }
+
+    if (!process.env.BLOB_READ_WRITE_TOKEN) {
+      console.error('BLOB_READ_WRITE_TOKEN not found');
+      return NextResponse.json({ error: "Server configuration error" }, { status: 500 });
     }
 
     // Validate file type
@@ -54,10 +66,13 @@ export async function POST(request: NextRequest) {
                     'technical-council-groups';
     const fileName = `logos/${logoType}/${cleanClubId}.${fileExtension}`;
 
+    console.log('Uploading to blob:', { fileName, logoType, fileExtension });
+
     // Upload to Vercel Blob
     const blob = await put(fileName, file, {
       access: 'public',
       token: process.env.BLOB_READ_WRITE_TOKEN,
+      addRandomSuffix: false, // Ensure consistent file naming
     });
 
     console.log('Logo uploaded successfully:', { url: blob.url, fileName });
@@ -68,9 +83,16 @@ export async function POST(request: NextRequest) {
     });
 
   } catch (error) {
-    console.error("Error uploading logo:", error);
+    console.error("Error uploading logo:", {
+      error: error instanceof Error ? error.message : error,
+      stack: error instanceof Error ? error.stack : undefined,
+      type: error?.constructor?.name
+    });
     return NextResponse.json(
-      { error: "Failed to upload logo" },
+      { 
+        error: "Failed to upload logo",
+        details: error instanceof Error ? error.message : "Unknown error"
+      },
       { status: 500 }
     );
   }

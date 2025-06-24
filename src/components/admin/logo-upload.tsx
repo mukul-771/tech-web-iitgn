@@ -85,16 +85,19 @@ export function LogoUpload({
 
       if (!response.ok) {
         const error = await response.json();
-        throw new Error(error.error || "Failed to upload logo");
+        console.error('Upload error response:', error);
+        throw new Error(error.error || `HTTP ${response.status}: ${response.statusText}`);
       }
 
       const result = await response.json();
+      console.log('Upload successful:', result);
       onLogoUploaded(result.url);
       setUploadSuccess(true);
 
     } catch (error) {
       console.error("Error uploading logo:", error);
-      alert("Failed to upload logo. Please try again.");
+      const errorMessage = error instanceof Error ? error.message : "Failed to upload logo. Please try again.";
+      alert(errorMessage);
       setPreviewUrl(currentLogoUrl || null);
     } finally {
       setIsUploading(false);

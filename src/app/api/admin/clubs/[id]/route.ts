@@ -89,14 +89,27 @@ export async function PUT(
     console.log('PUT Club request - User-Agent:', request.headers.get('user-agent'));
     console.log('PUT Club request - Cache-Control:', request.headers.get('cache-control'));
     
-    const body = await request.json();
-    console.log('Request body keys:', Object.keys(body));
+    let body;
+    try {
+      body = await request.json();
+      console.log('Request body parsed successfully. Keys:', Object.keys(body));
+    } catch (parseError) {
+      console.error('Failed to parse request body:', parseError);
+      return NextResponse.json({ error: "Invalid JSON in request body" }, { status: 400 });
+    }
 
     // Validate request body
-    const validatedData = updateClubSchema.parse(body);
-    console.log('Validation passed');
+    let validatedData;
+    try {
+      validatedData = updateClubSchema.parse(body);
+      console.log('Validation passed');
+    } catch (validationError) {
+      console.error('Validation failed:', validationError);
+      throw validationError;
+    }
 
     // Update club
+    console.log('Attempting to update club with ID:', cleanClubId);
     const updatedClub = await updateClub(cleanClubId, validatedData);
 
     if (!updatedClub) {
@@ -117,7 +130,6 @@ export async function PUT(
     return NextResponse.json(updatedClub);
   } catch (error) {
     console.error("Error updating club:", {
-      clubId: (await params).id,
       error: error instanceof Error ? error.message : error,
       stack: error instanceof Error ? error.stack : undefined,
       type: error?.constructor?.name

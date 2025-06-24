@@ -127,6 +127,7 @@ export async function saveAllClubs(clubs: Record<string, Club>): Promise<void> {
       // Use Vercel Blob in production
       console.log('Using Vercel Blob storage for clubs');
       if (!BLOB_TOKEN) {
+        console.error('BLOB_READ_WRITE_TOKEN not found');
         throw new Error('BLOB_READ_WRITE_TOKEN not found');
       }
 
@@ -146,6 +147,8 @@ export async function saveAllClubs(clubs: Record<string, Club>): Promise<void> {
           console.log('Could not list existing blobs:', listError);
         }
 
+        console.log('Starting blob upload for clubs data...');
+        
         // Upload new data
         const blob = await put(CLUBS_BLOB_URL, JSON.stringify(clubs, null, 2), {
           access: 'public',
@@ -156,7 +159,11 @@ export async function saveAllClubs(clubs: Record<string, Club>): Promise<void> {
 
         console.log('Clubs data saved successfully to blob:', blob.url);
       } catch (blobError) {
-        console.error('Vercel Blob save failed:', blobError);
+        console.error('Vercel Blob save failed:', {
+          error: blobError instanceof Error ? blobError.message : blobError,
+          stack: blobError instanceof Error ? blobError.stack : undefined,
+          type: blobError?.constructor?.name
+        });
         throw new Error(`Blob storage failed: ${blobError instanceof Error ? blobError.message : 'Unknown error'}`);
       }
     }
@@ -164,7 +171,8 @@ export async function saveAllClubs(clubs: Record<string, Club>): Promise<void> {
     console.error('Error saving clubs:', {
       error: error instanceof Error ? error.message : error,
       stack: error instanceof Error ? error.stack : undefined,
-      isDevelopment
+      isDevelopment,
+      clubsCount: Object.keys(clubs).length
     });
 
     if (isDevelopment) {

@@ -268,7 +268,9 @@ export default function EditMagazinePage() {
       });
 
       if (!response.ok) {
-        throw new Error("Failed to set latest magazine");
+        const errorData = await response.json().catch(() => ({}));
+        const errorMessage = errorData.error || "Failed to set latest magazine";
+        throw new Error(errorMessage);
       }
 
       // Update local state
@@ -276,7 +278,8 @@ export default function EditMagazinePage() {
       alert("Magazine set as latest successfully!");
     } catch (error) {
       console.error("Error setting latest magazine:", error);
-      alert("Failed to set latest magazine");
+      const errorMessage = error instanceof Error ? error.message : "Failed to set latest magazine";
+      alert(errorMessage);
     }
   };
 

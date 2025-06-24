@@ -41,11 +41,16 @@ function generateMagazineId(): string {
 
 // Store metadata as JSON in Vercel Blob
 async function storeMetadata(id: string, data: TorqueMagazineData): Promise<void> {
-  const metadataPath = `magazines/${id}/metadata.json`;
-  await put(metadataPath, JSON.stringify(data, null, 2), {
-    access: 'public',
-    contentType: 'application/json',
-  });
+  try {
+    const metadataPath = `magazines/${id}/metadata.json`;
+    await put(metadataPath, JSON.stringify(data, null, 2), {
+      access: 'public',
+      contentType: 'application/json',
+    });
+  } catch (error) {
+    console.error(`Failed to store metadata for magazine ${id}:`, error);
+    throw new Error(`Failed to store magazine metadata: ${error instanceof Error ? error.message : 'Unknown error'}`);
+  }
 }
 
 // Get metadata from Vercel Blob
@@ -155,6 +160,12 @@ export async function updateMagazine(id: string, updates: Partial<TorqueMagazine
 export async function setLatestMagazine(targetId: string): Promise<void> {
   const magazines = await listAllMetadata();
   
+  // Check if target magazine exists
+  const target = magazines.find(mag => mag.id === targetId);
+  if (!target) {
+    throw new Error(`Magazine with ID ${targetId} not found`);
+  }
+  
   // Update all magazines to not be latest, except the target
   for (const mag of magazines) {
     if (mag.id !== targetId && mag.isLatest) {
@@ -163,12 +174,9 @@ export async function setLatestMagazine(targetId: string): Promise<void> {
     }
   }
   
-  // Set target as latest if it exists
-  const target = magazines.find(mag => mag.id === targetId);
-  if (target) {
-    const updated = { ...target, isLatest: true, updatedAt: new Date().toISOString() };
-    await storeMetadata(targetId, updated);
-  }
+  // Set target as latest
+  const updated = { ...target, isLatest: true, updatedAt: new Date().toISOString() };
+  await storeMetadata(targetId, updated);
 }
 
 // Delete magazine and all its files

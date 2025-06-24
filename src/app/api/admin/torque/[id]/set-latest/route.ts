@@ -21,13 +21,22 @@ export async function POST(
     }
 
     const resolvedParams = await params;
-    await setLatestMagazine(resolvedParams.id);
+    const magazineId = resolvedParams.id;
+    
+    if (!magazineId) {
+      return NextResponse.json({ error: "Magazine ID is required" }, { status: 400 });
+    }
+
+    await setLatestMagazine(magazineId);
 
     return NextResponse.json({ message: "Magazine set as latest successfully" });
   } catch (error) {
     console.error("Error setting latest magazine:", error);
+    
+    // Provide more specific error message
+    const errorMessage = error instanceof Error ? error.message : "Unknown error occurred";
     return NextResponse.json(
-      { error: "Failed to set latest magazine" },
+      { error: `Failed to set latest magazine: ${errorMessage}` },
       { status: 500 }
     );
   }

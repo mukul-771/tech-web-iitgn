@@ -150,14 +150,19 @@ export async function saveAllClubs(clubs: Record<string, Club>): Promise<void> {
         console.log('Starting blob upload for clubs data...');
         
         // Upload new data
-        const blob = await put(CLUBS_BLOB_URL, JSON.stringify(clubs, null, 2), {
-          access: 'public',
-          token: BLOB_TOKEN,
-          contentType: 'application/json',
-          addRandomSuffix: false, // Ensure we overwrite the same blob
-        });
-
-        console.log('Clubs data saved successfully to blob:', blob.url);
+        try {
+          const blob = await put(CLUBS_BLOB_URL, JSON.stringify(clubs, null, 2), {
+            access: 'public',
+            token: BLOB_TOKEN,
+            contentType: 'application/json',
+            addRandomSuffix: false, // Ensure we overwrite the same blob
+            allowOverwrite: true, // Allow overwriting existing clubs.json
+          });
+          console.log('Clubs data saved successfully to blob:', blob.url);
+        } catch (putError) {
+          console.error('Failed to save clubs data to blob:', putError);
+          throw new Error('Blob storage failed: ' + (putError instanceof Error ? putError.message : String(putError)));
+        }
       } catch (blobError) {
         console.error('Vercel Blob save failed:', {
           error: blobError instanceof Error ? blobError.message : blobError,

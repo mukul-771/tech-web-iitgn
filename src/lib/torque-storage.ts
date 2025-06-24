@@ -160,12 +160,19 @@ export async function deleteMagazine(id: string): Promise<boolean> {
     return false;
   }
   
-  // Delete the file if it exists
+  // Delete the PDF file if it exists
   try {
     const filePath = path.join(process.cwd(), 'public', magazines[id].filePath);
     await fs.unlink(filePath);
   } catch (error) {
     console.warn('Could not delete magazine file:', error);
+  }
+  
+  // Delete the cover photo if it exists
+  try {
+    await deleteCoverPhoto(id);
+  } catch (error) {
+    console.warn('Could not delete cover photo:', error);
   }
   
   delete magazines[id];

@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import NextImage from "next/image";
 import { AdminLayout } from "@/components/admin/admin-layout";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -10,7 +11,7 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Alert, AlertDescription } from "@/components/ui/alert";
-import { ArrowLeft, Upload, FileText, Image, CheckCircle, AlertCircle, Info } from "lucide-react";
+import { ArrowLeft, Upload, FileText, Image, CheckCircle, AlertCircle } from "lucide-react";
 import { maxFileSize, maxImageSize } from "@/lib/torque-data";
 
 export default function NewMagazinePage() {
@@ -176,13 +177,13 @@ export default function NewMagazinePage() {
       setUploadProgress(60);
 
       // Upload cover photo if selected
-      if (selectedCoverPhoto && createdMagazine.magazine) {
+      if (selectedCoverPhoto && createdMagazine.id) {
         setUploadProgress(70);
         try {
-          const coverUploadResult = await uploadCoverPhoto(selectedCoverPhoto, createdMagazine.magazine.id);
+          const coverUploadResult = await uploadCoverPhoto(selectedCoverPhoto, createdMagazine.id);
 
           // Update magazine with cover photo
-          const updateResponse = await fetch(`/api/admin/torque/${createdMagazine.magazine.id}`, {
+          const updateResponse = await fetch(`/api/admin/torque/${createdMagazine.id}`, {
             method: "PUT",
             headers: {
               "Content-Type": "application/json",
@@ -327,7 +328,7 @@ export default function NewMagazinePage() {
           <Card className="glass">
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
-                <Image className="h-5 w-5" />
+                <Image className="h-5 w-5" aria-label="Cover photo icon" />
                 Cover Photo (Optional)
               </CardTitle>
             </CardHeader>
@@ -349,7 +350,7 @@ export default function NewMagazinePage() {
                 <div className="space-y-3">
                   <div className="p-3 bg-muted rounded-lg">
                     <div className="flex items-center gap-2">
-                      <Image className="h-4 w-4" />
+                      <Image className="h-4 w-4" aria-label="Image icon" />
                       <span className="text-sm font-medium">{selectedCoverPhoto.name}</span>
                     </div>
                     <p className="text-xs text-muted-foreground mt-1">
@@ -361,10 +362,11 @@ export default function NewMagazinePage() {
                     <div className="space-y-2">
                       <Label>Preview:</Label>
                       <div className="relative w-48 h-64 mx-auto">
-                        <img
+                        <NextImage
                           src={coverPhotoPreview}
                           alt="Cover photo preview"
                           className="w-full h-full object-cover rounded-lg shadow-md"
+                          fill
                         />
                       </div>
                     </div>

@@ -202,53 +202,6 @@
     "updatedAt": "2025-06-01T20:52:16.422Z",
     "logoPath": ""
   },
-  "tinkerers-lab": {
-    "id": "tinkerers-lab",
-    "name": "TINKERER'S LAB",
-    "description": "A hands-on innovation space where students experiment with hardware, prototyping, and creative engineering solutions to bring ideas to life.",
-    "longDescription": "TINKERER'S LAB is a hands-on innovation space dedicated to hardware experimentation, prototyping, and creative engineering solutions. We provide access to tools, equipment, and mentorship for students to bring their ideas to life through practical implementation and iterative design.",
-    "type": "technical-council-group",
-    "category": "Innovation & Prototyping",
-    "members": "50+",
-    "established": "2020",
-    "email": "tinkererslab@iitgn.ac.in",
-    "achievements": [
-      "Built innovative hardware prototypes",
-      "Winner - National Innovation Challenge",
-      "Developed IoT solutions for campus",
-      "Mentored 100+ student projects"
-    ],
-    "projects": [
-      "Smart Campus IoT Network",
-      "Sustainable Energy Solutions",
-      "Assistive Technology Development",
-      "Maker Space Equipment Design"
-    ],
-    "team": [
-      {
-        "name": "Rajesh Kumar",
-        "role": "Secretary",
-        "email": "rajesh.kumar@iitgn.ac.in"
-      },
-      {
-        "name": "Sneha Agarwal",
-        "role": "General Member",
-        "email": "sneha.agarwal@iitgn.ac.in"
-      },
-      {
-        "name": "Vikram Singh",
-        "role": "General Member",
-        "email": "vikram.singh@iitgn.ac.in"
-      },
-      {
-        "name": "Priya Sharma",
-        "role": "General Member",
-        "email": "priya.sharma@iitgn.ac.in"
-      }
-    ],
-    "createdAt": "2023-01-01T00:00:00Z",
-    "updatedAt": "2025-01-27T00:00:00Z"
-  },
   "systems": {
     "id": "systems",
     "name": "Systems Club",
@@ -413,5 +366,52 @@
     "createdAt": "2023-01-01T00:00:00Z",
     "updatedAt": "2025-06-01T20:57:02.702Z",
     "logoPath": ""
+  },
+  "tinkerers-lab": {
+    "id": "tinkerers-lab",
+    "name": "TINKERER'S LAB",
+    "description": "A hands-on innovation space where students experiment with hardware, prototyping, and creative engineering solutions to bring ideas to life.",
+    "longDescription": "TINKERER'S LAB is a hands-on innovation space dedicated to hardware experimentation, prototyping, and creative engineering solutions. We provide access to tools, equipment, and mentorship for students to bring their ideas to life through practical implementation and iterative design.",
+    "type": "technical-council-group",
+    "category": "Innovation & Prototyping",
+    "members": "50+",
+    "established": "2020",
+    "email": "tinkererslab@iitgn.ac.in",
+    "achievements": [
+      "Built innovative hardware prototypes",
+      "Winner - National Innovation Challenge",
+      "Developed IoT solutions for campus",
+      "Mentored 100+ student projects"
+    ],
+    "projects": [
+      "Smart Campus IoT Network",
+      "Sustainable Energy Solutions",
+      "Assistive Technology Development",
+      "Maker Space Equipment Design"
+    ],
+    "team": [
+      {
+        "name": "Rajesh Kumar",
+        "role": "Secretary",
+        "email": "rajesh.kumar@iitgn.ac.in"
+      },
+      {
+        "name": "Sneha Agarwal",
+        "role": "General Member",
+        "email": "sneha.agarwal@iitgn.ac.in"
+      },
+      {
+        "name": "Vikram Singh",
+        "role": "General Member",
+        "email": "vikram.singh@iitgn.ac.in"
+      },
+      {
+        "name": "Priya Sharma",
+        "role": "General Member",
+        "email": "priya.sharma@iitgn.ac.in"
+      }
+    ],
+    "createdAt": "2023-01-01T00:00:00Z",
+    "updatedAt": "2025-01-27T00:00:00Z"
   }
 }

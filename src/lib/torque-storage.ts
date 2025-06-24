@@ -28,38 +28,46 @@ export async function getLatestMagazine(): Promise<TorqueMagazine | null> {
 // Create new magazine (metadata only)
 export async function createMagazine(magazine: Omit<TorqueMagazine, 'id' | 'createdAt' | 'updatedAt'>): Promise<TorqueMagazine> {
   const magazines = await getAllMagazines();
-  
   const id = generateMagazineId(magazine.year, magazine.title);
   const now = new Date().toISOString();
-  
+
+  // If this magazine is set as latest, unset all others
+  if (magazine.isLatest) {
+    Object.keys(magazines).forEach(key => {
+      magazines[key].isLatest = false;
+    });
+  }
+
   const newMagazine: TorqueMagazine = {
     ...magazine,
     id,
     createdAt: now,
     updatedAt: now
   };
-  
   magazines[id] = newMagazine;
-  
   return newMagazine;
 }
 
 // Update existing magazine (metadata only)
 export async function updateMagazine(id: string, updates: Partial<Omit<TorqueMagazine, 'id' | 'createdAt'>>): Promise<TorqueMagazine | null> {
   const magazines = await getAllMagazines();
-  
   if (!magazines[id]) {
     return null;
   }
-  
+
+  // If update sets isLatest to true, unset all others
+  if (updates.isLatest) {
+    Object.keys(magazines).forEach(key => {
+      magazines[key].isLatest = false;
+    });
+  }
+
   const updatedMagazine: TorqueMagazine = {
     ...magazines[id],
     ...updates,
     updatedAt: new Date().toISOString()
   };
-  
   magazines[id] = updatedMagazine;
-  
   return updatedMagazine;
 }
 

@@ -54,14 +54,17 @@ export default function AdminHackathonsPage() {
       });
 
       if (!response.ok) {
-        throw new Error("Failed to delete hackathon");
+        const errorData = await response.json().catch(() => ({}));
+        const errorMessage = errorData.error || "Failed to delete hackathon";
+        throw new Error(errorMessage);
       }
 
       await fetchHackathons(); // Refresh the list
       alert("Hackathon deleted successfully!");
     } catch (error) {
       console.error("Error deleting hackathon:", error);
-      alert("Failed to delete hackathon. Please try again.");
+      const errorMessage = error instanceof Error ? error.message : "Failed to delete hackathon. Please try again.";
+      alert(errorMessage);
     } finally {
       setDeletingId(null);
     }

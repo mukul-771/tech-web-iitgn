@@ -1,5 +1,13 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { getServerSession } from "next-auth";
+import { authOptions } from "@/lib/auth";
 import { getHackathonById, updateHackathon, deleteHackathon } from '@/lib/hackathons-storage';
+
+// Check if user is admin
+async function checkAdminAuth() {
+  const session = await getServerSession(authOptions);
+  return session?.user?.isAdmin || false;
+}
 
 export async function GET(
   request: NextRequest,
@@ -31,6 +39,11 @@ export async function PUT(
   { params }: { params: Promise<{ id: string }> }
 ) {
   try {
+    const isAdmin = await checkAdminAuth();
+    if (!isAdmin) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
+
     const { id } = await params;
     const body = await request.json();
 
@@ -61,6 +74,11 @@ export async function DELETE(
   { params }: { params: Promise<{ id: string }> }
 ) {
   try {
+    const isAdmin = await checkAdminAuth();
+    if (!isAdmin) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
+
     const { id } = await params;
     await deleteHackathon(id);
     return NextResponse.json({ message: 'Hackathon deleted successfully' });

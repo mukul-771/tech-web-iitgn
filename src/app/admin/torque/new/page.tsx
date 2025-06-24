@@ -13,6 +13,7 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { ArrowLeft, Upload, FileText, Image, CheckCircle, AlertCircle } from "lucide-react";
 import { maxFileSize, maxImageSize } from "@/lib/torque-data";
+import { upload } from "@vercel/blob/client";
 
 export default function NewMagazinePage() {
   const router = useRouter();
@@ -39,50 +40,38 @@ export default function NewMagazinePage() {
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
-    setErrorMessage(''); // Clear previous errors
-
+    setErrorMessage('');
     if (file) {
-      // Validate file type
       if (file.type !== 'application/pdf') {
         setErrorMessage('Please select a PDF file.');
-        e.target.value = ''; // Clear the input
+        e.target.value = '';
         return;
       }
-
-      // Validate file size
       if (file.size > maxFileSize) {
         setErrorMessage(`File size too large. Maximum size is ${maxFileSize / (1024 * 1024)}MB.`);
-        e.target.value = ''; // Clear the input
+        e.target.value = '';
         return;
       }
-
       setSelectedFile(file);
     }
   };
 
   const handleCoverPhotoChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
-    setErrorMessage(''); // Clear previous errors
-
+    setErrorMessage('');
     if (file) {
-      // Validate file type
       const allowedTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/webp'];
       if (!allowedTypes.includes(file.type)) {
         setErrorMessage('Please select a valid image file (JPEG, PNG, or WebP).');
-        e.target.value = ''; // Clear the input
+        e.target.value = '';
         return;
       }
-
-      // Validate file size
       if (file.size > maxImageSize) {
         setErrorMessage(`Image size too large. Maximum size is ${maxImageSize / (1024 * 1024)}MB.`);
-        e.target.value = ''; // Clear the input
+        e.target.value = '';
         return;
       }
-
       setSelectedCoverPhoto(file);
-
-      // Create preview
       const reader = new FileReader();
       reader.onload = (e) => {
         setCoverPhotoPreview(e.target?.result as string);
@@ -91,63 +80,36 @@ export default function NewMagazinePage() {
     }
   };
 
-  const uploadFile = async (file: File, year: string) => {
-    const uploadFormData = new FormData();
-    uploadFormData.append('file', file);
-    uploadFormData.append('year', year);
-
-    const response = await fetch('/api/admin/torque/upload', {
-      method: 'POST',
-      body: uploadFormData,
+  // Direct-to-blob upload for PDF and cover photo
+  const uploadToBlob = async (file: File, pathPrefix: string) => {
+    const filename = `${pathPrefix}/${Date.now()}-${file.name}`;
+    const result = await upload(filename, file, {
+      access: 'public',
     });
-
-    if (!response.ok) {
-      const error = await response.json();
-      throw new Error(error.error || 'Failed to upload file');
-    }
-
-    return response.json();
-  };
-
-  const uploadCoverPhoto = async (file: File, magazineId: string) => {
-    const uploadFormData = new FormData();
-    uploadFormData.append('file', file);
-    uploadFormData.append('magazineId', magazineId);
-
-    const response = await fetch('/api/admin/torque/upload-cover', {
-      method: 'POST',
-      body: uploadFormData,
-    });
-
-    if (!response.ok) {
-      const error = await response.json();
-      throw new Error(error.error || 'Failed to upload cover photo');
-    }
-
-    return response.json();
+    return result.url;
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-
     if (!selectedFile) {
       setErrorMessage('Please select a PDF file to upload.');
       return;
     }
-
     setIsLoading(true);
     setUploadProgress(0);
     setUploadStatus('uploading');
     setErrorMessage('');
-
     try {
-      // Upload file first
       setUploadProgress(20);
-      const uploadResult = await uploadFile(selectedFile, formData.year);
-
-      setUploadProgress(40);
-
-      // Create magazine record first to get the ID
+      // Upload PDF to Vercel Blob
+      const pdfUrl = await uploadToBlob(selectedFile, `magazines/${formData.year}`);
+      setUploadProgress(50);
+      let coverPhotoUrl: string | undefined = undefined;
+      if (selectedCoverPhoto) {
+        coverPhotoUrl = await uploadToBlob(selectedCoverPhoto, `magazines/${formData.year}/covers`);
+        setUploadProgress(70);
+      }
+      // Create magazine record
       const magazineData = {
         year: formData.year,
         title: formData.title,
@@ -155,12 +117,10 @@ export default function NewMagazinePage() {
         pages: parseInt(formData.pages) || 0,
         articles: parseInt(formData.articles) || 0,
         featured: formData.featured,
-        filePath: uploadResult.filePath,
-        fileName: uploadResult.fileName,
-        fileSize: uploadResult.fileSize,
+        filePath: pdfUrl,
+        coverPhoto: coverPhotoUrl,
         isLatest: formData.isLatest
       };
-
       const response = await fetch("/api/admin/torque", {
         method: "POST",
         headers: {
@@ -168,51 +128,11 @@ export default function NewMagazinePage() {
         },
         body: JSON.stringify(magazineData),
       });
-
       if (!response.ok) {
         throw new Error("Failed to create magazine record");
       }
-
-      const createdMagazine = await response.json();
-      setUploadProgress(60);
-
-      // Upload cover photo if selected
-      if (selectedCoverPhoto && createdMagazine.id) {
-        setUploadProgress(70);
-        try {
-          const coverUploadResult = await uploadCoverPhoto(selectedCoverPhoto, createdMagazine.id);
-
-          // Update magazine with cover photo
-          const updateResponse = await fetch(`/api/admin/torque/${createdMagazine.id}`, {
-            method: "PUT",
-            headers: {
-              "Content-Type": "application/json",
-            },
-            body: JSON.stringify({
-              coverPhoto: coverUploadResult.filePath,
-              coverPhotoFileName: coverUploadResult.fileName
-            }),
-          });
-
-          if (!updateResponse.ok) {
-            const updateError = await updateResponse.json();
-            console.error("Failed to update magazine with cover photo:", updateError);
-            throw new Error("Failed to save cover photo to magazine");
-          }
-
-          console.log("Cover photo uploaded and saved successfully");
-        } catch (coverError) {
-          console.error("Cover photo upload error:", coverError);
-          // Don't fail the entire process for cover photo issues
-          setErrorMessage("Magazine created but cover photo upload failed. You can add it later by editing the magazine.");
-        }
-        setUploadProgress(90);
-      }
-
       setUploadProgress(100);
       setUploadStatus('success');
-
-      // Redirect after a brief success message
       setTimeout(() => {
         router.push("/admin/torque");
       }, 1000);
@@ -255,7 +175,6 @@ export default function NewMagazinePage() {
             </p>
           </div>
         </div>
-
         {/* Status Alerts */}
         {uploadStatus === 'error' && errorMessage && (
           <Alert variant="destructive">
@@ -263,14 +182,12 @@ export default function NewMagazinePage() {
             <AlertDescription>{errorMessage}</AlertDescription>
           </Alert>
         )}
-
         {uploadStatus === 'success' && (
           <Alert>
             <CheckCircle className="h-4 w-4" />
             <AlertDescription>Magazine uploaded successfully! Redirecting...</AlertDescription>
           </Alert>
         )}
-
         <form onSubmit={handleSubmit} className="space-y-6">
           {/* File Upload */}
           <Card className="glass">
@@ -294,7 +211,6 @@ export default function NewMagazinePage() {
                   Maximum file size: {formatFileSize(maxFileSize)}. Only PDF files are allowed.
                 </p>
               </div>
-              
               {selectedFile && (
                 <div className="p-3 bg-muted rounded-lg">
                   <div className="flex items-center gap-2">
@@ -306,7 +222,6 @@ export default function NewMagazinePage() {
                   </p>
                 </div>
               )}
-
               {uploadProgress > 0 && (
                 <div className="space-y-2">
                   <div className="flex justify-between text-sm">
@@ -323,7 +238,6 @@ export default function NewMagazinePage() {
               )}
             </CardContent>
           </Card>
-
           {/* Cover Photo Upload */}
           <Card className="glass">
             <CardHeader>
@@ -345,7 +259,6 @@ export default function NewMagazinePage() {
                   Maximum file size: {formatFileSize(maxImageSize)}. Supported formats: JPEG, PNG, WebP.
                 </p>
               </div>
-
               {selectedCoverPhoto && (
                 <div className="space-y-3">
                   <div className="p-3 bg-muted rounded-lg">
@@ -357,7 +270,6 @@ export default function NewMagazinePage() {
                       Size: {formatFileSize(selectedCoverPhoto.size)}
                     </p>
                   </div>
-
                   {coverPhotoPreview && (
                     <div className="space-y-2">
                       <Label>Preview:</Label>
@@ -375,7 +287,6 @@ export default function NewMagazinePage() {
               )}
             </CardContent>
           </Card>
-
           {/* Magazine Information */}
           <Card className="glass">
             <CardHeader>
@@ -404,7 +315,6 @@ export default function NewMagazinePage() {
                   />
                 </div>
               </div>
-
               <div>
                 <Label htmlFor="description">Description *</Label>
                 <Textarea
@@ -416,7 +326,6 @@ export default function NewMagazinePage() {
                   placeholder="Brief description of the magazine content"
                 />
               </div>
-
               <div className="grid gap-4 md:grid-cols-3">
                 <div>
                   <Label htmlFor="pages">Number of Pages *</Label>
@@ -453,7 +362,6 @@ export default function NewMagazinePage() {
                   />
                 </div>
               </div>
-
               <div className="flex items-center space-x-2">
                 <Checkbox
                   id="isLatest"
@@ -466,7 +374,6 @@ export default function NewMagazinePage() {
               </div>
             </CardContent>
           </Card>
-
           {/* Submit Button */}
           <div className="flex justify-end gap-4">
             <Button

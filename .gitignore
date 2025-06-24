@@ -43,3 +43,4 @@ next-env.d.ts
 # functions
 functions/node_modules/
 functions/lib/
+.env*.local

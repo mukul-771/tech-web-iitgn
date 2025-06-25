@@ -127,10 +127,10 @@ export const hackathonCategories = [
 
 // Hackathon statuses
 export const hackathonStatuses = [
-  { value: "upcoming", label: "Upcoming" },
-  { value: "ongoing", label: "Ongoing" },
-  { value: "completed", label: "Completed" },
-  { value: "cancelled", label: "Cancelled" }
+  "upcoming",
+  "ongoing",
+  "completed",
+  "cancelled"
 ];
 
 // Prize positions

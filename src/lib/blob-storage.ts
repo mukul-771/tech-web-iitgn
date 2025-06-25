@@ -15,9 +15,12 @@ const DEFAULT_BLOB_SETTINGS: BlobSettings = {
   lastUpdated: new Date().toISOString()
 }
 
-// Ensure data directory exists
+// Check if we're in development mode
+const isDevelopment = process.env.NODE_ENV === 'development'
+
+// Ensure data directory exists (development only)
 function ensureDataDir() {
-  if (!fs.existsSync(DATA_DIR)) {
+  if (isDevelopment && !fs.existsSync(DATA_DIR)) {
     fs.mkdirSync(DATA_DIR, { recursive: true })
   }
 }
@@ -25,6 +28,11 @@ function ensureDataDir() {
 // Get blob settings
 export function getBlobSettings(): BlobSettings {
   try {
+    if (!isDevelopment) {
+      // In production, return defaults since we can't write to filesystem
+      return DEFAULT_BLOB_SETTINGS
+    }
+
     ensureDataDir()
     
     if (!fs.existsSync(BLOB_FILE)) {
@@ -51,8 +59,6 @@ export function getBlobSettings(): BlobSettings {
 // Update blob settings
 export function updateBlobSettings(newSettings: Partial<BlobSettings>): BlobSettings {
   try {
-    ensureDataDir()
-    
     const currentSettings = getBlobSettings()
     const updatedSettings: BlobSettings = {
       ...currentSettings,
@@ -64,12 +70,17 @@ export function updateBlobSettings(newSettings: Partial<BlobSettings>): BlobSett
     if (updatedSettings.color && !/^#[0-9A-Fa-f]{6}$/.test(updatedSettings.color)) {
       throw new Error('Invalid color format. Must be a valid hex color (e.g., #06b6d4)')
     }
+
+    if (isDevelopment) {
+      ensureDataDir()
+      
+      // Write to file atomically
+      const tempFile = BLOB_FILE + '.tmp'
+      fs.writeFileSync(tempFile, JSON.stringify(updatedSettings, null, 2))
+      fs.renameSync(tempFile, BLOB_FILE)
+    }
     
-    // Write to file atomically
-    const tempFile = BLOB_FILE + '.tmp'
-    fs.writeFileSync(tempFile, JSON.stringify(updatedSettings, null, 2))
-    fs.renameSync(tempFile, BLOB_FILE)
-    
+    // In production, we can't write to filesystem, but return the updated settings anyway
     return updatedSettings
   } catch (error) {
     console.error('Error updating blob settings:', error)
@@ -80,8 +91,12 @@ export function updateBlobSettings(newSettings: Partial<BlobSettings>): BlobSett
 // Reset blob settings to default
 export function resetBlobSettings(): BlobSettings {
   try {
-    ensureDataDir()
-    fs.writeFileSync(BLOB_FILE, JSON.stringify(DEFAULT_BLOB_SETTINGS, null, 2))
+    if (isDevelopment) {
+      ensureDataDir()
+      fs.writeFileSync(BLOB_FILE, JSON.stringify(DEFAULT_BLOB_SETTINGS, null, 2))
+    }
+    
+    // In production, just return defaults
     return DEFAULT_BLOB_SETTINGS
   } catch (error) {
     console.error('Error resetting blob settings:', error)

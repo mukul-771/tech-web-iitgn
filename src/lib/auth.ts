@@ -1,6 +1,6 @@
 import { NextAuthOptions } from "next-auth";
 import GoogleProvider from "next-auth/providers/google";
-import { getAdminEmails } from "./admin-emails-storage";
+import { getAdminEmails } from "./admin-emails-blob-storage";
 
 // Get admin emails dynamically from storage
 async function getAuthorizedEmails(): Promise<string[]> {
@@ -99,7 +99,6 @@ declare module "next-auth/jwt" {
 }
 
 // Extend NextAuth Session type to include idToken
-import NextAuth from "next-auth";
 declare module "next-auth" {
   interface Session {
     idToken?: string;

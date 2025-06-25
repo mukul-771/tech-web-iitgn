@@ -6,7 +6,7 @@ import {
   addAdminEmail, 
   removeAdminEmail, 
   updateAdminEmails 
-} from '@/lib/admin-emails-storage';
+} from '@/lib/admin-emails-blob-storage';
 
 // GET - Fetch admin emails
 export async function GET() {

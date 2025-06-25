@@ -74,8 +74,7 @@ export async function createHackathon(hackathonInput: Record<string, unknown>): 
     location: String(hackathonInput.location || ''),
     category: String(hackathonInput.category || ''),
     status: String(hackathonInput.status || 'upcoming') as "upcoming" | "ongoing" | "completed" | "cancelled",
-    registrationUrl: hackathonInput.registrationLink ? String(hackathonInput.registrationLink) : 
-                     hackathonInput.registrationUrl ? String(hackathonInput.registrationUrl) : undefined,
+    registrationLink: hackathonInput.registrationLink ? String(hackathonInput.registrationLink) : undefined,
   };
 
   // Generate ID from name
@@ -124,9 +123,8 @@ export async function updateHackathon(id: string, updates: Record<string, unknow
   if (updates.location !== undefined) basicUpdates.location = String(updates.location);
   if (updates.category !== undefined) basicUpdates.category = String(updates.category);
   if (updates.status !== undefined) basicUpdates.status = String(updates.status) as "upcoming" | "ongoing" | "completed" | "cancelled";
-  if (updates.registrationLink !== undefined || updates.registrationUrl !== undefined) {
-    basicUpdates.registrationUrl = updates.registrationLink ? String(updates.registrationLink) : 
-                                   updates.registrationUrl ? String(updates.registrationUrl) : undefined;
+  if (updates.registrationLink !== undefined) {
+    basicUpdates.registrationLink = String(updates.registrationLink);
   }
 
   const updatedBasicHackathon: BasicHackathon = {
@@ -184,7 +182,7 @@ export async function getHackathonsForDisplay(): Promise<BasicHackathon[]> {
         location: h.location,
         category: h.category,
         status: h.status,
-        registrationUrl: h.registrationUrl,
+        registrationLink: h.registrationLink,
         createdAt: h.createdAt,
         updatedAt: h.updatedAt,
       } as BasicHackathon))

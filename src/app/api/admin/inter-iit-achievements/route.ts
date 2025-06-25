@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getServerSession } from 'next-auth';
 import { authOptions } from '@/lib/auth';
-import { getAllInterIITAchievements, createInterIITAchievement } from '@/lib/inter-iit-achievements-storage';
+import { getAllInterIITAchievements, createInterIITAchievement, migrateInterIITAchievementsFromFileSystem } from '@/lib/inter-iit-achievements-blob-storage';
 
 // Check if user is admin
 async function checkAdminAuth() {
@@ -15,6 +15,9 @@ export async function GET() {
     if (!isAdmin) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
+
+    // Ensure data is migrated to Blob
+    await migrateInterIITAchievementsFromFileSystem();
 
     const achievements = await getAllInterIITAchievements();
     const achievementsArray = Object.values(achievements).sort((a, b) =>

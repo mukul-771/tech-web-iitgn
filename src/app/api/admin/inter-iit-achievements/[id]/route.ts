@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getServerSession } from 'next-auth';
 import { authOptions } from '@/lib/auth';
-import { getInterIITAchievementById, updateInterIITAchievement, deleteInterIITAchievement } from '@/lib/inter-iit-achievements-storage';
+import { getInterIITAchievementById, updateInterIITAchievement, deleteInterIITAchievement } from '@/lib/inter-iit-achievements-blob-storage';
 
 // Check if user is admin
 async function checkAdminAuth() {

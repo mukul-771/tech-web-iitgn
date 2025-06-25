@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { getInterIITAchievementById } from '@/lib/inter-iit-achievements-storage';
+import { getInterIITAchievementById } from '@/lib/inter-iit-achievements-blob-storage';
 
 export async function GET(
   request: NextRequest,

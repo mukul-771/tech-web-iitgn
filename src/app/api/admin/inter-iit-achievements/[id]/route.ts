@@ -1,5 +1,13 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { getServerSession } from 'next-auth';
+import { authOptions } from '@/lib/auth';
 import { getInterIITAchievementById, updateInterIITAchievement, deleteInterIITAchievement } from '@/lib/inter-iit-achievements-storage';
+
+// Check if user is admin
+async function checkAdminAuth() {
+  const session = await getServerSession(authOptions);
+  return session?.user?.isAdmin || false;
+}
 
 export async function GET(
   request: NextRequest,
@@ -7,6 +15,11 @@ export async function GET(
 ) {
   const { id } = await params;
   try {
+    const isAdmin = await checkAdminAuth();
+    if (!isAdmin) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
+
     const achievement = await getInterIITAchievementById(id);
     
     if (!achievement) {
@@ -32,6 +45,11 @@ export async function PUT(
 ) {
   const { id } = await params;
   try {
+    const isAdmin = await checkAdminAuth();
+    if (!isAdmin) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
+
     const body = await request.json();
     
     // Validate required fields
@@ -67,6 +85,11 @@ export async function DELETE(
 ) {
   const { id } = await params;
   try {
+    const isAdmin = await checkAdminAuth();
+    if (!isAdmin) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
+
     await deleteInterIITAchievement(id);
     return NextResponse.json({ message: 'Inter-IIT achievement deleted successfully' });
   } catch (error) {

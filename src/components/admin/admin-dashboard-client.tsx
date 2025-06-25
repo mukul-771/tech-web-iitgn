@@ -12,7 +12,6 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import {
   Calendar,
-  Image,
   Plus,
   Users,
   Settings,
@@ -27,8 +26,8 @@ export function AdminDashboardClient() {
   const { data: session, status } = useSession();
   const router = useRouter();
   const [events, setEvents] = useState<Record<string, Event>>({});
-  const [clubs, setClubs] = useState<any[]>([]);
-  const [magazines, setMagazines] = useState<any[]>([]);
+  const [clubs, setClubs] = useState<Record<string, unknown>[]>([]);
+  const [magazines, setMagazines] = useState<Record<string, unknown>[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
@@ -190,7 +189,7 @@ export function AdminDashboardClient() {
             </CardHeader>
             <CardContent>
               <p className="responsive-text-sm text-muted-foreground mb-4">
-                Create, edit, and manage events for the gallery
+                Create, edit, and manage events with photos
               </p>
               <div className="flex gap-2">
                 <Badge variant="secondary" className="responsive-text-xs">{Object.keys(events).length} Events</Badge>
@@ -266,26 +265,6 @@ export function AdminDashboardClient() {
               </p>
               <div className="flex gap-2">
                 <Badge variant="secondary">{magazines.length} Magazine Issues</Badge>
-              </div>
-            </CardContent>
-          </Card>
-
-          <Card className="glass hover:shadow-lg transition-all duration-300 cursor-pointer"
-                onClick={() => router.push('/admin/gallery')}>
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <Image className="h-5 w-5" />
-                Photo Gallery
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              <p className="text-sm text-muted-foreground mb-4">
-                Upload and organize photos for events
-              </p>
-              <div className="flex gap-2">
-                <Badge variant="secondary">
-                  {Object.values(events).reduce((total, event) => total + (event.gallery?.length || 0), 0)} Photos
-                </Badge>
               </div>
             </CardContent>
           </Card>

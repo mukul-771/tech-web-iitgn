@@ -14,8 +14,6 @@ import {
   Home,
   Menu,
   X,
-  Image as ImageIcon,
-  BarChart3,
   Users,
   BookOpen,
   Trophy,
@@ -64,16 +62,6 @@ const navigation = [
     name: "Torque Magazine",
     href: "/admin/torque",
     icon: BookOpen,
-  },
-  {
-    name: "Gallery",
-    href: "/admin/gallery",
-    icon: ImageIcon,
-  },
-  {
-    name: "Analytics",
-    href: "/admin/analytics",
-    icon: BarChart3,
   },
   {
     name: "Settings",

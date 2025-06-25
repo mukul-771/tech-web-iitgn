@@ -56,6 +56,7 @@ async function getInterIITAchievements() {
     // Always use the full production URL for consistency
     const apiUrl = 'https://technical-council-iitgn.vercel.app/api/inter-iit-achievements';
     
+    console.log('Fetching achievements from:', apiUrl);
     const response = await fetch(apiUrl, {
       cache: 'no-store', // Ensure no caching
       headers: {
@@ -69,6 +70,8 @@ async function getInterIITAchievements() {
     }
     
     const achievements: Achievement[] = await response.json();
+    console.log('Fetched achievements count:', achievements.length);
+    console.log('Sample achievement:', achievements[0]?.achievementDescription?.substring(0, 50) + '...');
 
     // Transform the data to match the expected format for the UI
     return achievements.map((achievement: Achievement) => {

@@ -27,14 +27,7 @@ const createEventSchema = z.object({
 // Check if user is admin
 async function checkAdminAuth() {
   const session = await getServerSession(authOptions);
-  console.log("Auth check - session:", session);
-  console.log("Auth check - isAdmin:", session?.user?.isAdmin);
-
-  if (!session?.user?.isAdmin) {
-    return false;
-  }
-
-  return true;
+  return session?.user?.isAdmin || false;
 }
 
 // GET /api/admin/events - Get all events
@@ -69,7 +62,6 @@ export async function GET() {
 
 // POST /api/admin/events - Create new event
 export async function POST(request: NextRequest) {
-  console.log("POST /api/admin/events - Request received!");
   try {
     const isAdmin = await checkAdminAuth();
     if (!isAdmin) {
@@ -77,17 +69,9 @@ export async function POST(request: NextRequest) {
     }
 
     const body = await request.json();
-    console.log("Received body:", JSON.stringify(body, null, 2));
-    console.log("Location value:", `"${body.location}"`, "Type:", typeof body.location);
-    console.log("Duration value:", `"${body.duration}"`, "Type:", typeof body.duration);
-    console.log("Participants value:", `"${body.participants}"`, "Type:", typeof body.participants);
-    console.log("Organizer value:", `"${body.organizer}"`, "Type:", typeof body.organizer);
 
-    // Validate request body with updated schema v2
+    // Validate request body
     const validatedData = createEventSchema.parse(body);
-    console.log("Validated data:", JSON.stringify(validatedData, null, 2));
-    console.log("Validated location:", `"${validatedData.location}"`, "Type:", typeof validatedData.location);
-    console.log("Validated duration:", `"${validatedData.duration}"`, "Type:", typeof validatedData.duration);
 
     // Transform form data to Event format - only use defaults for empty/missing fields
     const eventData = {
@@ -99,8 +83,8 @@ export async function POST(request: NextRequest) {
       participants: validatedData.participants && validatedData.participants.trim() ? validatedData.participants : "50+",
       organizer: validatedData.organizer && validatedData.organizer.trim() ? validatedData.organizer : "Technical Council",
       category: validatedData.category,
-      highlights: validatedData.highlights || [], // Use exactly what user provided
-      gallery: validatedData.gallery || [] // Use exactly what user provided
+      highlights: validatedData.highlights || [],
+      gallery: validatedData.gallery || []
     };
 
     // Create event

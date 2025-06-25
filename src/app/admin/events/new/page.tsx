@@ -14,12 +14,10 @@ import { Switch } from "@/components/ui/switch";
 import {
   Save,
   ArrowLeft,
-  Upload,
   X,
   Plus,
   Image as ImageIcon
 } from "lucide-react";
-import { ImageUpload } from "@/components/admin/image-upload";
 import {
   Select,
   SelectContent,
@@ -27,13 +25,38 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { SimpleImageUpload } from "@/components/admin/simple-image-upload";
 import { eventCategories, organizingBodies } from "@/lib/events-data";
+
+interface FormData {
+  title: string;
+  description: string;
+  date: string;
+  location: string;
+  duration: string;
+  participants: string;
+  organizer: string;
+  category: string;
+  highlights: string[];
+  gallery: Array<{ id: string; url: string; alt: string; caption?: string }>;
+  draft: boolean;
+}
+
+interface ValidationErrors {
+  title?: string;
+  description?: string;
+  date?: string;
+  organizer?: string;
+  category?: string;
+  gallery?: string;
+}
 
 export default function NewEvent() {
   const { data: session, status } = useSession();
   const router = useRouter();
   const [isLoading, setIsLoading] = useState(false);
-  const [formData, setFormData] = useState({
+  const [errors, setErrors] = useState<ValidationErrors>({});
+  const [formData, setFormData] = useState<FormData>({
     title: "",
     description: "",
     date: "",
@@ -42,48 +65,89 @@ export default function NewEvent() {
     participants: "",
     organizer: "",
     category: "",
-    highlights: [] as string[],
-    gallery: [] as Array<{ id: string; url: string; alt: string; caption?: string }>,
+    highlights: [],
+    gallery: [],
     draft: true
   });
   const [newHighlight, setNewHighlight] = useState("");
-  const [newGalleryItem, setNewGalleryItem] = useState({
-    url: "",
-    alt: "",
-    caption: ""
-  });
+  const [newGalleryUrl, setNewGalleryUrl] = useState("");
+  const [newGalleryAlt, setNewGalleryAlt] = useState("");
+  const [newGalleryCaption, setNewGalleryCaption] = useState("");
 
   useEffect(() => {
     if (status === "loading") return;
-
     if (!session?.user?.isAdmin) {
       router.push("/admin/login");
-      return;
     }
   }, [session, status, router]);
 
+  const validateForm = (): boolean => {
+    const newErrors: ValidationErrors = {};
+
+    if (!formData.title.trim()) {
+      newErrors.title = "Event title is required";
+    }
+
+    if (!formData.description.trim()) {
+      newErrors.description = "Event description is required";
+    }
+
+    if (!formData.date.trim()) {
+      newErrors.date = "Event date is required";
+    }
+
+    if (!formData.organizer) {
+      newErrors.organizer = "Organizer is required";
+    }
+
+    if (!formData.category) {
+      newErrors.category = "Category is required";
+    }
+
+    // Validate gallery URLs
+    for (const item of formData.gallery) {
+      if (item.url && !isValidUrl(item.url)) {
+        newErrors.gallery = "Please provide valid image URLs";
+        break;
+      }
+    }
+
+    setErrors(newErrors);
+    return Object.keys(newErrors).length === 0;
+  };
+
+  const isValidUrl = (string: string): boolean => {
+    try {
+      const url = new URL(string);
+      return url.protocol === 'http:' || url.protocol === 'https:';
+    } catch {
+      return false;
+    }
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    
+    if (!validateForm()) {
+      return;
+    }
+
     setIsLoading(true);
 
     try {
-      // Transform form data to match API expectations - preserve exactly what user entered
       const eventData = {
-        title: formData.title,
-        description: formData.description,
-        date: formData.date,
-        location: formData.location, // Send exactly what user typed
-        duration: formData.duration, // Send exactly what user typed
-        participants: formData.participants, // Send exactly what user typed
-        organizer: formData.organizer, // Send exactly what user typed
+        title: formData.title.trim(),
+        description: formData.description.trim(),
+        date: formData.date.trim(),
+        location: formData.location.trim() || undefined,
+        duration: formData.duration.trim() || undefined,
+        participants: formData.participants.trim() || undefined,
+        organizer: formData.organizer,
         category: formData.category,
         highlights: formData.highlights.filter(h => h.trim() !== ""),
         gallery: formData.gallery.filter(item => item.url && item.alt),
         draft: formData.draft
       };
-
-      console.log("Client sending eventData:", eventData);
-      console.log("Form data before transform:", formData);
 
       const response = await fetch("/api/admin/events", {
         method: "POST",
@@ -95,52 +159,56 @@ export default function NewEvent() {
 
       if (!response.ok) {
         const errorData = await response.json();
-        console.error("Error response:", errorData);
-        throw new Error("Failed to create event");
+        throw new Error(errorData.error || "Failed to create event");
       }
 
-      const result = await response.json();
-      alert("Event created successfully!");
       router.push("/admin/events");
     } catch (err) {
       console.error("Error creating event:", err);
-      alert("Failed to create event");
+      alert(err instanceof Error ? err.message : "Failed to create event");
     } finally {
       setIsLoading(false);
     }
   };
 
-  const handleInputChange = (field: string, value: any) => {
+  const handleInputChange = (field: keyof FormData, value: string | boolean | string[]) => {
     setFormData(prev => ({
       ...prev,
       [field]: value
     }));
+    // Clear error when user starts typing
+    if (errors[field as keyof ValidationErrors]) {
+      setErrors(prev => ({
+        ...prev,
+        [field]: undefined
+      }));
+    }
   };
 
   const addHighlight = () => {
     if (newHighlight.trim()) {
-      setFormData(prev => ({
-        ...prev,
-        highlights: [...prev.highlights, newHighlight.trim()]
-      }));
+      handleInputChange("highlights", [...formData.highlights, newHighlight.trim()]);
       setNewHighlight("");
     }
   };
 
   const removeHighlight = (index: number) => {
-    setFormData(prev => ({
-      ...prev,
-      highlights: prev.highlights.filter((_, i) => i !== index)
-    }));
+    const newHighlights = formData.highlights.filter((_, i) => i !== index);
+    handleInputChange("highlights", newHighlights);
   };
 
   const addGalleryItem = () => {
-    if (newGalleryItem.url.trim() && newGalleryItem.alt.trim()) {
+    if (newGalleryUrl.trim() && newGalleryAlt.trim()) {
+      if (!isValidUrl(newGalleryUrl.trim())) {
+        alert("Please enter a valid image URL");
+        return;
+      }
+
       const newItem = {
         id: Date.now().toString(),
-        url: newGalleryItem.url.trim(),
-        alt: newGalleryItem.alt.trim(),
-        caption: newGalleryItem.caption.trim() || undefined
+        url: newGalleryUrl.trim(),
+        alt: newGalleryAlt.trim(),
+        caption: newGalleryCaption.trim() || undefined
       };
 
       setFormData(prev => ({
@@ -148,74 +216,18 @@ export default function NewEvent() {
         gallery: [...prev.gallery, newItem]
       }));
 
-      setNewGalleryItem({ url: "", alt: "", caption: "" });
+      setNewGalleryUrl("");
+      setNewGalleryAlt("");
+      setNewGalleryCaption("");
     }
   };
 
   const removeGalleryItem = (index: number) => {
+    const newGallery = formData.gallery.filter((_, i) => i !== index);
     setFormData(prev => ({
       ...prev,
-      gallery: prev.gallery.filter((_, i) => i !== index)
+      gallery: newGallery
     }));
-  };
-
-  const testCreateEvent = () => {
-    setFormData({
-      title: "Test Event",
-      description: "This is a test event created from the admin panel",
-      date: "2024-01-15",
-      category: "Workshop",
-      location: "IITGN Campus",
-      duration: "3 days",
-      participants: "100+",
-      organizer: "Technical Council",
-      highlights: ["Great speakers", "Hands-on workshops", "Networking opportunities"],
-      draft: false,
-      gallery: []
-    });
-  };
-
-  const testDirectAPI = async () => {
-    try {
-      const testData = {
-        title: "Direct API Test Event",
-        description: "This is a test event created directly via API",
-        date: "2024-01-15",
-        category: "Workshop",
-        location: "IITGN Campus",
-        duration: "3 days",
-        participants: "100+",
-        organizer: "Technical Council",
-        highlights: ["Great speakers", "Hands-on workshops", "Networking opportunities"],
-        draft: false,
-        gallery: []
-      };
-
-      console.log("Making direct API call with data:", testData);
-
-      const response = await fetch("/api/admin/events", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(testData),
-      });
-
-      console.log("Response status:", response.status);
-
-      if (!response.ok) {
-        const errorData = await response.json();
-        console.error("Error response:", errorData);
-        alert(`Failed to create event: ${JSON.stringify(errorData)}`);
-      } else {
-        const result = await response.json();
-        console.log("Success result:", result);
-        alert("Event created successfully via direct API!");
-      }
-    } catch (err) {
-      console.error("Error creating event:", err);
-      alert("Failed to create event");
-    }
   };
 
   if (status === "loading") {
@@ -242,24 +254,12 @@ export default function NewEvent() {
             <ArrowLeft className="h-4 w-4 mr-2" />
             Back
           </Button>
-          <Button
-            variant="secondary"
-            onClick={testCreateEvent}
-          >
-            Fill Test Data
-          </Button>
-          <Button
-            variant="outline"
-            onClick={testDirectAPI}
-          >
-            Test Direct API
-          </Button>
           <div>
             <h1 className="text-3xl font-bold font-space-grotesk">
               Create New Event
             </h1>
             <p className="text-gray-600 dark:text-gray-400 mt-2">
-              Add a new event to your gallery
+              Add a new event to showcase your activities
             </p>
           </div>
         </div>
@@ -281,7 +281,11 @@ export default function NewEvent() {
                       onChange={(e) => handleInputChange("title", e.target.value)}
                       placeholder="Enter event title"
                       required
+                      className={errors.title ? "border-red-500" : ""}
                     />
+                    {errors.title && (
+                      <p className="text-sm text-red-500 mt-1">{errors.title}</p>
+                    )}
                   </div>
 
                   <div>
@@ -290,10 +294,14 @@ export default function NewEvent() {
                       id="description"
                       value={formData.description}
                       onChange={(e) => handleInputChange("description", e.target.value)}
-                      placeholder="Describe the event"
+                      placeholder="Describe the event, its purpose, and what participants can expect"
                       rows={4}
                       required
+                      className={errors.description ? "border-red-500" : ""}
                     />
+                    {errors.description && (
+                      <p className="text-sm text-red-500 mt-1">{errors.description}</p>
+                    )}
                   </div>
 
                   <div className="grid gap-4 md:grid-cols-2">
@@ -303,9 +311,13 @@ export default function NewEvent() {
                         id="date"
                         value={formData.date}
                         onChange={(e) => handleInputChange("date", e.target.value)}
-                        placeholder="e.g., March 15-17, 2023"
+                        placeholder="e.g., March 15-17, 2024"
                         required
+                        className={errors.date ? "border-red-500" : ""}
                       />
+                      {errors.date && (
+                        <p className="text-sm text-red-500 mt-1">{errors.date}</p>
+                      )}
                     </div>
                     <div>
                       <Label htmlFor="location">Location</Label>
@@ -313,7 +325,7 @@ export default function NewEvent() {
                         id="location"
                         value={formData.location}
                         onChange={(e) => handleInputChange("location", e.target.value)}
-                        placeholder="Event location"
+                        placeholder="Event location (optional)"
                       />
                     </div>
                   </div>
@@ -325,7 +337,7 @@ export default function NewEvent() {
                         id="duration"
                         value={formData.duration}
                         onChange={(e) => handleInputChange("duration", e.target.value)}
-                        placeholder="e.g., 3 days"
+                        placeholder="e.g., 3 days (optional)"
                       />
                     </div>
                     <div>
@@ -334,7 +346,7 @@ export default function NewEvent() {
                         id="participants"
                         value={formData.participants}
                         onChange={(e) => handleInputChange("participants", e.target.value)}
-                        placeholder="e.g., 500+"
+                        placeholder="e.g., 500+ (optional)"
                       />
                     </div>
                   </div>
@@ -346,7 +358,7 @@ export default function NewEvent() {
                         value={formData.organizer}
                         onValueChange={(value) => handleInputChange("organizer", value)}
                       >
-                        <SelectTrigger>
+                        <SelectTrigger className={errors.organizer ? "border-red-500" : ""}>
                           <SelectValue placeholder="Select organizer" />
                         </SelectTrigger>
                         <SelectContent>
@@ -357,6 +369,9 @@ export default function NewEvent() {
                           ))}
                         </SelectContent>
                       </Select>
+                      {errors.organizer && (
+                        <p className="text-sm text-red-500 mt-1">{errors.organizer}</p>
+                      )}
                     </div>
                     <div>
                       <Label htmlFor="category">Category *</Label>
@@ -364,7 +379,7 @@ export default function NewEvent() {
                         value={formData.category}
                         onValueChange={(value) => handleInputChange("category", value)}
                       >
-                        <SelectTrigger>
+                        <SelectTrigger className={errors.category ? "border-red-500" : ""}>
                           <SelectValue placeholder="Select category" />
                         </SelectTrigger>
                         <SelectContent>
@@ -375,6 +390,9 @@ export default function NewEvent() {
                           ))}
                         </SelectContent>
                       </Select>
+                      {errors.category && (
+                        <p className="text-sm text-red-500 mt-1">{errors.category}</p>
+                      )}
                     </div>
                   </div>
                 </CardContent>
@@ -384,6 +402,9 @@ export default function NewEvent() {
               <Card className="glass">
                 <CardHeader>
                   <CardTitle>Event Highlights</CardTitle>
+                  <p className="text-sm text-muted-foreground">
+                    Add key points that make this event special
+                  </p>
                 </CardHeader>
                 <CardContent className="space-y-4">
                   <div className="space-y-2">
@@ -432,11 +453,20 @@ export default function NewEvent() {
               <Card className="glass">
                 <CardHeader>
                   <CardTitle>Event Gallery</CardTitle>
+                  <p className="text-sm text-muted-foreground">
+                    Add images to showcase the event (images must be uploaded to a hosting service)
+                  </p>
                 </CardHeader>
                 <CardContent className="space-y-4">
-                  <div className="space-y-6">
+                  {errors.gallery && (
+                    <div className="bg-red-50 border border-red-200 rounded-md p-3">
+                      <p className="text-sm text-red-600">{errors.gallery}</p>
+                    </div>
+                  )}
+
+                  <div className="space-y-4">
                     {formData.gallery.map((item, index) => (
-                      <div key={index} className="border rounded-lg p-4 space-y-4">
+                      <div key={index} className="border rounded-lg p-4 space-y-3">
                         <div className="flex items-center justify-between">
                           <h4 className="font-medium">Image {index + 1}</h4>
                           <Button
@@ -449,62 +479,99 @@ export default function NewEvent() {
                           </Button>
                         </div>
 
-                        <ImageUpload
-                          label="Gallery Image"
-                          currentImageUrl={item.url}
-                          onImageUploaded={(url) => {
-                            const newGallery = [...formData.gallery];
-                            newGallery[index].url = url;
-                            handleInputChange("gallery", newGallery);
-                          }}
-                          onImageRemoved={() => {
-                            const newGallery = [...formData.gallery];
-                            newGallery[index].url = "";
-                            handleInputChange("gallery", newGallery);
-                          }}
-                          showAltText={true}
-                          altText={item.alt}
-                          onAltTextChange={(altText) => {
-                            const newGallery = [...formData.gallery];
-                            newGallery[index].alt = altText;
-                            handleInputChange("gallery", newGallery);
-                          }}
-                          showCaption={true}
-                          caption={item.caption || ""}
-                          onCaptionChange={(caption) => {
-                            const newGallery = [...formData.gallery];
-                            newGallery[index].caption = caption;
-                            handleInputChange("gallery", newGallery);
-                          }}
-                          required={true}
-                        />
+                        <div className="grid gap-3">
+                          <div>
+                            <Label>Image URL *</Label>
+                            <Input
+                              value={item.url}
+                              onChange={(e) => {
+                                const newGallery = [...formData.gallery];
+                                newGallery[index].url = e.target.value;
+                                setFormData(prev => ({ ...prev, gallery: newGallery }));
+                              }}
+                              placeholder="https://example.com/image.jpg"
+                            />
+                          </div>
+                          <div>
+                            <Label>Alt Text *</Label>
+                            <Input
+                              value={item.alt}
+                              onChange={(e) => {
+                                const newGallery = [...formData.gallery];
+                                newGallery[index].alt = e.target.value;
+                                setFormData(prev => ({ ...prev, gallery: newGallery }));
+                              }}
+                              placeholder="Describe the image for accessibility"
+                            />
+                          </div>
+                          <div>
+                            <Label>Caption (Optional)</Label>
+                            <Input
+                              value={item.caption || ""}
+                              onChange={(e) => {
+                                const newGallery = [...formData.gallery];
+                                newGallery[index].caption = e.target.value;
+                                setFormData(prev => ({ ...prev, gallery: newGallery }));
+                              }}
+                              placeholder="Image caption"
+                            />
+                          </div>
+                        </div>
                       </div>
                     ))}
                   </div>
 
+                  {/* Add New Image */}
                   <div className="border-2 border-dashed border-gray-300 rounded-lg p-4 space-y-4">
-                    <h4 className="font-medium">Add New Image</h4>
-                    <ImageUpload
-                      label="Upload New Gallery Image"
-                      currentImageUrl={newGalleryItem.url}
-                      onImageUploaded={(url) => setNewGalleryItem(prev => ({ ...prev, url }))}
-                      onImageRemoved={() => setNewGalleryItem(prev => ({ ...prev, url: "" }))}
-                      showAltText={true}
-                      altText={newGalleryItem.alt}
-                      onAltTextChange={(altText) => setNewGalleryItem(prev => ({ ...prev, alt: altText }))}
-                      showCaption={true}
-                      caption={newGalleryItem.caption}
-                      onCaptionChange={(caption) => setNewGalleryItem(prev => ({ ...prev, caption }))}
-                      required={true}
-                    />
-                    <Button
-                      type="button"
-                      onClick={addGalleryItem}
-                      disabled={!newGalleryItem.url || !newGalleryItem.alt}
-                    >
-                      <Plus className="h-4 w-4 mr-2" />
-                      Add Image
-                    </Button>
+                    <div className="flex items-center gap-2">
+                      <ImageIcon className="h-5 w-5 text-muted-foreground" />
+                      <h4 className="font-medium">Add New Image</h4>
+                    </div>
+                    
+                    {/* Upload Option */}
+                    <div className="bg-blue-50 border border-blue-200 rounded-md p-3">
+                      <SimpleImageUpload
+                        onImageUploaded={(url) => setNewGalleryUrl(url)}
+                        disabled={isLoading}
+                      />
+                    </div>
+
+                    {/* Manual URL Option */}
+                    <div className="space-y-3">
+                      <p className="text-sm text-muted-foreground">Option 2: Enter image URL manually</p>
+                      <div>
+                        <Label>Image URL *</Label>
+                        <Input
+                          value={newGalleryUrl}
+                          onChange={(e) => setNewGalleryUrl(e.target.value)}
+                          placeholder="https://example.com/image.jpg"
+                        />
+                      </div>
+                      <div>
+                        <Label>Alt Text *</Label>
+                        <Input
+                          value={newGalleryAlt}
+                          onChange={(e) => setNewGalleryAlt(e.target.value)}
+                          placeholder="Describe the image for accessibility"
+                        />
+                      </div>
+                      <div>
+                        <Label>Caption (Optional)</Label>
+                        <Input
+                          value={newGalleryCaption}
+                          onChange={(e) => setNewGalleryCaption(e.target.value)}
+                          placeholder="Image caption"
+                        />
+                      </div>
+                      <Button
+                        type="button"
+                        onClick={addGalleryItem}
+                        disabled={!newGalleryUrl || !newGalleryAlt}
+                      >
+                        <Plus className="h-4 w-4 mr-2" />
+                        Add Image
+                      </Button>
+                    </div>
                   </div>
                 </CardContent>
               </Card>
@@ -541,7 +608,7 @@ export default function NewEvent() {
                   <Button
                     type="submit"
                     className="w-full"
-                    disabled={isLoading || !formData.title || !formData.description}
+                    disabled={isLoading || !formData.title || !formData.description || !formData.organizer || !formData.category}
                   >
                     {isLoading ? (
                       <LoadingSpinner />
@@ -573,8 +640,10 @@ export default function NewEvent() {
                   <div className="space-y-2 text-sm">
                     <p><strong>Title:</strong> {formData.title || "Untitled Event"}</p>
                     <p><strong>Category:</strong> {formData.category || "Uncategorized"}</p>
-                    <p><strong>Date:</strong> {formData.date ? new Date(formData.date).toLocaleDateString() : "No date set"}</p>
-                    <p><strong>Photos:</strong> {formData.gallery.length} images</p>
+                    <p><strong>Organizer:</strong> {formData.organizer || "No organizer"}</p>
+                    <p><strong>Date:</strong> {formData.date || "No date set"}</p>
+                    <p><strong>Images:</strong> {formData.gallery.length} image{formData.gallery.length !== 1 ? 's' : ''}</p>
+                    <p><strong>Highlights:</strong> {formData.highlights.length} item{formData.highlights.length !== 1 ? 's' : ''}</p>
                     <p><strong>Status:</strong> {formData.draft ? "Draft" : "Published"}</p>
                   </div>
                 </CardContent>

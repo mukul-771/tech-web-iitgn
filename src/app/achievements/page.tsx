@@ -3,21 +3,76 @@ import Link from "next/link"
 import Image from "next/image"
 import { Trophy, Medal, Award, Calendar, Users, Camera, ArrowRight } from "lucide-react"
 
+// Force dynamic rendering to ensure fresh data
+export const dynamic = 'force-dynamic'
+export const revalidate = 0
+export const runtime = 'nodejs'
+
+interface TeamMember {
+  name: string;
+  rollNumber: string;
+  branch: string;
+  year: string;
+  role: string;
+  email: string;
+  achievements: string[];
+}
+
+interface Achievement {
+  id: string;
+  achievementType: string;
+  competitionName: string;
+  interIITEdition: string;
+  year: string;
+  hostIIT: string;
+  location: string;
+  ranking?: number;
+  achievementDescription: string;
+  significance: string;
+  competitionCategory: string;
+  achievementDate: string;
+  points?: number;
+  status: string;
+  teamMembers: TeamMember[];
+}
+
 export const metadata: Metadata = {
   title: "Achievements - Technical Council IITGN",
   description: "Explore the achievements and victories of Technical Council clubs in Inter-IIT Tech Meet, hackathons, and competitions.",
 }
 
-// This will be replaced with dynamic data fetching
+interface UIAchievement {
+  year: string;
+  position: string;
+  event: string;
+  description: string;
+  team: string;
+  medal: string;
+}
+
+// This will fetch fresh data from the API for dynamic updates
 async function getInterIITAchievements() {
   try {
-    // In production, this would fetch from the API
-    // For now, we'll use a server-side import of the storage function
-    const { getInterIITAchievementsForDisplay } = await import('@/lib/inter-iit-achievements-blob-storage');
-    const achievements = await getInterIITAchievementsForDisplay();
+    // Fetch from the API to ensure we get the latest data
+    // Use relative URL for server-side fetching in production
+    const baseUrl = process.env.VERCEL_URL 
+      ? `https://${process.env.VERCEL_URL}` 
+      : process.env.NODE_ENV === 'production' 
+        ? 'https://technical-council-iitgn.vercel.app'
+        : 'http://localhost:3000';
+    const response = await fetch(`${baseUrl}/api/inter-iit-achievements`, {
+      next: { revalidate: 0 }, // Always fetch fresh data
+      cache: 'no-store' // Ensure no caching
+    });
+    
+    if (!response.ok) {
+      throw new Error(`Failed to fetch achievements: ${response.status}`);
+    }
+    
+    const achievements: Achievement[] = await response.json();
 
     // Transform the data to match the expected format for the UI
-    return achievements.map(achievement => {
+    return achievements.map((achievement: Achievement) => {
       let medal = "bronze";
       let position = `${achievement.ranking || 'N/A'}`;
 
@@ -39,7 +94,7 @@ async function getInterIITAchievements() {
         position,
         event: achievement.competitionName,
         description: achievement.achievementDescription,
-        team: achievement.teamMembers.map(member => member.name).join(", "),
+        team: achievement.teamMembers.map((member: TeamMember) => member.name).join(", "),
         medal
       };
     });
@@ -121,14 +176,14 @@ async function getEventGallery() {
 
 export default async function AchievementsPage() {
   const eventGallery = await getEventGallery();
-  const interIITAchievements = await getInterIITAchievements();
+  const interIITAchievements: UIAchievement[] = await getInterIITAchievements();
 
   // Calculate dynamic stats
   const stats = {
     totalAwards: interIITAchievements.length,
-    competitions: new Set(interIITAchievements.map(a => a.event)).size,
-    participants: new Set(interIITAchievements.flatMap(a => a.team.split(", "))).size,
-    yearsActive: new Set(interIITAchievements.map(a => a.year)).size
+    competitions: new Set(interIITAchievements.map((a: UIAchievement) => a.event)).size,
+    participants: new Set(interIITAchievements.flatMap((a: UIAchievement) => a.team.split(", "))).size,
+    yearsActive: new Set(interIITAchievements.map((a: UIAchievement) => a.year)).size
   };
 
   return (
@@ -186,7 +241,7 @@ export default async function AchievementsPage() {
             </div>
 
             <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-              {interIITAchievements.map((achievement, index) => (
+              {interIITAchievements.map((achievement: UIAchievement, index: number) => (
                 <div key={index} className="glass rounded-xl p-6 transition-all duration-300 hover:scale-105 hover:shadow-xl">
                   <div className="flex items-center justify-between mb-4">
                     <div className="flex items-center gap-2">

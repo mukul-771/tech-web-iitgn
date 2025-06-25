@@ -105,19 +105,36 @@ export async function DELETE(
   { params }: { params: Promise<{ id: string }> }
 ) {
   try {
+    console.log('DELETE request received for event');
+    
+    const session = await getServerSession(authOptions);
+    console.log('Session:', session ? 'exists' : 'null', session?.user?.email, session?.user?.isAdmin);
+    
     const isAdmin = await checkAdminAuth();
+    console.log('Admin check result:', isAdmin);
+    
     if (!isAdmin) {
+      console.log('Unauthorized delete attempt');
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
     const resolvedParams = await params;
+    console.log('Deleting event with ID:', resolvedParams.id);
+    
     await deleteEvent(resolvedParams.id);
+    console.log('Event deleted successfully');
 
-    return NextResponse.json({ message: "Event deleted successfully" });
+    return NextResponse.json({ 
+      message: "Event deleted successfully",
+      success: true 
+    });
   } catch (error) {
     console.error("Error deleting event:", error);
     return NextResponse.json(
-      { error: "Failed to delete event" },
+      { 
+        error: error instanceof Error ? error.message : "Failed to delete event",
+        success: false 
+      },
       { status: 500 }
     );
   }

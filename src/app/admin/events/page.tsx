@@ -63,17 +63,33 @@ export default function EventsManagement() {
     if (!confirm("Are you sure you want to delete this event?")) return;
 
     try {
+      console.log('Deleting event:', eventId);
+      
       const response = await fetch(`/api/admin/events/${eventId}`, {
         method: "DELETE",
+        headers: {
+          'Content-Type': 'application/json'
+        }
       });
 
+      console.log('Delete response status:', response.status);
+      
       if (!response.ok) {
-        throw new Error("Failed to delete event");
+        const errorData = await response.json().catch(() => ({ error: 'Unknown error' }));
+        console.error('Delete failed:', errorData);
+        throw new Error(errorData.error || `HTTP ${response.status}: Failed to delete event`);
       }
 
+      const result = await response.json();
+      console.log('Delete successful:', result);
+      
+      // Refresh the events list
       fetchEvents();
+      alert('Event deleted successfully!');
     } catch (err) {
-      alert("Failed to delete event");
+      console.error('Delete error:', err);
+      const errorMessage = err instanceof Error ? err.message : 'Failed to delete event';
+      alert(`Failed to delete event: ${errorMessage}`);
     }
   };
 

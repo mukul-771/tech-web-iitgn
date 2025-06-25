@@ -37,7 +37,7 @@ export async function saveAllHackathons(hackathons: Record<string, BasicHackatho
       allowOverwrite: true, // Allow overwriting existing data
     });
     
-    console.log('BasicHackathons data saved successfully to Vercel Blob');
+    console.log('Hackathons data saved successfully to Vercel Blob');
   } catch (error) {
     console.error('Error saving hackathons to blob:', error);
     throw new Error(`Failed to save hackathons data: ${error instanceof Error ? error.message : 'Unknown error'}`);
@@ -91,6 +91,9 @@ export async function createHackathon(hackathonInput: Record<string, unknown>): 
   
   hackathons[uniqueId] = newBasicHackathon;
   await saveAllHackathons(hackathons);
+  
+  // Add a small delay to ensure consistency
+  await new Promise(resolve => setTimeout(resolve, 100));
   
   return newBasicHackathon;
 }

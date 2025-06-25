@@ -44,7 +44,12 @@ export default function EventsManagement() {
   const fetchEvents = async () => {
     try {
       setIsLoading(true);
-      const response = await fetch("/api/admin/events");
+      const response = await fetch("/api/admin/events", {
+        cache: 'no-store',
+        headers: {
+          'Cache-Control': 'no-cache'
+        }
+      });
 
       if (!response.ok) {
         throw new Error("Failed to fetch events");

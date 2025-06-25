@@ -51,7 +51,13 @@ export async function GET() {
     const events = await getAllEvents();
     
     // Return the events object with IDs as keys for admin interface
-    return NextResponse.json(events);
+    return NextResponse.json(events, {
+      headers: {
+        'Cache-Control': 'no-cache, no-store, must-revalidate',
+        'Pragma': 'no-cache',
+        'Expires': '0'
+      }
+    });
   } catch (error) {
     console.error("Error fetching events:", error);
     return NextResponse.json(

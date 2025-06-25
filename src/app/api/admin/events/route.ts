@@ -9,18 +9,18 @@ const createEventSchema = z.object({
   title: z.string().min(1, "Title is required"),
   description: z.string().min(1, "Description is required"),
   date: z.string().min(1, "Date is required"),
-  location: z.string().optional().default("IITGN Campus"),
-  duration: z.string().optional().default("1 day"),
-  participants: z.string().optional().default("50+"),
-  organizer: z.string().optional().default("Technical Council"),
+  location: z.string().optional(),
+  duration: z.string().optional(),
+  participants: z.string().optional(),
+  organizer: z.string().optional(),
   category: z.string().min(1, "Category is required"),
-  highlights: z.array(z.string()).default([]),
+  highlights: z.array(z.string()).optional().default([]),
   gallery: z.array(z.object({
     id: z.string(),
     url: z.string(),
     alt: z.string(),
     caption: z.string().optional()
-  })).default([]),
+  })).optional().default([]),
   draft: z.boolean().optional().default(false)
 });
 
@@ -83,22 +83,18 @@ export async function POST(request: NextRequest) {
     const validatedData = createEventSchema.parse(body);
     console.log("Validated data:", validatedData);
 
-    // Transform form data to Event format
+    // Transform form data to Event format - only use defaults for empty/missing fields
     const eventData = {
       title: validatedData.title,
       description: validatedData.description,
       date: validatedData.date,
-      location: validatedData.location,
-      duration: validatedData.duration,
-      participants: validatedData.participants,
-      organizer: validatedData.organizer,
+      location: validatedData.location && validatedData.location.trim() ? validatedData.location : "IITGN Campus",
+      duration: validatedData.duration && validatedData.duration.trim() ? validatedData.duration : "1 day", 
+      participants: validatedData.participants && validatedData.participants.trim() ? validatedData.participants : "50+",
+      organizer: validatedData.organizer && validatedData.organizer.trim() ? validatedData.organizer : "Technical Council",
       category: validatedData.category,
-      highlights: validatedData.highlights.length > 0 ? validatedData.highlights : [
-        "Engaging sessions and activities",
-        "Learning opportunities",
-        "Networking with peers"
-      ],
-      gallery: validatedData.gallery
+      highlights: validatedData.highlights || [], // Use exactly what user provided
+      gallery: validatedData.gallery || [] // Use exactly what user provided
     };
 
     // Create event

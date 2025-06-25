@@ -239,26 +239,14 @@ export async function updateEvent(id: string, updates: Partial<Omit<Event, 'id' 
 
 // Delete event
 export async function deleteEvent(id: string): Promise<void> {
-  console.log('deleteEvent: Starting deletion for ID:', id);
-  
   const events = await getAllEvents();
-  console.log('deleteEvent: Current events before deletion:', Object.keys(events));
   
   if (!events[id]) {
-    console.log('deleteEvent: Event not found:', id);
     throw new Error('Event not found');
   }
   
-  console.log('deleteEvent: Deleting event:', events[id].title);
   delete events[id];
-  console.log('deleteEvent: Events after deletion:', Object.keys(events));
-  
   await saveAllEvents(events);
-  console.log('deleteEvent: Save completed');
-  
-  // Verify the deletion worked by fetching again
-  const verifyEvents = await getAllEvents();
-  console.log('deleteEvent: Verification - events after save:', Object.keys(verifyEvents));
 }
 
 // Migrate events from file system to blob storage

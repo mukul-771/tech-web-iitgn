@@ -56,11 +56,6 @@ export default function EventsManagement() {
       }
 
       const data = await response.json();
-      console.log('Fetched events data:', data);
-      console.log('Data type:', typeof data);
-      console.log('Is array:', Array.isArray(data));
-      console.log('Object keys:', typeof data === 'object' && !Array.isArray(data) ? Object.keys(data) : 'N/A');
-      
       setEvents(data);
     } catch (err) {
       setError(err instanceof Error ? err.message : "An error occurred");
@@ -130,10 +125,6 @@ export default function EventsManagement() {
   }
 
   const eventsArray = Object.entries(events);
-  console.log('Events object:', events);
-  console.log('Events array:', eventsArray);
-  console.log('First few entries:', eventsArray.slice(0, 3));
-  
   const categories = ["all", ...new Set(Object.values(events).map(event => event.category))];
 
   const filteredEvents = eventsArray.filter(([id, event]) => {

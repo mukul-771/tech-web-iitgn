@@ -67,15 +67,15 @@ export default function NewEvent() {
     setIsLoading(true);
 
     try {
-      // Transform form data to match API expectations
+      // Transform form data to match API expectations - preserve exactly what user entered
       const eventData = {
         title: formData.title,
         description: formData.description,
         date: formData.date,
-        location: formData.location || "IITGN Campus",
-        duration: formData.duration || "1 day",
-        participants: formData.participants || "50+",
-        organizer: formData.organizer || "Technical Council",
+        location: formData.location, // Send exactly what user typed
+        duration: formData.duration, // Send exactly what user typed
+        participants: formData.participants, // Send exactly what user typed
+        organizer: formData.organizer, // Send exactly what user typed
         category: formData.category,
         highlights: formData.highlights.filter(h => h.trim() !== ""),
         gallery: formData.gallery.filter(item => item.url && item.alt),

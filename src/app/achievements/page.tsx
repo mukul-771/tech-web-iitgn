@@ -102,30 +102,14 @@ async function getInterIITAchievements() {
     });
   } catch (error) {
     console.error('Error fetching Inter-IIT achievements:', error);
-    // Fallback to default data
+    // Return error achievement to debug the issue
     return [
       {
-        year: "2023",
-        position: "3rd Place",
-        event: "Autonomous Robotics Challenge",
-        description: "Secured 3rd position in the Autonomous Robotics Challenge with excellent navigation and task completion capabilities.",
-        team: "Sneha Agarwal, Vikram Singh, Priya Sharma, Amit Kumar",
-        medal: "bronze"
-      },
-      {
-        year: "2023",
-        position: "2nd Place",
-        event: "Innovation Challenge",
-        description: "Secured 2nd position in the Innovation Challenge with an innovative IoT solution for smart campus management.",
-        team: "Kavya Reddy, Rohit Sharma",
-        medal: "silver"
-      },
-      {
-        year: "2023",
-        position: "5th Place",
-        event: "Programming Contest",
-        description: "Achieved 5th position in the highly competitive Programming Contest, demonstrating strong algorithmic and problem-solving skills.",
-        team: "Arjun Patel, Kavya Sharma, Rohit Gupta",
+        year: "ERROR",
+        position: "ERROR",
+        event: "Failed to fetch achievements",
+        description: `Error: ${error instanceof Error ? error.message : 'Unknown error'}. API should be available at the URL.`,
+        team: "Debug Team",
         medal: "bronze"
       }
     ];

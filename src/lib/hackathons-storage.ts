@@ -108,16 +108,45 @@ export async function createHackathon(hackathonInput: Record<string, unknown>): 
   // Always fetch latest from blob to avoid overwrites
   const latest = await getAllHackathons();
 
-  // Extract only BasicHackathon properties from the input
+  // Extract all BasicHackathon properties from the input
   const basicHackathonData: Omit<BasicHackathon, 'id' | 'createdAt' | 'updatedAt'> = {
+    // Core fields
     name: String(hackathonInput.name || ''),
     description: String(hackathonInput.description || ''),
     longDescription: String(hackathonInput.longDescription || ''),
     date: String(hackathonInput.date || ''),
+    startTime: hackathonInput.startTime ? String(hackathonInput.startTime) : undefined,
+    endTime: hackathonInput.endTime ? String(hackathonInput.endTime) : undefined,
     location: String(hackathonInput.location || ''),
     category: String(hackathonInput.category || ''),
     status: String(hackathonInput.status || 'upcoming') as "upcoming" | "ongoing" | "completed" | "cancelled",
     registrationLink: hackathonInput.registrationLink ? String(hackathonInput.registrationLink) : undefined,
+    
+    // Organizer details
+    organizerName: hackathonInput.organizerName ? String(hackathonInput.organizerName) : undefined,
+    organizerEmail: hackathonInput.organizerEmail ? String(hackathonInput.organizerEmail) : undefined,
+    organizerPhone: hackathonInput.organizerPhone ? String(hackathonInput.organizerPhone) : undefined,
+    organizerWebsite: hackathonInput.organizerWebsite ? String(hackathonInput.organizerWebsite) : undefined,
+    
+    // Requirements and eligibility
+    requirements: hackathonInput.requirements ? String(hackathonInput.requirements) : undefined,
+    eligibility: hackathonInput.eligibility ? String(hackathonInput.eligibility) : undefined,
+    teamSize: hackathonInput.teamSize ? String(hackathonInput.teamSize) : undefined,
+    
+    // Prize pool
+    firstPrize: hackathonInput.firstPrize ? String(hackathonInput.firstPrize) : undefined,
+    secondPrize: hackathonInput.secondPrize ? String(hackathonInput.secondPrize) : undefined,
+    thirdPrize: hackathonInput.thirdPrize ? String(hackathonInput.thirdPrize) : undefined,
+    specialPrizes: hackathonInput.specialPrizes ? String(hackathonInput.specialPrizes) : undefined,
+    
+    // Timeline and important details
+    timeline: hackathonInput.timeline ? String(hackathonInput.timeline) : undefined,
+    importantNotes: hackathonInput.importantNotes ? String(hackathonInput.importantNotes) : undefined,
+    
+    // Additional details
+    themes: hackathonInput.themes ? String(hackathonInput.themes) : undefined,
+    judingCriteria: hackathonInput.judingCriteria ? String(hackathonInput.judingCriteria) : undefined,
+    submissionGuidelines: hackathonInput.submissionGuidelines ? String(hackathonInput.submissionGuidelines) : undefined,
   };
 
   // Generate ID from name
@@ -157,18 +186,46 @@ export async function updateHackathon(id: string, updates: Record<string, unknow
     throw new Error('BasicHackathon not found');
   }
 
-  // Extract only BasicHackathon properties from updates
+  // Extract all BasicHackathon properties from updates
   const basicUpdates: Partial<BasicHackathon> = {};
+  
+  // Core fields
   if (updates.name !== undefined) basicUpdates.name = String(updates.name);
   if (updates.description !== undefined) basicUpdates.description = String(updates.description);
   if (updates.longDescription !== undefined) basicUpdates.longDescription = String(updates.longDescription);
   if (updates.date !== undefined) basicUpdates.date = String(updates.date);
+  if (updates.startTime !== undefined) basicUpdates.startTime = String(updates.startTime);
+  if (updates.endTime !== undefined) basicUpdates.endTime = String(updates.endTime);
   if (updates.location !== undefined) basicUpdates.location = String(updates.location);
   if (updates.category !== undefined) basicUpdates.category = String(updates.category);
   if (updates.status !== undefined) basicUpdates.status = String(updates.status) as "upcoming" | "ongoing" | "completed" | "cancelled";
-  if (updates.registrationLink !== undefined) {
-    basicUpdates.registrationLink = String(updates.registrationLink);
-  }
+  if (updates.registrationLink !== undefined) basicUpdates.registrationLink = String(updates.registrationLink);
+  
+  // Organizer details
+  if (updates.organizerName !== undefined) basicUpdates.organizerName = String(updates.organizerName);
+  if (updates.organizerEmail !== undefined) basicUpdates.organizerEmail = String(updates.organizerEmail);
+  if (updates.organizerPhone !== undefined) basicUpdates.organizerPhone = String(updates.organizerPhone);
+  if (updates.organizerWebsite !== undefined) basicUpdates.organizerWebsite = String(updates.organizerWebsite);
+  
+  // Requirements and eligibility
+  if (updates.requirements !== undefined) basicUpdates.requirements = String(updates.requirements);
+  if (updates.eligibility !== undefined) basicUpdates.eligibility = String(updates.eligibility);
+  if (updates.teamSize !== undefined) basicUpdates.teamSize = String(updates.teamSize);
+  
+  // Prize pool
+  if (updates.firstPrize !== undefined) basicUpdates.firstPrize = String(updates.firstPrize);
+  if (updates.secondPrize !== undefined) basicUpdates.secondPrize = String(updates.secondPrize);
+  if (updates.thirdPrize !== undefined) basicUpdates.thirdPrize = String(updates.thirdPrize);
+  if (updates.specialPrizes !== undefined) basicUpdates.specialPrizes = String(updates.specialPrizes);
+  
+  // Timeline and important details
+  if (updates.timeline !== undefined) basicUpdates.timeline = String(updates.timeline);
+  if (updates.importantNotes !== undefined) basicUpdates.importantNotes = String(updates.importantNotes);
+  
+  // Additional details
+  if (updates.themes !== undefined) basicUpdates.themes = String(updates.themes);
+  if (updates.judingCriteria !== undefined) basicUpdates.judingCriteria = String(updates.judingCriteria);
+  if (updates.submissionGuidelines !== undefined) basicUpdates.submissionGuidelines = String(updates.submissionGuidelines);
 
   const updatedBasicHackathon: BasicHackathon = {
     ...latest[id],

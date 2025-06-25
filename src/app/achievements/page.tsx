@@ -2,6 +2,7 @@ import { Metadata } from "next"
 import Link from "next/link"
 import Image from "next/image"
 import { Trophy, Medal, Award, Calendar, Users, Camera, ArrowRight } from "lucide-react"
+import { Event } from "@/lib/events-data"
 
 // Force dynamic rendering to ensure fresh data
 export const dynamic = 'force-dynamic'
@@ -118,43 +119,55 @@ async function getInterIITAchievements() {
 
 
 
-// This will be replaced with dynamic data fetching
-async function getEventGallery() {
+// This will fetch fresh data from the events API for dynamic updates
+async function getEventGallery(): Promise<Event[]> {
   try {
-    // In production, this would fetch from the API
-    // For now, we'll use a server-side import of the storage function
-    const { getEventsForDisplay } = await import('@/lib/events-storage');
-    return await getEventsForDisplay();
+    // Always use the full production URL for consistency
+    const apiUrl = 'https://technical-council-iitgn.vercel.app/api/events';
+    
+    console.log('Fetching events from:', apiUrl);
+    const response = await fetch(apiUrl, {
+      cache: 'no-store', // Ensure no caching
+      headers: {
+        'Cache-Control': 'no-cache',
+        'Pragma': 'no-cache'
+      }
+    });
+    
+    if (!response.ok) {
+      throw new Error(`Failed to fetch events: ${response.status}`);
+    }
+    
+    const events = await response.json();
+    console.log('Fetched events count:', events.length);
+    console.log('Sample event:', events[0]?.title);
+    
+    return events;
   } catch (error) {
     console.error('Error fetching events:', error);
-    // Fallback to default data
+    // Return error event to debug the issue
     return [
       {
-        id: "tech-symposium-2023",
-        title: "Annual Tech Symposium 2023",
-        description: "A grand showcase of innovation featuring project exhibitions, tech talks, and networking sessions with industry leaders.",
-        organizer: "Technical Council",
-        date: "March 2023",
-        image: "/events/placeholder-1.svg",
-        category: "Symposium"
-      },
-      {
-        id: "robotics-workshop-2023",
-        title: "Robotics Workshop Series",
-        description: "Hands-on workshop series covering autonomous navigation, computer vision, and machine learning in robotics.",
-        organizer: "Robotics Club",
-        date: "September 2023",
-        image: "/events/placeholder-3.svg",
-        category: "Workshop"
-      },
-      {
-        id: "hackathon-2023",
-        title: "IITGNHacks 2023",
-        description: "48-hour hackathon bringing together brilliant minds to solve real-world problems using cutting-edge technology.",
-        organizer: "Programming Club",
-        date: "November 2023",
-        image: "/events/placeholder-2.svg",
-        category: "Hackathon"
+        id: "error-event",
+        title: "Failed to fetch events",
+        description: `Error: ${error instanceof Error ? error.message : 'Unknown error'}. Events API should be available.`,
+        organizer: "Debug Team",
+        date: "ERROR",
+        location: "Error Location",
+        duration: "N/A",
+        participants: "0",
+        category: "Error",
+        highlights: [],
+        gallery: [
+          {
+            id: "error-img",
+            url: "/events/placeholder-1.svg",
+            alt: "Error placeholder",
+            caption: "Error loading events"
+          }
+        ],
+        createdAt: new Date().toISOString(),
+        updatedAt: new Date().toISOString()
       }
     ];
   }
@@ -275,8 +288,8 @@ export default async function AchievementsPage() {
                     {/* Event Image */}
                     <div className="relative h-48 bg-gradient-to-br from-blue-600/20 to-purple-600/20 flex items-center justify-center">
                       <Image
-                        src={event.image}
-                        alt={event.title}
+                        src={event.gallery[0]?.url || "/events/placeholder-1.svg"}
+                        alt={event.gallery[0]?.alt || event.title}
                         width={400}
                         height={200}
                         className="w-full h-full object-cover"

@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
-import { getAllEvents, createEvent } from "@/lib/events-storage";
+import { getAllEvents, createEvent, migrateEventsFromFileSystem } from "@/lib/events-blob-storage";
 import { z } from "zod";
 
 // Validation schema for event creation
@@ -45,8 +45,14 @@ export async function GET() {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
+    // Ensure data is migrated to Blob
+    await migrateEventsFromFileSystem();
+
     const events = await getAllEvents();
-    return NextResponse.json(events);
+    const eventsArray = Object.values(events).sort((a, b) =>
+      new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
+    );
+    return NextResponse.json(eventsArray);
   } catch (error) {
     console.error("Error fetching events:", error);
     return NextResponse.json(

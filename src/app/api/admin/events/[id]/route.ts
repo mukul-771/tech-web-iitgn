@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
-import { getEventById, updateEvent, deleteEvent } from "@/lib/events-storage";
+import { getEventById, updateEvent, deleteEvent } from "@/lib/events-blob-storage";
 import { z } from "zod";
 
 // Validation schema for event updates
@@ -111,11 +111,7 @@ export async function DELETE(
     }
 
     const resolvedParams = await params;
-    const success = await deleteEvent(resolvedParams.id);
-
-    if (!success) {
-      return NextResponse.json({ error: "Event not found" }, { status: 404 });
-    }
+    await deleteEvent(resolvedParams.id);
 
     return NextResponse.json({ message: "Event deleted successfully" });
   } catch (error) {

@@ -17,6 +17,7 @@ export interface Event {
   category: string;
   highlights: string[];
   gallery: EventImage[];
+  draft?: boolean;
   createdAt: string;
   updatedAt: string;
 }

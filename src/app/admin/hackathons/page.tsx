@@ -266,16 +266,11 @@ export default function AdminHackathonsPage() {
                     </div>
                     <div className="flex items-center gap-2">
                       <Users className="h-4 w-4 text-muted-foreground" />
-                      <span>{hackathon.currentParticipants || '0'} / {hackathon.maxParticipants || 'Unlimited'}</span>
+                      <span>Participants: N/A</span>
                     </div>
                   </div>
                   <div className="mt-4">
                     <Badge variant="outline">{hackathon.category}</Badge>
-                    {hackathon.prizes && hackathon.prizes.length > 0 && (
-                      <span className="ml-2 text-sm text-muted-foreground">
-                        {hackathon.prizes.length} prize{hackathon.prizes.length !== 1 ? 's' : ''}
-                      </span>
-                    )}
                   </div>
                 </CardContent>
               </Card>

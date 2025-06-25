@@ -13,7 +13,7 @@ async function getInterIITAchievements() {
   try {
     // In production, this would fetch from the API
     // For now, we'll use a server-side import of the storage function
-    const { getInterIITAchievementsForDisplay } = await import('@/lib/inter-iit-achievements-storage');
+    const { getInterIITAchievementsForDisplay } = await import('@/lib/inter-iit-achievements-blob-storage');
     const achievements = await getInterIITAchievementsForDisplay();
 
     // Transform the data to match the expected format for the UI

@@ -113,8 +113,6 @@ export default function EditHackathonPage({ params }: EditHackathonPageProps) {
         requirements: requirements.filter(r => r.trim() !== ""),
         schedule: schedule.filter(s => s.time.trim() !== "" && s.activity.trim() !== ""),
         sponsors: sponsors.filter(s => s.name.trim() !== ""),
-        gallery: hackathon?.gallery || [],
-        winners: hackathon?.winners || [],
       };
 
       const response = await fetch(`/api/admin/hackathons/${hackathonId}`, {

@@ -70,9 +70,6 @@ export default function NewEvent() {
     draft: true
   });
   const [newHighlight, setNewHighlight] = useState("");
-  const [newGalleryUrl, setNewGalleryUrl] = useState("");
-  const [newGalleryAlt, setNewGalleryAlt] = useState("");
-  const [newGalleryCaption, setNewGalleryCaption] = useState("");
 
   useEffect(() => {
     if (status === "loading") return;
@@ -104,25 +101,8 @@ export default function NewEvent() {
       newErrors.category = "Category is required";
     }
 
-    // Validate gallery URLs
-    for (const item of formData.gallery) {
-      if (item.url && !isValidUrl(item.url)) {
-        newErrors.gallery = "Please provide valid image URLs";
-        break;
-      }
-    }
-
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
-  };
-
-  const isValidUrl = (string: string): boolean => {
-    try {
-      const url = new URL(string);
-      return url.protocol === 'http:' || url.protocol === 'https:';
-    } catch {
-      return false;
-    }
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -197,29 +177,18 @@ export default function NewEvent() {
     handleInputChange("highlights", newHighlights);
   };
 
-  const addGalleryItem = () => {
-    if (newGalleryUrl.trim() && newGalleryAlt.trim()) {
-      if (!isValidUrl(newGalleryUrl.trim())) {
-        alert("Please enter a valid image URL");
-        return;
-      }
+  const addGalleryItem = (url: string, alt: string, caption?: string) => {
+    const newItem = {
+      id: Date.now().toString(),
+      url: url.trim(),
+      alt: alt.trim(),
+      caption: caption?.trim() || undefined
+    };
 
-      const newItem = {
-        id: Date.now().toString(),
-        url: newGalleryUrl.trim(),
-        alt: newGalleryAlt.trim(),
-        caption: newGalleryCaption.trim() || undefined
-      };
-
-      setFormData(prev => ({
-        ...prev,
-        gallery: [...prev.gallery, newItem]
-      }));
-
-      setNewGalleryUrl("");
-      setNewGalleryAlt("");
-      setNewGalleryCaption("");
-    }
+    setFormData(prev => ({
+      ...prev,
+      gallery: [...prev.gallery, newItem]
+    }));
   };
 
   const removeGalleryItem = (index: number) => {
@@ -454,7 +423,7 @@ export default function NewEvent() {
                 <CardHeader>
                   <CardTitle>Event Gallery</CardTitle>
                   <p className="text-sm text-muted-foreground">
-                    Add images to showcase the event (images must be uploaded to a hosting service)
+                    Upload images to showcase the event (stored securely on Vercel Blob)
                   </p>
                 </CardHeader>
                 <CardContent className="space-y-4">
@@ -481,16 +450,16 @@ export default function NewEvent() {
 
                         <div className="grid gap-3">
                           <div>
-                            <Label>Image URL *</Label>
+                            <Label>Image URL</Label>
                             <Input
                               value={item.url}
-                              onChange={(e) => {
-                                const newGallery = [...formData.gallery];
-                                newGallery[index].url = e.target.value;
-                                setFormData(prev => ({ ...prev, gallery: newGallery }));
-                              }}
-                              placeholder="https://example.com/image.jpg"
+                              readOnly
+                              className="bg-gray-50"
+                              placeholder="Image will be uploaded to Vercel Blob"
                             />
+                            <p className="text-xs text-muted-foreground mt-1">
+                              Stored securely on Vercel Blob
+                            </p>
                           </div>
                           <div>
                             <Label>Alt Text *</Label>
@@ -522,56 +491,30 @@ export default function NewEvent() {
                   </div>
 
                   {/* Add New Image */}
-                  <div className="border-2 border-dashed border-gray-300 rounded-lg p-4 space-y-4">
+                  <div className="border-2 border-dashed border-gray-300 rounded-lg p-6 space-y-4">
                     <div className="flex items-center gap-2">
                       <ImageIcon className="h-5 w-5 text-muted-foreground" />
-                      <h4 className="font-medium">Add New Image</h4>
+                      <h4 className="font-medium">Upload New Image</h4>
                     </div>
                     
-                    {/* Upload Option */}
-                    <div className="bg-blue-50 border border-blue-200 rounded-md p-3">
-                      <SimpleImageUpload
-                        onImageUploaded={(url) => setNewGalleryUrl(url)}
-                        disabled={isLoading}
-                      />
-                    </div>
-
-                    {/* Manual URL Option */}
-                    <div className="space-y-3">
-                      <p className="text-sm text-muted-foreground">Option 2: Enter image URL manually</p>
-                      <div>
-                        <Label>Image URL *</Label>
-                        <Input
-                          value={newGalleryUrl}
-                          onChange={(e) => setNewGalleryUrl(e.target.value)}
-                          placeholder="https://example.com/image.jpg"
-                        />
-                      </div>
-                      <div>
-                        <Label>Alt Text *</Label>
-                        <Input
-                          value={newGalleryAlt}
-                          onChange={(e) => setNewGalleryAlt(e.target.value)}
-                          placeholder="Describe the image for accessibility"
-                        />
-                      </div>
-                      <div>
-                        <Label>Caption (Optional)</Label>
-                        <Input
-                          value={newGalleryCaption}
-                          onChange={(e) => setNewGalleryCaption(e.target.value)}
-                          placeholder="Image caption"
-                        />
-                      </div>
-                      <Button
-                        type="button"
-                        onClick={addGalleryItem}
-                        disabled={!newGalleryUrl || !newGalleryAlt}
-                      >
-                        <Plus className="h-4 w-4 mr-2" />
-                        Add Image
-                      </Button>
-                    </div>
+                    <SimpleImageUpload
+                      onImageUploaded={(url) => {
+                        // Prompt for alt text
+                        const alt = prompt("Enter alt text for this image (required for accessibility):");
+                        if (alt && alt.trim()) {
+                          const caption = prompt("Enter a caption for this image (optional):") || "";
+                          addGalleryItem(url, alt.trim(), caption.trim());
+                        } else {
+                          alert("Alt text is required for accessibility. Image not added.");
+                        }
+                      }}
+                      disabled={isLoading}
+                      className="w-full"
+                    />
+                    
+                    <p className="text-sm text-muted-foreground text-center">
+                      Images are automatically uploaded to secure Vercel Blob storage
+                    </p>
                   </div>
                 </CardContent>
               </Card>

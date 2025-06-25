@@ -14,13 +14,7 @@ import { Hackathon, hackathonCategories, hackathonStatuses, expandBasicHackathon
 import { Combobox } from "@/components/ui/combobox";
 import { BasicHackathon } from "@/lib/hackathons-storage";
 
-interface EditHackathonPageProps {
-  params: {
-    id: string;
-  };
-}
-
-export default function EditHackathonPage({ params }: EditHackathonPageProps) {
+export default function EditHackathonPage({ params }: { params: { id: string } }) {
   const router = useRouter();
   const { id } = params;
   const [isLoading, setIsLoading] = useState(true);
@@ -40,12 +34,12 @@ export default function EditHackathonPage({ params }: EditHackathonPageProps) {
   const fetchHackathon = useCallback(async (hackathonId: string) => {
     try {
       setIsLoading(true);
-      const response = await fetch(`/api/admin/hackathons/${hackathonId}`);
-      if (!response.ok) {
+      const fetchResponse = await fetch(`/api/admin/hackathons/${hackathonId}`);
+      if (!fetchResponse.ok) {
         throw new Error("Failed to fetch hackathon");
       }
       
-      const data: BasicHackathon = await response.json();
+      const data: BasicHackathon = await fetchResponse.json();
       const expandedHackathon = expandBasicHackathon(data);
       setHackathon(expandedHackathon);
       
@@ -86,7 +80,7 @@ export default function EditHackathonPage({ params }: EditHackathonPageProps) {
     setIsSaving(true);
 
     try {
-      const response = await fetch(`/api/admin/hackathons/${id}`, {
+      const updateResponse = await fetch(`/api/admin/hackathons/${id}`, {
         method: "PUT",
         headers: {
           "Content-Type": "application/json",
@@ -94,8 +88,8 @@ export default function EditHackathonPage({ params }: EditHackathonPageProps) {
         body: JSON.stringify(formData),
       });
 
-      if (!response.ok) {
-        const errorData = await response.json();
+      if (!updateResponse.ok) {
+        const errorData = await updateResponse.json();
         throw new Error(errorData.error || "Failed to update hackathon");
       }
 

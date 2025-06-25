@@ -62,8 +62,9 @@ export async function getHackathonById(id: string): Promise<BasicHackathon | nul
 
 // Create new hackathon
 export async function createHackathon(hackathonInput: Record<string, unknown>): Promise<BasicHackathon> {
-  const hackathons = await getAllHackathons();
-  
+  // Always fetch latest from blob to avoid overwrites
+  const latest = await getAllHackathons();
+
   // Extract only BasicHackathon properties from the input
   const basicHackathonData: Omit<BasicHackathon, 'id' | 'createdAt' | 'updatedAt'> = {
     name: String(hackathonInput.name || ''),
@@ -76,21 +77,21 @@ export async function createHackathon(hackathonInput: Record<string, unknown>): 
     registrationUrl: hackathonInput.registrationLink ? String(hackathonInput.registrationLink) : 
                      hackathonInput.registrationUrl ? String(hackathonInput.registrationUrl) : undefined,
   };
-  
+
   // Generate ID from name
   const id = basicHackathonData.name.toLowerCase()
     .replace(/[^a-z0-9\s]/g, '')
     .replace(/\s+/g, '-')
     .substring(0, 50);
-  
+
   // Ensure unique ID
   let uniqueId = id;
   let counter = 1;
-  while (hackathons[uniqueId]) {
+  while (latest[uniqueId]) {
     uniqueId = `${id}-${counter}`;
     counter++;
   }
-  
+
   const now = new Date().toISOString();
   const newBasicHackathon: BasicHackathon = {
     ...basicHackathonData,
@@ -98,27 +99,24 @@ export async function createHackathon(hackathonInput: Record<string, unknown>): 
     createdAt: now,
     updatedAt: now,
   };
-  
-  hackathons[uniqueId] = newBasicHackathon;
-  await saveAllHackathons(hackathons);
-  
-  // Add a delay to ensure Vercel Blob consistency
+
+  latest[uniqueId] = newBasicHackathon;
+  await saveAllHackathons(latest);
   await new Promise(resolve => setTimeout(resolve, 500));
-  
   return newBasicHackathon;
 }
 
 // Update existing hackathon
 export async function updateHackathon(id: string, updates: Record<string, unknown>): Promise<BasicHackathon> {
-  const hackathons = await getAllHackathons();
-  
-  if (!hackathons[id]) {
+  // Always fetch latest from blob to avoid overwrites
+  const latest = await getAllHackathons();
+
+  if (!latest[id]) {
     throw new Error('BasicHackathon not found');
   }
-  
+
   // Extract only BasicHackathon properties from updates
   const basicUpdates: Partial<BasicHackathon> = {};
-  
   if (updates.name !== undefined) basicUpdates.name = String(updates.name);
   if (updates.description !== undefined) basicUpdates.description = String(updates.description);
   if (updates.longDescription !== undefined) basicUpdates.longDescription = String(updates.longDescription);
@@ -130,34 +128,28 @@ export async function updateHackathon(id: string, updates: Record<string, unknow
     basicUpdates.registrationUrl = updates.registrationLink ? String(updates.registrationLink) : 
                                    updates.registrationUrl ? String(updates.registrationUrl) : undefined;
   }
-  
+
   const updatedBasicHackathon: BasicHackathon = {
-    ...hackathons[id],
+    ...latest[id],
     ...basicUpdates,
     updatedAt: new Date().toISOString(),
   };
-  
-  hackathons[id] = updatedBasicHackathon;
-  await saveAllHackathons(hackathons);
-  
-  // Add a delay to ensure Vercel Blob consistency
+
+  latest[id] = updatedBasicHackathon;
+  await saveAllHackathons(latest);
   await new Promise(resolve => setTimeout(resolve, 500));
-  
   return updatedBasicHackathon;
 }
 
 // Delete hackathon
 export async function deleteHackathon(id: string): Promise<void> {
-  const hackathons = await getAllHackathons();
-  
-  if (!hackathons[id]) {
+  // Always fetch latest from blob to avoid overwrites
+  const latest = await getAllHackathons();
+  if (!latest[id]) {
     throw new Error('BasicHackathon not found');
   }
-  
-  delete hackathons[id];
-  await saveAllHackathons(hackathons);
-  
-  // Add a delay to ensure Vercel Blob consistency
+  delete latest[id];
+  await saveAllHackathons(latest);
   await new Promise(resolve => setTimeout(resolve, 500));
 }
 

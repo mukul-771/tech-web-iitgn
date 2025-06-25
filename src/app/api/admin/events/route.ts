@@ -77,11 +77,17 @@ export async function POST(request: NextRequest) {
     }
 
     const body = await request.json();
-    console.log("Received body:", body);
+    console.log("Received body:", JSON.stringify(body, null, 2));
+    console.log("Location value:", `"${body.location}"`, "Type:", typeof body.location);
+    console.log("Duration value:", `"${body.duration}"`, "Type:", typeof body.duration);
+    console.log("Participants value:", `"${body.participants}"`, "Type:", typeof body.participants);
+    console.log("Organizer value:", `"${body.organizer}"`, "Type:", typeof body.organizer);
 
     // Validate request body with updated schema v2
     const validatedData = createEventSchema.parse(body);
-    console.log("Validated data:", validatedData);
+    console.log("Validated data:", JSON.stringify(validatedData, null, 2));
+    console.log("Validated location:", `"${validatedData.location}"`, "Type:", typeof validatedData.location);
+    console.log("Validated duration:", `"${validatedData.duration}"`, "Type:", typeof validatedData.duration);
 
     // Transform form data to Event format - only use defaults for empty/missing fields
     const eventData = {

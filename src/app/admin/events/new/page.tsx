@@ -82,6 +82,9 @@ export default function NewEvent() {
         draft: formData.draft
       };
 
+      console.log("Client sending eventData:", eventData);
+      console.log("Form data before transform:", formData);
+
       const response = await fetch("/api/admin/events", {
         method: "POST",
         headers: {

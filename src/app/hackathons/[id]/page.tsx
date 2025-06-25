@@ -1,12 +1,10 @@
 import { Metadata } from "next"
 import Link from "next/link"
-import Image from "next/image"
 import { notFound } from "next/navigation"
 import { Calendar, MapPin, Users, Clock, ExternalLink, ArrowLeft } from "lucide-react"
 import { Button } from "@/components/ui/button"
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
-import { Separator } from "@/components/ui/separator"
 import { getHackathonById } from "@/lib/hackathons-storage"
 
 interface HackathonPageProps {
@@ -109,10 +107,10 @@ export default async function HackathonPage({ params }: HackathonPageProps) {
             </div>
 
             {/* Registration Button */}
-            {hackathon.registrationUrl && (hackathon.status === 'upcoming' || hackathon.status === 'ongoing') && (
+            {hackathon.registrationLink && (hackathon.status === 'upcoming' || hackathon.status === 'ongoing') && (
               <div className="flex flex-col sm:flex-row gap-4 items-start">
                 <Button asChild size="lg" className="w-fit">
-                  <Link href={hackathon.registrationUrl} target="_blank" rel="noopener noreferrer">
+                  <Link href={hackathon.registrationLink} target="_blank" rel="noopener noreferrer">
                     {hackathon.status === 'upcoming' ? 'Register Now' : 'Join Now'}
                     <ExternalLink className="h-4 w-4 ml-2" />
                   </Link>
@@ -155,7 +153,7 @@ export default async function HackathonPage({ params }: HackathonPageProps) {
             {/* Sidebar */}
             <div className="space-y-6">
               {/* Registration Card */}
-              {hackathon.registrationUrl && (hackathon.status === 'upcoming' || hackathon.status === 'ongoing') && (
+              {hackathon.registrationLink && (hackathon.status === 'upcoming' || hackathon.status === 'ongoing') && (
                 <Card className="border-primary/20 bg-gradient-to-br from-primary/5 to-primary/10">
                   <CardHeader>
                     <CardTitle className="flex items-center gap-2">
@@ -179,7 +177,7 @@ export default async function HackathonPage({ params }: HackathonPageProps) {
                       </div>
                     )}
                     <Button asChild className="w-full" size="lg">
-                      <Link href={hackathon.registrationUrl} target="_blank" rel="noopener noreferrer">
+                      <Link href={hackathon.registrationLink} target="_blank" rel="noopener noreferrer">
                         {hackathon.status === 'upcoming' ? 'Register Now' : 'Join Event'}
                         <ExternalLink className="h-4 w-4 ml-2" />
                       </Link>

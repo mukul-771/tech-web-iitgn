@@ -14,7 +14,17 @@ export async function getAllHackathons(): Promise<Record<string, BasicHackathon>
       return {};
     }
     
-    const response = await fetch(blobs[0].url);
+    // Add cache busting to ensure fresh data
+    const url = `${blobs[0].url}?t=${Date.now()}`;
+    const response = await fetch(url, {
+      cache: 'no-store',
+      headers: {
+        'Cache-Control': 'no-cache, no-store, must-revalidate',
+        'Pragma': 'no-cache',
+        'Expires': '0'
+      }
+    });
+    
     if (!response.ok) {
       throw new Error(`Failed to fetch hackathons data: ${response.statusText}`);
     }
@@ -92,8 +102,8 @@ export async function createHackathon(hackathonInput: Record<string, unknown>): 
   hackathons[uniqueId] = newBasicHackathon;
   await saveAllHackathons(hackathons);
   
-  // Add a small delay to ensure consistency
-  await new Promise(resolve => setTimeout(resolve, 100));
+  // Add a delay to ensure Vercel Blob consistency
+  await new Promise(resolve => setTimeout(resolve, 500));
   
   return newBasicHackathon;
 }
@@ -130,6 +140,9 @@ export async function updateHackathon(id: string, updates: Record<string, unknow
   hackathons[id] = updatedBasicHackathon;
   await saveAllHackathons(hackathons);
   
+  // Add a delay to ensure Vercel Blob consistency
+  await new Promise(resolve => setTimeout(resolve, 500));
+  
   return updatedBasicHackathon;
 }
 
@@ -143,6 +156,9 @@ export async function deleteHackathon(id: string): Promise<void> {
   
   delete hackathons[id];
   await saveAllHackathons(hackathons);
+  
+  // Add a delay to ensure Vercel Blob consistency
+  await new Promise(resolve => setTimeout(resolve, 500));
 }
 
 // Get hackathons for public display (sorted by date)

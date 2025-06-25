@@ -53,16 +53,15 @@ interface UIAchievement {
 // This will fetch fresh data from the API for dynamic updates
 async function getInterIITAchievements() {
   try {
-    // Fetch from the API to ensure we get the latest data
-    // Use relative URL for server-side fetching in production
-    const baseUrl = process.env.VERCEL_URL 
-      ? `https://${process.env.VERCEL_URL}` 
-      : process.env.NODE_ENV === 'production' 
-        ? 'https://technical-council-iitgn.vercel.app'
-        : 'http://localhost:3000';
-    const response = await fetch(`${baseUrl}/api/inter-iit-achievements`, {
-      next: { revalidate: 0 }, // Always fetch fresh data
-      cache: 'no-store' // Ensure no caching
+    // Always use the full production URL for consistency
+    const apiUrl = 'https://technical-council-iitgn.vercel.app/api/inter-iit-achievements';
+    
+    const response = await fetch(apiUrl, {
+      cache: 'no-store', // Ensure no caching
+      headers: {
+        'Cache-Control': 'no-cache',
+        'Pragma': 'no-cache'
+      }
     });
     
     if (!response.ok) {

@@ -1,5 +1,8 @@
 import { put, list } from '@vercel/blob';
-import { BasicHackathon } from './hackathons-data';
+import type { BasicHackathon } from './hackathons-data';
+
+// Re-export for convenience in other modules
+export type { BasicHackathon };
 
 // Store hackathons as JSON in Vercel Blob
 const HACKATHONS_BLOB_PATH = 'hackathons-data.json';

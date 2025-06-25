@@ -14,9 +14,9 @@ import { Hackathon, hackathonCategories, hackathonStatuses, expandBasicHackathon
 import { Combobox } from "@/components/ui/combobox";
 import { BasicHackathon } from "@/lib/hackathons-storage";
 
-export default function EditHackathonPage({ params }: { params: { id: string } }) {
+export default function EditHackathonPage({ params }: { params: Promise<{ id: string }> }) {
   const router = useRouter();
-  const { id } = params;
+  const [id, setId] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [isSaving, setIsSaving] = useState(false);
   const [hackathon, setHackathon] = useState<Hackathon | null>(null);
@@ -27,9 +27,16 @@ export default function EditHackathonPage({ params }: { params: { id: string } }
     date: "",
     location: "",
     category: "",
-    status: "upcoming" as const,
+    status: "upcoming" as "upcoming" | "ongoing" | "completed" | "cancelled",
     registrationLink: "",
   });
+
+  // Resolve params Promise
+  useEffect(() => {
+    params.then((resolvedParams) => {
+      setId(resolvedParams.id);
+    });
+  }, [params]);
 
   const fetchHackathon = useCallback(async (hackathonId: string) => {
     try {
@@ -72,7 +79,7 @@ export default function EditHackathonPage({ params }: { params: { id: string } }
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
-    if (!formData.name.trim() || !formData.description.trim() || !formData.longDescription.trim()) {
+    if (!id || !formData.name.trim() || !formData.description.trim() || !formData.longDescription.trim()) {
       alert("Please fill in all required fields");
       return;
     }
@@ -161,7 +168,8 @@ export default function EditHackathonPage({ params }: { params: { id: string } }
           <div className="flex gap-3">
             <Button
               variant="outline"
-              onClick={() => window.open(`/hackathons/${id}`, '_blank')}
+              onClick={() => id && window.open(`/hackathons/${id}`, '_blank')}
+              disabled={!id}
             >
               View Public Page
             </Button>

@@ -49,10 +49,9 @@ export async function GET() {
     await migrateEventsFromFileSystem();
 
     const events = await getAllEvents();
-    const eventsArray = Object.values(events).sort((a, b) =>
-      new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
-    );
-    return NextResponse.json(eventsArray);
+    
+    // Return the events object with IDs as keys for admin interface
+    return NextResponse.json(events);
   } catch (error) {
     console.error("Error fetching events:", error);
     return NextResponse.json(

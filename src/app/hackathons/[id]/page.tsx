@@ -81,6 +81,13 @@ export default async function HackathonPage({ params }: HackathonPageProps) {
                 <div>
                   <p className="text-sm text-muted-foreground">Date</p>
                   <p className="font-medium">{hackathon.date}</p>
+                  {(hackathon.startTime || hackathon.endTime) && (
+                    <p className="text-sm text-muted-foreground">
+                      {hackathon.startTime && hackathon.endTime 
+                        ? `${hackathon.startTime} - ${hackathon.endTime}`
+                        : hackathon.startTime || hackathon.endTime}
+                    </p>
+                  )}
                 </div>
               </div>
               <div className="flex items-center gap-2">
@@ -93,15 +100,15 @@ export default async function HackathonPage({ params }: HackathonPageProps) {
               <div className="flex items-center gap-2">
                 <Clock className="h-5 w-5 text-muted-foreground" />
                 <div>
-                  <p className="text-sm text-muted-foreground">Event Type</p>
+                  <p className="text-sm text-muted-foreground">Category</p>
                   <p className="font-medium">{hackathon.category}</p>
                 </div>
               </div>
               <div className="flex items-center gap-2">
                 <Users className="h-5 w-5 text-muted-foreground" />
                 <div>
-                  <p className="text-sm text-muted-foreground">Registration</p>
-                  <p className="font-medium">Open</p>
+                  <p className="text-sm text-muted-foreground">Team Size</p>
+                  <p className="font-medium">{hackathon.teamSize || "Open"}</p>
                 </div>
               </div>
             </div>
@@ -145,9 +152,144 @@ export default async function HackathonPage({ params }: HackathonPageProps) {
                 </CardContent>
               </Card>
 
-              {/* Requirements */}
-              {/* Schedule */}
-              {/* Winners (for completed hackathons) */}
+              {/* Themes/Tracks */}
+              {hackathon.themes && (
+                <Card>
+                  <CardHeader>
+                    <CardTitle>Themes & Tracks</CardTitle>
+                  </CardHeader>
+                  <CardContent>
+                    <p className="text-muted-foreground leading-relaxed whitespace-pre-line">
+                      {hackathon.themes}
+                    </p>
+                  </CardContent>
+                </Card>
+              )}
+
+              {/* Requirements & Eligibility */}
+              {(hackathon.eligibility || hackathon.requirements) && (
+                <Card>
+                  <CardHeader>
+                    <CardTitle>Requirements & Eligibility</CardTitle>
+                  </CardHeader>
+                  <CardContent className="space-y-4">
+                    {hackathon.eligibility && (
+                      <div>
+                        <h4 className="font-semibold mb-2">Eligibility Criteria</h4>
+                        <p className="text-muted-foreground leading-relaxed whitespace-pre-line">
+                          {hackathon.eligibility}
+                        </p>
+                      </div>
+                    )}
+                    {hackathon.requirements && (
+                      <div>
+                        <h4 className="font-semibold mb-2">Technical Requirements</h4>
+                        <p className="text-muted-foreground leading-relaxed whitespace-pre-line">
+                          {hackathon.requirements}
+                        </p>
+                      </div>
+                    )}
+                  </CardContent>
+                </Card>
+              )}
+
+              {/* Timeline */}
+              {hackathon.timeline && (
+                <Card>
+                  <CardHeader>
+                    <CardTitle>Event Timeline</CardTitle>
+                  </CardHeader>
+                  <CardContent>
+                    <pre className="text-muted-foreground leading-relaxed whitespace-pre-line font-sans">
+                      {hackathon.timeline}
+                    </pre>
+                  </CardContent>
+                </Card>
+              )}
+
+              {/* Prize Pool */}
+              {(hackathon.firstPrize || hackathon.secondPrize || hackathon.thirdPrize || hackathon.specialPrizes) && (
+                <Card>
+                  <CardHeader>
+                    <CardTitle>Prize Pool</CardTitle>
+                  </CardHeader>
+                  <CardContent>
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
+                      {hackathon.firstPrize && (
+                        <div className="text-center p-4 bg-gradient-to-br from-yellow-50 to-yellow-100 dark:from-yellow-900/20 dark:to-yellow-800/20 rounded-lg border border-yellow-200 dark:border-yellow-800">
+                          <div className="text-2xl font-bold text-yellow-600 dark:text-yellow-400">🥇</div>
+                          <h4 className="font-semibold text-yellow-700 dark:text-yellow-300">First Prize</h4>
+                          <p className="text-sm text-yellow-600 dark:text-yellow-400">{hackathon.firstPrize}</p>
+                        </div>
+                      )}
+                      {hackathon.secondPrize && (
+                        <div className="text-center p-4 bg-gradient-to-br from-gray-50 to-gray-100 dark:from-gray-900/20 dark:to-gray-800/20 rounded-lg border border-gray-200 dark:border-gray-700">
+                          <div className="text-2xl font-bold text-gray-600 dark:text-gray-400">🥈</div>
+                          <h4 className="font-semibold text-gray-700 dark:text-gray-300">Second Prize</h4>
+                          <p className="text-sm text-gray-600 dark:text-gray-400">{hackathon.secondPrize}</p>
+                        </div>
+                      )}
+                      {hackathon.thirdPrize && (
+                        <div className="text-center p-4 bg-gradient-to-br from-orange-50 to-orange-100 dark:from-orange-900/20 dark:to-orange-800/20 rounded-lg border border-orange-200 dark:border-orange-800">
+                          <div className="text-2xl font-bold text-orange-600 dark:text-orange-400">🥉</div>
+                          <h4 className="font-semibold text-orange-700 dark:text-orange-300">Third Prize</h4>
+                          <p className="text-sm text-orange-600 dark:text-orange-400">{hackathon.thirdPrize}</p>
+                        </div>
+                      )}
+                    </div>
+                    {hackathon.specialPrizes && (
+                      <div>
+                        <h4 className="font-semibold mb-2">Special Prizes</h4>
+                        <p className="text-muted-foreground leading-relaxed whitespace-pre-line">
+                          {hackathon.specialPrizes}
+                        </p>
+                      </div>
+                    )}
+                  </CardContent>
+                </Card>
+              )}
+
+              {/* Judging Criteria */}
+              {hackathon.judingCriteria && (
+                <Card>
+                  <CardHeader>
+                    <CardTitle>Judging Criteria</CardTitle>
+                  </CardHeader>
+                  <CardContent>
+                    <p className="text-muted-foreground leading-relaxed whitespace-pre-line">
+                      {hackathon.judingCriteria}
+                    </p>
+                  </CardContent>
+                </Card>
+              )}
+
+              {/* Submission Guidelines */}
+              {hackathon.submissionGuidelines && (
+                <Card>
+                  <CardHeader>
+                    <CardTitle>Submission Guidelines</CardTitle>
+                  </CardHeader>
+                  <CardContent>
+                    <p className="text-muted-foreground leading-relaxed whitespace-pre-line">
+                      {hackathon.submissionGuidelines}
+                    </p>
+                  </CardContent>
+                </Card>
+              )}
+
+              {/* Important Notes */}
+              {hackathon.importantNotes && (
+                <Card className="border-orange-200 dark:border-orange-800 bg-orange-50/50 dark:bg-orange-900/10">
+                  <CardHeader>
+                    <CardTitle className="text-orange-700 dark:text-orange-300">Important Notes</CardTitle>
+                  </CardHeader>
+                  <CardContent>
+                    <p className="text-orange-600 dark:text-orange-400 leading-relaxed whitespace-pre-line">
+                      {hackathon.importantNotes}
+                    </p>
+                  </CardContent>
+                </Card>
+              )}
             </div>
 
             {/* Sidebar */}
@@ -199,13 +341,79 @@ export default async function HackathonPage({ params }: HackathonPageProps) {
                   <div>
                     <p className="text-sm text-muted-foreground">Date</p>
                     <p className="font-medium">{hackathon.date}</p>
+                    {(hackathon.startTime || hackathon.endTime) && (
+                      <p className="text-sm text-muted-foreground">
+                        {hackathon.startTime && hackathon.endTime 
+                          ? `${hackathon.startTime} - ${hackathon.endTime}`
+                          : hackathon.startTime || hackathon.endTime}
+                      </p>
+                    )}
                   </div>
                   <div>
                     <p className="text-sm text-muted-foreground">Location</p>
                     <p className="font-medium">{hackathon.location}</p>
                   </div>
+                  {hackathon.teamSize && (
+                    <div>
+                      <p className="text-sm text-muted-foreground">Team Size</p>
+                      <p className="font-medium">{hackathon.teamSize}</p>
+                    </div>
+                  )}
                 </CardContent>
               </Card>
+
+              {/* Organizer Contact */}
+              {(hackathon.organizerName || hackathon.organizerEmail || hackathon.organizerPhone || hackathon.organizerWebsite) && (
+                <Card>
+                  <CardHeader>
+                    <CardTitle>Contact Organizers</CardTitle>
+                  </CardHeader>
+                  <CardContent className="space-y-3">
+                    {hackathon.organizerName && (
+                      <div>
+                        <p className="text-sm text-muted-foreground">Organizer</p>
+                        <p className="font-medium">{hackathon.organizerName}</p>
+                      </div>
+                    )}
+                    {hackathon.organizerEmail && (
+                      <div>
+                        <p className="text-sm text-muted-foreground">Email</p>
+                        <Link 
+                          href={`mailto:${hackathon.organizerEmail}`}
+                          className="font-medium text-primary hover:underline"
+                        >
+                          {hackathon.organizerEmail}
+                        </Link>
+                      </div>
+                    )}
+                    {hackathon.organizerPhone && (
+                      <div>
+                        <p className="text-sm text-muted-foreground">Phone</p>
+                        <Link 
+                          href={`tel:${hackathon.organizerPhone}`}
+                          className="font-medium text-primary hover:underline"
+                        >
+                          {hackathon.organizerPhone}
+                        </Link>
+                      </div>
+                    )}
+                    {hackathon.organizerWebsite && (
+                      <div>
+                        <p className="text-sm text-muted-foreground">Website</p>
+                        <Link 
+                          href={hackathon.organizerWebsite}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="font-medium text-primary hover:underline flex items-center gap-1"
+                        >
+                          Visit Website
+                          <ExternalLink className="h-3 w-3" />
+                        </Link>
+                      </div>
+                    )}
+                  </CardContent>
+                </Card>
+              )}
             </div>
           </div>
         </div>

@@ -4,10 +4,39 @@ export interface Hackathon {
   description: string;
   longDescription: string;
   date: string;
+  startTime?: string;
+  endTime?: string;
   location: string;
   category: string;
   status: "upcoming" | "ongoing" | "completed" | "cancelled";
   registrationLink?: string;
+  
+  // Organizer details
+  organizerName?: string;
+  organizerEmail?: string;
+  organizerPhone?: string;
+  organizerWebsite?: string;
+  
+  // Requirements and eligibility
+  requirements?: string;
+  eligibility?: string;
+  teamSize?: string;
+  
+  // Prize pool
+  firstPrize?: string;
+  secondPrize?: string;
+  thirdPrize?: string;
+  specialPrizes?: string;
+  
+  // Timeline and important details
+  timeline?: string;
+  importantNotes?: string;
+  
+  // Additional details
+  themes?: string;
+  judingCriteria?: string;
+  submissionGuidelines?: string;
+  
   createdAt: string;
   updatedAt: string;
 }

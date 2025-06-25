@@ -1,8 +1,48 @@
 import { put, list } from '@vercel/blob';
-import type { BasicHackathon } from './hackathons-data';
 
-// Re-export for convenience in other modules
-export type { BasicHackathon };
+// Updated BasicHackathon interface to match the enhanced Hackathon interface
+export interface BasicHackathon {
+  id: string;
+  name: string;
+  description: string;
+  longDescription: string;
+  date: string;
+  startTime?: string;
+  endTime?: string;
+  location: string;
+  category: string;
+  status: "upcoming" | "ongoing" | "completed" | "cancelled";
+  registrationLink?: string;
+  
+  // Organizer details
+  organizerName?: string;
+  organizerEmail?: string;
+  organizerPhone?: string;
+  organizerWebsite?: string;
+  
+  // Requirements and eligibility
+  requirements?: string;
+  eligibility?: string;
+  teamSize?: string;
+  
+  // Prize pool
+  firstPrize?: string;
+  secondPrize?: string;
+  thirdPrize?: string;
+  specialPrizes?: string;
+  
+  // Timeline and important details
+  timeline?: string;
+  importantNotes?: string;
+  
+  // Additional details
+  themes?: string;
+  judingCriteria?: string;
+  submissionGuidelines?: string;
+  
+  createdAt: string;
+  updatedAt: string;
+}
 
 // Store hackathons as JSON in Vercel Blob
 const HACKATHONS_BLOB_PATH = 'hackathons-data.json';

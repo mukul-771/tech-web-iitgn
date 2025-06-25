@@ -90,7 +90,16 @@ export default async function HackathonsPage() {
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-sm">
             <div className="flex items-center gap-2 p-2 rounded-lg bg-white/5 dark:bg-white/5">
               <Calendar className="h-4 w-4 text-blue-500 flex-shrink-0" />
-              <span className="truncate">{hackathon.date}</span>
+              <div className="flex flex-col">
+                <span className="truncate">{hackathon.date}</span>
+                {(hackathon.startTime || hackathon.endTime) && (
+                  <span className="text-xs text-muted-foreground">
+                    {hackathon.startTime && hackathon.endTime 
+                      ? `${hackathon.startTime} - ${hackathon.endTime}`
+                      : hackathon.startTime || hackathon.endTime}
+                  </span>
+                )}
+              </div>
             </div>
             <div className="flex items-center gap-2 p-2 rounded-lg bg-white/5 dark:bg-white/5">
               <MapPin className="h-4 w-4 text-green-500 flex-shrink-0" />
@@ -98,12 +107,14 @@ export default async function HackathonsPage() {
             </div>
             <div className="flex items-center gap-2 p-2 rounded-lg bg-white/5 dark:bg-white/5">
               <Clock className="h-4 w-4 text-purple-500 flex-shrink-0" />
-              <span className="truncate">{hackathon.duration}</span>
+              <span className="truncate">{hackathon.category}</span>
             </div>
-            <div className="flex items-center gap-2 p-2 rounded-lg bg-white/5 dark:bg-white/5">
-              <Users className="h-4 w-4 text-orange-500 flex-shrink-0" />
-              <span className="truncate">{hackathon.currentParticipants || '0'} / {hackathon.maxParticipants || 'Unlimited'}</span>
-            </div>
+            {hackathon.teamSize && (
+              <div className="flex items-center gap-2 p-2 rounded-lg bg-white/5 dark:bg-white/5">
+                <Users className="h-4 w-4 text-orange-500 flex-shrink-0" />
+                <span className="truncate">{hackathon.teamSize}</span>
+              </div>
+            )}
           </div>
 
           {/* Category and Prizes */}
@@ -111,10 +122,10 @@ export default async function HackathonsPage() {
             <div className="px-3 py-1 rounded-full text-xs font-medium bg-gradient-to-r from-purple-600/10 to-blue-600/10 text-purple-600 dark:text-purple-400 border border-purple-600/20 w-fit">
               {hackathon.category}
             </div>
-            {hackathon.prizes && hackathon.prizes.length > 0 && (
+            {(hackathon.firstPrize || hackathon.secondPrize || hackathon.thirdPrize) && (
               <div className="flex items-center gap-2 text-sm text-muted-foreground">
                 <Trophy className="h-4 w-4 text-yellow-500" />
-                <span>{hackathon.prizes.length} prize{hackathon.prizes.length !== 1 ? 's' : ''}</span>
+                <span>Prizes Available</span>
               </div>
             )}
           </div>

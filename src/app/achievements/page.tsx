@@ -63,12 +63,16 @@ async function getInterIITAchievements() {
     });
     
     if (!response.ok) {
-      throw new Error(`Failed to fetch achievements: ${response.status}`);
+      throw new Error(`HTTP ${response.status}: ${response.statusText}`);
     }
     
     const achievements: Achievement[] = await response.json();
     console.log('Fetched achievements count:', achievements.length);
-    console.log('Sample achievement:', achievements[0]?.achievementDescription?.substring(0, 50) + '...');
+    
+    if (achievements.length === 0) {
+      console.warn('No achievements found');
+      return [];
+    }
 
     // Transform the data to match the expected format for the UI
     return achievements.map((achievement: Achievement) => {
@@ -99,17 +103,8 @@ async function getInterIITAchievements() {
     });
   } catch (error) {
     console.error('Error fetching Inter-IIT achievements:', error);
-    // Return error achievement to debug the issue
-    return [
-      {
-        year: "ERROR",
-        position: "ERROR",
-        event: "Failed to fetch achievements",
-        description: `Error: ${error instanceof Error ? error.message : 'Unknown error'}. API should be available at the URL.`,
-        team: "Debug Team",
-        medal: "bronze"
-      }
-    ];
+    // Return empty array instead of error object to avoid showing errors in UI
+    return [];
   }
 }
 
@@ -131,41 +126,17 @@ async function getEventGallery(): Promise<Event[]> {
     });
     
     if (!response.ok) {
-      throw new Error(`Failed to fetch events: ${response.status}`);
+      throw new Error(`HTTP ${response.status}: ${response.statusText}`);
     }
     
     const events = await response.json();
     console.log('Fetched events count:', events.length);
-    console.log('Sample event:', events[0]?.title);
     
-    return events;
+    return events || [];
   } catch (error) {
     console.error('Error fetching events:', error);
-    // Return error event to debug the issue
-    return [
-      {
-        id: "error-event",
-        title: "Failed to fetch events",
-        description: `Error: ${error instanceof Error ? error.message : 'Unknown error'}. Events API should be available.`,
-        organizer: "Debug Team",
-        date: "ERROR",
-        location: "Error Location",
-        duration: "N/A",
-        participants: "0",
-        category: "Error",
-        highlights: [],
-        gallery: [
-          {
-            id: "error-img",
-            url: "/events/placeholder-1.svg",
-            alt: "Error placeholder",
-            caption: "Error loading events"
-          }
-        ],
-        createdAt: new Date().toISOString(),
-        updatedAt: new Date().toISOString()
-      }
-    ];
+    // Return empty array instead of error object to avoid showing errors in UI
+    return [];
   }
 }
 
@@ -266,27 +237,37 @@ export default function AchievementsPage() {
             </div>
 
             <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-              {interIITAchievements.map((achievement: UIAchievement, index: number) => (
-                <div key={index} className="glass rounded-xl p-6 transition-all duration-300 hover:scale-105 hover:shadow-xl">
-                  <div className="flex items-center justify-between mb-4">
-                    <div className="flex items-center gap-2">
-                      {achievement.medal === "gold" && <Trophy className="h-6 w-6 text-yellow-500" />}
-                      {achievement.medal === "silver" && <Medal className="h-6 w-6 text-gray-400" />}
-                      {achievement.medal === "bronze" && <Award className="h-6 w-6 text-orange-600" />}
-                      <span className="font-bold text-lg">{achievement.position}</span>
+              {interIITAchievements.length > 0 ? (
+                interIITAchievements.map((achievement: UIAchievement, index: number) => (
+                  <div key={index} className="glass rounded-xl p-6 transition-all duration-300 hover:scale-105 hover:shadow-xl">
+                    <div className="flex items-center justify-between mb-4">
+                      <div className="flex items-center gap-2">
+                        {achievement.medal === "gold" && <Trophy className="h-6 w-6 text-yellow-500" />}
+                        {achievement.medal === "silver" && <Medal className="h-6 w-6 text-gray-400" />}
+                        {achievement.medal === "bronze" && <Award className="h-6 w-6 text-orange-600" />}
+                        <span className="font-bold text-lg">{achievement.position}</span>
+                      </div>
+                      <span className="text-sm text-muted-foreground">{achievement.year}</span>
                     </div>
-                    <span className="text-sm text-muted-foreground">{achievement.year}</span>
-                  </div>
 
-                  <h3 className="font-semibold mb-2">{achievement.event}</h3>
-                  <p className="text-sm text-muted-foreground mb-3">{achievement.description}</p>
+                    <h3 className="font-semibold mb-2">{achievement.event}</h3>
+                    <p className="text-sm text-muted-foreground mb-3">{achievement.description}</p>
 
-                  <div className="flex items-center gap-2 text-xs text-blue-600">
-                    <Users className="h-3 w-3" />
-                    {achievement.team}
+                    <div className="flex items-center gap-2 text-xs text-blue-600">
+                      <Users className="h-3 w-3" />
+                      {achievement.team}
+                    </div>
                   </div>
+                ))
+              ) : (
+                <div className="col-span-full text-center py-12">
+                  <Trophy className="h-16 w-16 text-muted-foreground mx-auto mb-4 opacity-50" />
+                  <h3 className="text-lg font-semibold text-muted-foreground mb-2">No Achievements Yet</h3>
+                  <p className="text-sm text-muted-foreground">
+                    Check back later for updates on our Inter-IIT performance.
+                  </p>
                 </div>
-              ))}
+              )}
             </div>
           </div>
         </div>
@@ -308,56 +289,66 @@ export default function AchievementsPage() {
             </div>
 
             <div className="grid gap-6 md:grid-cols-2">
-              {eventGallery.map((event, index) => (
-                <Link key={index} href={`/achievements/events/${event.id}`} className="group block">
-                  <div className="glass rounded-xl overflow-hidden transition-all duration-300 hover:scale-105 hover:shadow-xl">
-                    {/* Event Image */}
-                    <div className="relative h-48 bg-gradient-to-br from-blue-600/20 to-purple-600/20 flex items-center justify-center">
-                      <Image
-                        src={event.gallery[0]?.url || "/events/placeholder-1.svg"}
-                        alt={event.gallery[0]?.alt || event.title}
-                        width={400}
-                        height={200}
-                        className="w-full h-full object-cover"
-                      />
-                      <div className="absolute inset-0 bg-black/20 group-hover:bg-black/10 transition-colors duration-300" />
-                      <div className="absolute top-4 right-4">
-                        <span className="inline-block rounded-full bg-white/90 dark:bg-gray-900/90 px-3 py-1 text-xs font-medium text-gray-900 dark:text-gray-100">
-                          {event.category}
-                        </span>
-                      </div>
-                      <div className="absolute bottom-4 right-4">
-                        <Camera className="h-5 w-5 text-white/80" />
-                      </div>
-                    </div>
-
-                    {/* Event Content */}
-                    <div className="p-6">
-                      <div className="flex items-start justify-between mb-3">
-                        <h3 className="font-bold text-lg group-hover:text-blue-600 transition-colors duration-300">
-                          {event.title}
-                        </h3>
-                        <ArrowRight className="h-4 w-4 text-muted-foreground group-hover:text-blue-600 group-hover:translate-x-1 transition-all duration-300" />
-                      </div>
-
-                      <p className="text-sm text-muted-foreground mb-4 line-clamp-2">
-                        {event.description}
-                      </p>
-
-                      <div className="flex items-center justify-between text-xs">
-                        <div className="flex items-center gap-2 text-blue-600">
-                          <Users className="h-3 w-3" />
-                          {event.organizer}
+              {eventGallery.length > 0 ? (
+                eventGallery.map((event, index) => (
+                  <Link key={index} href={`/achievements/events/${event.id}`} className="group block">
+                    <div className="glass rounded-xl overflow-hidden transition-all duration-300 hover:scale-105 hover:shadow-xl">
+                      {/* Event Image */}
+                      <div className="relative h-48 bg-gradient-to-br from-blue-600/20 to-purple-600/20 flex items-center justify-center">
+                        <Image
+                          src={event.gallery[0]?.url || "/events/placeholder-1.svg"}
+                          alt={event.gallery[0]?.alt || event.title}
+                          width={400}
+                          height={200}
+                          className="w-full h-full object-cover"
+                        />
+                        <div className="absolute inset-0 bg-black/20 group-hover:bg-black/10 transition-colors duration-300" />
+                        <div className="absolute top-4 right-4">
+                          <span className="inline-block rounded-full bg-white/90 dark:bg-gray-900/90 px-3 py-1 text-xs font-medium text-gray-900 dark:text-gray-100">
+                            {event.category}
+                          </span>
                         </div>
-                        <div className="flex items-center gap-2 text-muted-foreground">
-                          <Calendar className="h-3 w-3" />
-                          {event.date}
+                        <div className="absolute bottom-4 right-4">
+                          <Camera className="h-5 w-5 text-white/80" />
                         </div>
                       </div>
+
+                      {/* Event Content */}
+                      <div className="p-6">
+                        <div className="flex items-start justify-between mb-3">
+                          <h3 className="font-bold text-lg group-hover:text-blue-600 transition-colors duration-300">
+                            {event.title}
+                          </h3>
+                          <ArrowRight className="h-4 w-4 text-muted-foreground group-hover:text-blue-600 group-hover:translate-x-1 transition-all duration-300" />
+                        </div>
+
+                        <p className="text-sm text-muted-foreground mb-4 line-clamp-2">
+                          {event.description}
+                        </p>
+
+                        <div className="flex items-center justify-between text-xs">
+                          <div className="flex items-center gap-2 text-blue-600">
+                            <Users className="h-3 w-3" />
+                            {event.organizer}
+                          </div>
+                          <div className="flex items-center gap-2 text-muted-foreground">
+                            <Calendar className="h-3 w-3" />
+                            {event.date}
+                          </div>
+                        </div>
+                      </div>
                     </div>
-                  </div>
-                </Link>
-              ))}
+                  </Link>
+                ))
+              ) : (
+                <div className="col-span-full text-center py-12">
+                  <Camera className="h-16 w-16 text-muted-foreground mx-auto mb-4 opacity-50" />
+                  <h3 className="text-lg font-semibold text-muted-foreground mb-2">No Events Yet</h3>
+                  <p className="text-sm text-muted-foreground">
+                    Stay tuned for upcoming events and activities.
+                  </p>
+                </div>
+              )}
             </div>
           </div>
         </div>

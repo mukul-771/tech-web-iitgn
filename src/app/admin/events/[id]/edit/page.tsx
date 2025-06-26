@@ -4,7 +4,7 @@ import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { useSession } from "next-auth/react";
 import Image from "next/image";
-import { ArrowLeft, Save, Trash2, Plus, X, Edit, Replace } from "lucide-react";
+import { ArrowLeft, Save, Trash2, Plus, X, Edit, Replace, Upload } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -507,66 +507,54 @@ export default function EditEvent({ params }: PageProps) {
                 <CardHeader>
                   <CardTitle>Event Gallery</CardTitle>
                   <p className="text-sm text-muted-foreground">
-                    Upload up to 10 images to showcase the event
+                    Upload up to 10 images to showcase the event. Drag and drop to reorder.
                   </p>
                 </CardHeader>
-                <CardContent className="space-y-6">
+                <CardContent className="space-y-4">
                   {/* Gallery Grid */}
-                  <div className="grid grid-cols-5 gap-3">
+                  <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4">
                     {formData.gallery.map((item, index) => (
                       <div
-                        key={index}
-                        className="relative group aspect-square bg-gray-100 rounded-lg overflow-hidden border-2 border-gray-200 hover:border-primary/50 transition-all duration-200"
+                        key={item.id || index}
+                        className="relative group aspect-square bg-gray-100 dark:bg-gray-800 rounded-lg overflow-hidden border-2 border-gray-200 dark:border-gray-700 hover:border-primary/80 dark:hover:border-primary/80 transition-all duration-300 shadow-sm"
                       >
                         <Image
                           src={item.url}
                           alt={item.alt}
                           width={200}
                           height={200}
-                          className="w-full h-full object-cover"
+                          className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
                         />
                         
                         {/* Hover Overlay */}
-                        <div className="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 transition-opacity duration-200 flex items-center justify-center">
-                          <div className="flex gap-1">
+                        <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/40 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex flex-col justify-between p-2">
+                          {/* Top controls */}
+                          <div className="flex justify-end gap-1">
                             <Button
                               type="button"
-                              size="sm"
+                              size="icon"
                               variant="secondary"
-                              className="h-7 w-7 p-0 text-xs"
+                              className="h-7 w-7 bg-black/50 hover:bg-black/80 text-white border-none"
                               onClick={() => {
-                                // Create a temporary file input for replacing
                                 const fileInput = document.createElement('input');
                                 fileInput.type = 'file';
                                 fileInput.accept = 'image/*';
                                 fileInput.onchange = async (e) => {
                                   const file = (e.target as HTMLInputElement).files?.[0];
                                   if (!file) return;
-
-                                  // Validate file size
                                   if (file.size > 10 * 1024 * 1024) {
                                     alert('File size must be less than 10MB');
                                     return;
                                   }
-
                                   try {
-                                    const formData = new FormData();
-                                    formData.append("file", file);
-                                    formData.append("folder", "events");
-
-                                    const response = await fetch("/api/admin/upload", {
-                                      method: "POST",
-                                      body: formData,
-                                    });
-
-                                    if (!response.ok) {
-                                      throw new Error("Failed to upload");
-                                    }
-
+                                    const uploadFormData = new FormData();
+                                    uploadFormData.append("file", file);
+                                    uploadFormData.append("folder", "events");
+                                    const response = await fetch("/api/admin/upload", { method: "POST", body: uploadFormData });
+                                    if (!response.ok) throw new Error("Failed to upload");
                                     const result = await response.json();
                                     const newAlt = prompt("Enter alt text for the new image:", item.alt) || item.alt;
                                     const newCaption = prompt("Enter caption (optional):", item.caption || "") || item.caption;
-                                    
                                     if (newAlt.trim()) {
                                       replaceGalleryItem(index, result.url, newAlt, newCaption);
                                     } else {
@@ -580,13 +568,22 @@ export default function EditEvent({ params }: PageProps) {
                               }}
                               title="Replace image"
                             >
-                              <Replace className="h-3 w-3" />
+                              <Replace className="h-4 w-4" />
                             </Button>
                             <Button
                               type="button"
-                              size="sm"
-                              variant="secondary"
-                              className="h-7 w-7 p-0"
+                              size="icon"
+                              variant="destructive"
+                              className="h-7 w-7"
+                              onClick={() => removeGalleryItem(index)}
+                              title="Remove image"
+                            >
+                              <X className="h-4 w-4" />
+                            </Button>
+                          </div>
+                          {/* Bottom controls */}
+                          <div className="text-white">
+                            <button
                               onClick={() => {
                                 const newAlt = prompt("Edit alt text:", item.alt);
                                 if (newAlt !== null && newAlt.trim()) {
@@ -597,25 +594,17 @@ export default function EditEvent({ params }: PageProps) {
                                   setFormData(prev => ({ ...prev, gallery: newGallery }));
                                 }
                               }}
-                              title="Edit details"
+                              className="text-xs font-semibold hover:underline truncate w-full text-left"
+                              title={item.alt}
                             >
-                              <Edit className="h-3 w-3" />
-                            </Button>
-                            <Button
-                              type="button"
-                              size="sm"
-                              variant="destructive"
-                              className="h-7 w-7 p-0"
-                              onClick={() => removeGalleryItem(index)}
-                              title="Remove image"
-                            >
-                              <X className="h-3 w-3" />
-                            </Button>
+                              <Edit className="h-3 w-3 inline-block mr-1" />
+                              {item.alt}
+                            </button>
                           </div>
                         </div>
                         
                         {/* Image Counter */}
-                        <div className="absolute top-1 left-1 bg-black/70 text-white text-xs px-1.5 py-0.5 rounded">
+                        <div className="absolute top-1 left-1 bg-black/70 text-white text-xs px-1.5 py-0.5 rounded-full">
                           {index + 1}
                         </div>
                       </div>
@@ -623,7 +612,7 @@ export default function EditEvent({ params }: PageProps) {
 
                     {/* Add New Image Slot */}
                     {formData.gallery.length < 10 && (
-                      <div className="aspect-square border-2 border-dashed border-gray-300 rounded-lg flex flex-col items-center justify-center hover:border-primary/50 transition-colors bg-gray-50 hover:bg-gray-100">
+                      <div className="aspect-square rounded-lg border-2 border-dashed border-gray-300 dark:border-gray-600 flex items-center justify-center hover:border-primary dark:hover:border-primary hover:bg-gray-50 dark:hover:bg-gray-800/50 transition-colors duration-300">
                         <SimpleImageUpload
                           onImageUploaded={(url) => {
                             const alt = prompt("Enter alt text for this image (required for accessibility):");
@@ -635,20 +624,20 @@ export default function EditEvent({ params }: PageProps) {
                             }
                           }}
                           disabled={isSaving}
-                          compact={true}
+                          compact={false} // Use the non-compact version for a better UI
                         />
                       </div>
                     )}
                   </div>
 
                   {/* Gallery Info */}
-                  <div className="flex items-center justify-between text-sm">
+                  <div className="flex items-center justify-between text-sm pt-2">
                     <span className="text-muted-foreground">
-                      {formData.gallery.length} of 10 images
+                      {formData.gallery.length} of 10 images used
                     </span>
                     {formData.gallery.length >= 10 && (
-                      <span className="text-amber-600 font-medium">
-                        Gallery is full - remove an image to add more
+                      <span className="text-amber-500 font-medium">
+                        Gallery is full.
                       </span>
                     )}
                   </div>

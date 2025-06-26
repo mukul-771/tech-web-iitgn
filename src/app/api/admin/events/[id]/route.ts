@@ -3,6 +3,7 @@ import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import { getEventById, updateEvent, deleteEvent } from "@/lib/events-blob-storage";
 import { z } from "zod";
+import { revalidatePath } from "next/cache";
 
 // Validation schema for event updates
 const updateEventSchema = z.object({
@@ -81,6 +82,13 @@ export async function PUT(
       return NextResponse.json({ error: "Event not found" }, { status: 404 });
     }
 
+    // Revalidate relevant paths to clear cache
+    revalidatePath('/admin/events');
+    revalidatePath(`/admin/events/${resolvedParams.id}/edit`);
+    revalidatePath('/achievements');
+    revalidatePath(`/achievements/events/${resolvedParams.id}`);
+    console.log(`Revalidated paths for event: ${resolvedParams.id}`);
+
     return NextResponse.json(updatedEvent);
   } catch (error) {
     console.error("Error updating event:", error);
@@ -112,6 +120,12 @@ export async function DELETE(
 
     const resolvedParams = await params;
     await deleteEvent(resolvedParams.id);
+
+    // Revalidate relevant paths
+    revalidatePath('/admin/events');
+    revalidatePath('/achievements');
+    revalidatePath(`/achievements/events/${resolvedParams.id}`);
+    console.log(`Deleted event ${resolvedParams.id} and revalidated paths.`);
 
     return NextResponse.json({ 
       message: "Event deleted successfully",

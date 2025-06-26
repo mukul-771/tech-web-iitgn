@@ -5,7 +5,7 @@ import Image from "next/image"
 import { ArrowLeft, Calendar, Users, MapPin, Clock } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { ImageSlider } from "@/components/ui/image-slider"
-import { getEventById } from "@/lib/events-storage"
+import { getEventById } from "@/lib/db/events"
 
 // Fallback event data for development
 const fallbackEventsData: Record<string, unknown> = {

@@ -51,7 +51,7 @@ export function Footer() {
       <div className="container mobile-padding">
         {/* Mobile-First Design: Social Media Bar at Top */}
         <div className="py-4 md:hidden">
-          <div className="flex items-center justify-center space-x-4">
+          <div className="flex items-center justify-center space-x-4 mx-auto max-w-fit">
             <a
               href={contactInfo?.socialMedia.instagram || "https://www.instagram.com/tech_iitgn?utm_source=ig_web_button_share_sheet&igsh=ZDNlZDc0MzIxNw=="}
               target="_blank"

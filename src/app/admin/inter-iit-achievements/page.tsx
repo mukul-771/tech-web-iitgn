@@ -8,7 +8,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Badge } from "@/components/ui/badge";
 import { AdminLayout } from "@/components/admin/admin-layout";
 import { Plus, Search, Edit, Trash2, Calendar, MapPin, Trophy, Medal, Loader2, AlertCircle, Award, Users } from "lucide-react";
-import { InterIITAchievement } from "@/lib/inter-iit-achievements-data";
+import { InterIITAchievement } from "@/lib/db/schema";
 
 export default function AdminInterIITAchievementsPage() {
   const router = useRouter();
@@ -23,7 +23,13 @@ export default function AdminInterIITAchievementsPage() {
       setIsLoading(true);
       setError(null);
       
-      const response = await fetch("/api/admin/inter-iit-achievements");
+      const response = await fetch("/api/admin/inter-iit-achievements", {
+        cache: 'no-store',
+        headers: {
+          'Cache-Control': 'no-cache',
+          'Pragma': 'no-cache'
+        }
+      });
       if (!response.ok) {
         throw new Error("Failed to fetch Inter-IIT achievements");
       }
@@ -53,6 +59,10 @@ export default function AdminInterIITAchievementsPage() {
       setDeletingId(id);
       const response = await fetch(`/api/admin/inter-iit-achievements/${id}`, {
         method: "DELETE",
+        headers: {
+          'Cache-Control': 'no-cache',
+          'Pragma': 'no-cache'
+        }
       });
 
       if (!response.ok) {

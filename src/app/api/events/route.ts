@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server';
-import { getEventsForDisplay } from '@/lib/events-blob-storage';
+import { getEventsForDisplay } from '@/lib/db/events';
 
 export async function GET() {
   try {

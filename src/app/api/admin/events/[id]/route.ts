@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
-import { getEventById, updateEvent, deleteEvent } from "@/lib/events-blob-storage";
+import { getEventById, updateEvent, deleteEvent } from "@/lib/db/events";
 import { z } from "zod";
 import { revalidatePath } from "next/cache";
 
@@ -48,7 +48,13 @@ export async function GET(
       return NextResponse.json({ error: "Event not found" }, { status: 404 });
     }
 
-    return NextResponse.json(event);
+    return NextResponse.json(event, {
+      headers: {
+        'Cache-Control': 'no-cache, no-store, must-revalidate',
+        'Pragma': 'no-cache',
+        'Expires': '0'
+      }
+    });
   } catch (error) {
     console.error("Error fetching event:", error);
     return NextResponse.json(

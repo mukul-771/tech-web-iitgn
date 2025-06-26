@@ -1,7 +1,11 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getServerSession } from 'next-auth';
 import { authOptions } from '@/lib/auth';
-import { getInterIITAchievementById, updateInterIITAchievement, deleteInterIITAchievement } from '@/lib/inter-iit-achievements-blob-storage';
+import { 
+  getInterIITAchievementById, 
+  updateInterIITAchievement, 
+  deleteInterIITAchievement 
+} from '@/lib/db/achievements';
 
 // Check if user is admin
 async function checkAdminAuth() {
@@ -29,7 +33,13 @@ export async function GET(
       );
     }
     
-    return NextResponse.json(achievement);
+    return NextResponse.json(achievement, {
+      headers: {
+        'Cache-Control': 'no-cache, no-store, must-revalidate',
+        'Pragma': 'no-cache',
+        'Expires': '0'
+      }
+    });
   } catch (error) {
     console.error('Error fetching Inter-IIT achievement:', error);
     return NextResponse.json(
@@ -69,7 +79,13 @@ export async function PUT(
     }
     
     const updatedAchievement = await updateInterIITAchievement(id, body);
-    return NextResponse.json(updatedAchievement);
+    return NextResponse.json(updatedAchievement, {
+      headers: {
+        'Cache-Control': 'no-cache, no-store, must-revalidate',
+        'Pragma': 'no-cache',
+        'Expires': '0'
+      }
+    });
   } catch (error) {
     console.error('Error updating Inter-IIT achievement:', error);
     return NextResponse.json(
@@ -91,7 +107,16 @@ export async function DELETE(
     }
 
     await deleteInterIITAchievement(id);
-    return NextResponse.json({ message: 'Inter-IIT achievement deleted successfully' });
+    return NextResponse.json(
+      { message: 'Inter-IIT achievement deleted successfully' },
+      {
+        headers: {
+          'Cache-Control': 'no-cache, no-store, must-revalidate',
+          'Pragma': 'no-cache',
+          'Expires': '0'
+        }
+      }
+    );
   } catch (error) {
     console.error('Error deleting Inter-IIT achievement:', error);
     return NextResponse.json(

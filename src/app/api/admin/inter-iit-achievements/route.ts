@@ -1,7 +1,10 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getServerSession } from 'next-auth';
 import { authOptions } from '@/lib/auth';
-import { getAllInterIITAchievements, createInterIITAchievement, migrateInterIITAchievementsFromFileSystem } from '@/lib/inter-iit-achievements-blob-storage';
+import { 
+  getAllInterIITAchievements, 
+  createInterIITAchievement 
+} from '@/lib/db/achievements';
 
 // Check if user is admin
 async function checkAdminAuth() {
@@ -16,14 +19,20 @@ export async function GET() {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
-    // Ensure data is migrated to Blob
-    await migrateInterIITAchievementsFromFileSystem();
-
     const achievements = await getAllInterIITAchievements();
-    const achievementsArray = Object.values(achievements).sort((a, b) =>
+    
+    // Sort by achievement date (most recent first)
+    const sortedAchievements = achievements.sort((a, b) =>
       new Date(b.achievementDate).getTime() - new Date(a.achievementDate).getTime()
     );
-    return NextResponse.json(achievementsArray);
+    
+    return NextResponse.json(sortedAchievements, {
+      headers: {
+        'Cache-Control': 'no-cache, no-store, must-revalidate',
+        'Pragma': 'no-cache',
+        'Expires': '0'
+      }
+    });
   } catch (error) {
     console.error('Error fetching Inter-IIT achievements:', error);
     return NextResponse.json(
@@ -125,14 +134,39 @@ export async function POST(request: NextRequest) {
 
     // Set default values for optional fields
     const achievementData = {
-      ...body,
-      supportingDocuments: body.supportingDocuments || [],
+      achievementType: body.achievementType,
+      competitionName: body.competitionName,
+      interIITEdition: body.interIITEdition,
+      year: body.year,
+      hostIIT: body.hostIIT,
+      location: body.location,
+      achievementDescription: body.achievementDescription,
+      significance: body.significance,
+      competitionCategory: body.competitionCategory,
+      achievementDate: body.achievementDate,
+      status: body.status,
+      teamMembers: body.teamMembers.map((member: { name: string; rollNumber: string; branch: string; year: string; role: string; email: string; achievements?: string[] }) => ({
+        ...member,
+        achievements: member.achievements || []
+      })),
+      supportingDocuments: body.supportingDocuments?.map((doc: { name: string; type: string; filePath: string; uploadDate: string; description?: string }) => ({
+        ...doc,
+        description: doc.description || ''
+      })) || [],
       points: body.points || null,
       ranking: body.ranking || null
     };
 
     const newAchievement = await createInterIITAchievement(achievementData);
-    return NextResponse.json(newAchievement, { status: 201 });
+    
+    return NextResponse.json(newAchievement, { 
+      status: 201,
+      headers: {
+        'Cache-Control': 'no-cache, no-store, must-revalidate',
+        'Pragma': 'no-cache',
+        'Expires': '0'
+      }
+    });
   } catch (error) {
     console.error('Error creating Inter-IIT achievement:', error);
     return NextResponse.json(

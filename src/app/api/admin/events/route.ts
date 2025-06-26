@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
-import { getAllEvents, createEvent, migrateEventsFromFileSystem } from "@/lib/events-blob-storage";
+import { getAllEvents, createEvent } from "@/lib/db/events";
 import { z } from "zod";
 
 // Validation schema for event creation
@@ -38,13 +38,15 @@ export async function GET() {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
-    // Ensure data is migrated to Blob
-    await migrateEventsFromFileSystem();
-
     const events = await getAllEvents();
     
-    // Return the events object with IDs as keys for admin interface
-    return NextResponse.json(events, {
+    // Convert array to object with IDs as keys for admin interface compatibility
+    const eventsObject = events.reduce((acc, event) => {
+      acc[event.id] = event;
+      return acc;
+    }, {} as Record<string, typeof events[0]>);
+    
+    return NextResponse.json(eventsObject, {
       headers: {
         'Cache-Control': 'no-cache, no-store, must-revalidate',
         'Pragma': 'no-cache',
@@ -90,7 +92,14 @@ export async function POST(request: NextRequest) {
     // Create event
     const newEvent = await createEvent(eventData);
 
-    return NextResponse.json(newEvent, { status: 201 });
+    return NextResponse.json(newEvent, { 
+      status: 201,
+      headers: {
+        'Cache-Control': 'no-cache, no-store, must-revalidate',
+        'Pragma': 'no-cache',
+        'Expires': '0'
+      }
+    });
   } catch (error) {
     console.error("Error creating event:", error);
 

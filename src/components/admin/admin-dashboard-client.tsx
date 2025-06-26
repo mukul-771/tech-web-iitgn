@@ -30,6 +30,7 @@ export function AdminDashboardClient() {
   const [magazines, setMagazines] = useState<Record<string, unknown>[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [isMigrating, setIsMigrating] = useState(false);
 
   useEffect(() => {
     if (status === "loading") return;
@@ -77,6 +78,37 @@ export function AdminDashboardClient() {
 
   const handleEventUpdate = () => {
     fetchEvents();
+  };
+
+  const handleMigration = async () => {
+    if (!confirm('This will migrate all your existing achievements and events from blob storage to the database. This is a one-time setup process. Continue?')) {
+      return;
+    }
+
+    try {
+      setIsMigrating(true);
+      const response = await fetch('/api/admin/migrate-data', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      });
+
+      if (!response.ok) {
+        throw new Error('Migration failed');
+      }
+
+      const result = await response.json();
+      alert(`Migration completed successfully!\n\nAchievements: ${result.result.achievements.migrated} migrated, ${result.result.achievements.skipped} skipped\nEvents: ${result.result.events.migrated} migrated, ${result.result.events.skipped} skipped`);
+      
+      // Refresh data
+      fetchAllData();
+    } catch (error) {
+      console.error('Migration error:', error);
+      alert('Migration failed. Please try again or check the console for details.');
+    } finally {
+      setIsMigrating(false);
+    }
   };
 
   if (status === "loading" || isLoading) {
@@ -265,6 +297,26 @@ export function AdminDashboardClient() {
               </p>
               <div className="flex gap-2">
                 <Badge variant="secondary">{magazines.length} Magazine Issues</Badge>
+              </div>
+            </CardContent>
+          </Card>
+
+          <Card className="glass hover:shadow-lg transition-all duration-300 cursor-pointer"
+                onClick={handleMigration}>
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <RefreshCw className={`h-5 w-5 ${isMigrating ? 'animate-spin' : ''}`} />
+                Database Migration
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <p className="text-sm text-muted-foreground mb-4">
+                {isMigrating ? 'Migrating data to database...' : 'Migrate blob storage data to database (one-time setup)'}
+              </p>
+              <div className="flex gap-2">
+                <Badge variant="outline" className={isMigrating ? 'animate-pulse' : ''}>
+                  {isMigrating ? 'Migrating...' : 'One-time Setup'}
+                </Badge>
               </div>
             </CardContent>
           </Card>

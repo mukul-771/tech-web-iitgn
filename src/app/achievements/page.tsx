@@ -54,8 +54,8 @@ interface UIAchievement {
 // This will fetch fresh data from the API for dynamic updates
 async function getInterIITAchievements() {
   try {
-    // Always use the full production URL for consistency
-    const apiUrl = 'https://technical-council-iitgn.vercel.app/api/inter-iit-achievements';
+    // Use relative API calls to work with any domain
+    const apiUrl = '/api/inter-iit-achievements';
     
     console.log('Fetching achievements from:', apiUrl);
     const response = await fetch(apiUrl, {
@@ -122,8 +122,8 @@ async function getInterIITAchievements() {
 // This will fetch fresh data from the events API for dynamic updates
 async function getEventGallery(): Promise<Event[]> {
   try {
-    // Always use the full production URL for consistency
-    const apiUrl = 'https://technical-council-iitgn.vercel.app/api/events';
+    // Use relative API calls to work with any domain
+    const apiUrl = '/api/events';
     
     console.log('Fetching events from:', apiUrl);
     const response = await fetch(apiUrl, {

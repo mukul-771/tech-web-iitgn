@@ -18,7 +18,7 @@ Ensure you have all required environment variables:
 
 ```env
 # NextAuth Configuration
-NEXTAUTH_URL=https://your-domain.vercel.app
+NEXTAUTH_URL=https://tech-web-iitgn.vercel.app/
 NEXTAUTH_SECRET=your_production_secret
 
 # Google OAuth

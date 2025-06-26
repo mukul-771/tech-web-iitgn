@@ -126,7 +126,7 @@ export default function AdminStatusPage() {
                 icon={CheckCircle}
                 title="NextAuth URL"
                 status="success"
-                description="NEXTAUTH_URL is configured for localhost:3001"
+                description="NEXTAUTH_URL is configured for https://tech-web-iitgn.vercel.app/"
               />
               
               <StatusItem

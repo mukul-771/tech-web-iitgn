@@ -12,25 +12,14 @@ import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
 import { Badge } from "@/components/ui/badge";
 import {
-  Settings as SettingsIcon,
   Save,
   RefreshCw,
   Shield,
-  Database,
   Globe,
-  Users,
-  Bell,
   Palette,
-  Download,
   Upload,
   Trash2,
-  MapPin,
-  Mail,
-  Phone,
-  Instagram,
-  Youtube,
-  Linkedin,
-  Facebook
+  MapPin
 } from "lucide-react";
 
 export default function SettingsPage() {
@@ -41,7 +30,6 @@ export default function SettingsPage() {
     siteName: "Tech@IITGN",
     siteDescription: "Technical Council - IIT Gandhinagar",
     enableNotifications: true,
-    autoBackup: true,
     maintenanceMode: false,
     maxFileSize: "10MB",
     allowedFileTypes: ["jpg", "jpeg", "png", "gif", "webp"]
@@ -327,55 +315,6 @@ export default function SettingsPage() {
       console.error("Error removing admin email:", error);
       alert(`Failed to remove admin email: ${error instanceof Error ? error.message : 'Unknown error'}`);
     }
-  };
-
-  const handleBackup = async () => {
-    setIsLoading(true);
-    try {
-      const response = await fetch("/api/admin/backup", {
-        method: "POST"
-      });
-      if (response.ok) {
-        const blob = await response.blob();
-        const url = window.URL.createObjectURL(blob);
-        const a = document.createElement('a');
-        a.href = url;
-        a.download = `backup-${new Date().toISOString().split('T')[0]}.json`;
-        a.click();
-        window.URL.revokeObjectURL(url);
-      }
-    } catch (err) {
-      alert("Backup failed");
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
-  const handleRestore = () => {
-    const input = document.createElement('input');
-    input.type = 'file';
-    input.accept = '.json';
-    input.onchange = async (e) => {
-      const file = (e.target as HTMLInputElement).files?.[0];
-      if (file) {
-        const formData = new FormData();
-        formData.append('backup', file);
-        
-        try {
-          const response = await fetch("/api/admin/restore", {
-            method: "POST",
-            body: formData
-          });
-          if (response.ok) {
-            alert("Data restored successfully!");
-            window.location.reload();
-          }
-        } catch (err) {
-          alert("Restore failed");
-        }
-      }
-    };
-    input.click();
   };
 
   if (status === "loading") {
@@ -804,112 +743,7 @@ export default function SettingsPage() {
               )}
             </CardContent>
           </Card>
-
-          {/* Data Management */}
-          <Card className="glass">
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <Database className="h-5 w-5" />
-                Data Management
-              </CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              <div className="flex items-center justify-between">
-                <div>
-                  <Label>Auto Backup</Label>
-                  <p className="text-sm text-muted-foreground">
-                    Automatically backup data daily
-                  </p>
-                </div>
-                <Switch
-                  checked={settings.autoBackup}
-                  onCheckedChange={(checked) => setSettings(prev => ({ ...prev, autoBackup: checked }))}
-                />
-              </div>
-
-              <div className="space-y-2">
-                <Button
-                  variant="outline"
-                  className="w-full"
-                  onClick={handleBackup}
-                  disabled={isLoading}
-                >
-                  <Download className="h-4 w-4 mr-2" />
-                  Download Backup
-                </Button>
-
-                <Button
-                  variant="outline"
-                  className="w-full"
-                  onClick={handleRestore}
-                >
-                  <Upload className="h-4 w-4 mr-2" />
-                  Restore from Backup
-                </Button>
-              </div>
-            </CardContent>
-          </Card>
         </div>
-
-        {/* System Information */}
-        <Card className="glass">
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <SettingsIcon className="h-5 w-5" />
-              System Information
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
-              <div className="text-center p-4 border rounded-lg">
-                <h4 className="font-semibold">Version</h4>
-                <p className="text-2xl font-bold text-blue-600">1.0.0</p>
-              </div>
-              
-              <div className="text-center p-4 border rounded-lg">
-                <h4 className="font-semibold">Environment</h4>
-                <p className="text-2xl font-bold text-green-600">Development</p>
-              </div>
-              
-              <div className="text-center p-4 border rounded-lg">
-                <h4 className="font-semibold">Last Backup</h4>
-                <p className="text-sm text-muted-foreground">Never</p>
-              </div>
-              
-              <div className="text-center p-4 border rounded-lg">
-                <h4 className="font-semibold">Storage Used</h4>
-                <p className="text-sm text-muted-foreground">~2.5 MB</p>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-
-        {/* Danger Zone */}
-        <Card className="glass border-red-200 dark:border-red-800">
-          <CardHeader>
-            <CardTitle className="text-red-700 dark:text-red-300">Danger Zone</CardTitle>
-          </CardHeader>
-          <CardContent className="space-y-4">
-            <div className="flex items-center justify-between p-4 border border-red-200 dark:border-red-800 rounded-lg">
-              <div>
-                <h4 className="font-medium">Reset All Data</h4>
-                <p className="text-sm text-muted-foreground">
-                  This will permanently delete all events and photos
-                </p>
-              </div>
-              <Button
-                variant="destructive"
-                onClick={() => {
-                  if (confirm("Are you sure? This action cannot be undone.")) {
-                    alert("Reset functionality would be implemented here");
-                  }
-                }}
-              >
-                Reset Data
-              </Button>
-            </div>
-          </CardContent>
-        </Card>
       </div>
     </AdminLayout>
   );

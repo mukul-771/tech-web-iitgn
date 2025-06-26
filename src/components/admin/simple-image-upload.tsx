@@ -90,28 +90,25 @@ export function SimpleImageUpload({
           </p>
         </>
       )}
-      
       {compact && (
-        <div className="w-full h-full flex flex-col items-center justify-center">
+        <div className="w-full h-full flex items-center justify-center">
           <input
             type="file"
             accept="image/*"
             onChange={handleFileSelect}
             disabled={disabled || isUploading}
             className="hidden"
-            id={`compact-upload-${Math.random()}`}
+            id="minimal-upload"
           />
           <Label 
-            htmlFor={`compact-upload-${Math.random()}`}
-            className="w-full h-full flex flex-col items-center justify-center cursor-pointer text-center hover:bg-gray-100 transition-colors rounded-lg"
+            htmlFor="minimal-upload"
+            className="w-full h-full flex items-center justify-center cursor-pointer hover:bg-gray-100 transition-colors rounded-lg"
+            style={{ minHeight: 0, minWidth: 0 }}
           >
             {isUploading ? (
               <LoadingSpinner />
             ) : (
-              <>
-                <Plus className="h-8 w-8 text-muted-foreground mb-2" />
-                <span className="text-xs text-muted-foreground font-medium">Add Image</span>
-              </>
+              <Plus className="h-8 w-8 text-muted-foreground" />
             )}
           </Label>
         </div>

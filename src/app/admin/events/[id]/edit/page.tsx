@@ -624,7 +624,7 @@ export default function EditEvent({ params }: PageProps) {
                             }
                           }}
                           disabled={isSaving}
-                          compact={false} // Use the non-compact version for a better UI
+                          compact={true}
                         />
                       </div>
                     )}

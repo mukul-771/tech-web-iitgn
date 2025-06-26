@@ -3,7 +3,8 @@
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { useSession } from "next-auth/react";
-import { ArrowLeft, Save, Trash2, Plus, X } from "lucide-react";
+import Image from "next/image";
+import { ArrowLeft, Save, Trash2, Plus, X, Edit, Replace } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -21,7 +22,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { ImageUpload } from "@/components/admin/image-upload";
+import { SimpleImageUpload } from "@/components/admin/simple-image-upload";
 
 interface PageProps {
   params: Promise<{
@@ -50,11 +51,6 @@ export default function EditEvent({ params }: PageProps) {
     draft: false
   });
   const [newHighlight, setNewHighlight] = useState("");
-  const [newGalleryItem, setNewGalleryItem] = useState({
-    url: "",
-    alt: "",
-    caption: ""
-  });
 
   useEffect(() => {
     async function resolveParams() {
@@ -161,28 +157,44 @@ export default function EditEvent({ params }: PageProps) {
     }));
   };
 
-  const addGalleryItem = () => {
-    if (newGalleryItem.url.trim() && newGalleryItem.alt.trim()) {
-      const newItem = {
-        id: Date.now().toString(),
-        url: newGalleryItem.url.trim(),
-        alt: newGalleryItem.alt.trim(),
-        caption: newGalleryItem.caption.trim() || undefined
-      };
-      
-      setFormData(prev => ({
-        ...prev,
-        gallery: [...prev.gallery, newItem]
-      }));
-      
-      setNewGalleryItem({ url: "", alt: "", caption: "" });
+  const addGalleryItem = (url: string, alt: string, caption?: string) => {
+    // Check if we've reached the maximum limit
+    if (formData.gallery.length >= 10) {
+      alert("Maximum 10 images allowed per event");
+      return;
     }
+
+    const newItem = {
+      id: Date.now().toString(),
+      url: url.trim(),
+      alt: alt.trim(),
+      caption: caption?.trim() || undefined
+    };
+    
+    setFormData(prev => ({
+      ...prev,
+      gallery: [...prev.gallery, newItem]
+    }));
   };
 
   const removeGalleryItem = (index: number) => {
     setFormData(prev => ({
       ...prev,
       gallery: prev.gallery.filter((_, i) => i !== index)
+    }));
+  };
+
+  const replaceGalleryItem = (index: number, url: string, alt: string, caption?: string) => {
+    const newGallery = [...formData.gallery];
+    newGallery[index] = {
+      id: Date.now().toString(),
+      url: url.trim(),
+      alt: alt.trim(),
+      caption: caption?.trim() || undefined
+    };
+    setFormData(prev => ({
+      ...prev,
+      gallery: newGallery
     }));
   };
 
@@ -443,79 +455,151 @@ export default function EditEvent({ params }: PageProps) {
               <Card className="glass">
                 <CardHeader>
                   <CardTitle>Event Gallery</CardTitle>
+                  <p className="text-sm text-muted-foreground">
+                    Upload up to 10 images to showcase the event
+                  </p>
                 </CardHeader>
-                <CardContent className="space-y-4">
-                  <div className="space-y-6">
+                <CardContent className="space-y-6">
+                  {/* Gallery Grid */}
+                  <div className="grid grid-cols-5 gap-3">
                     {formData.gallery.map((item, index) => (
-                      <div key={index} className="border rounded-lg p-4 space-y-4">
-                        <div className="flex items-center justify-between">
-                          <h4 className="font-medium">Image {index + 1}</h4>
-                          <Button
-                            type="button"
-                            variant="outline"
-                            size="sm"
-                            onClick={() => removeGalleryItem(index)}
-                          >
-                            <X className="h-4 w-4" />
-                          </Button>
-                        </div>
-
-                        <ImageUpload
-                          label="Gallery Image"
-                          currentImageUrl={item.url}
-                          onImageUploaded={(url) => {
-                            const newGallery = [...formData.gallery];
-                            newGallery[index].url = url;
-                            handleInputChange("gallery", newGallery);
-                          }}
-                          onImageRemoved={() => {
-                            const newGallery = [...formData.gallery];
-                            newGallery[index].url = "";
-                            handleInputChange("gallery", newGallery);
-                          }}
-                          showAltText={true}
-                          altText={item.alt}
-                          onAltTextChange={(altText) => {
-                            const newGallery = [...formData.gallery];
-                            newGallery[index].alt = altText;
-                            handleInputChange("gallery", newGallery);
-                          }}
-                          showCaption={true}
-                          caption={item.caption || ""}
-                          onCaptionChange={(caption) => {
-                            const newGallery = [...formData.gallery];
-                            newGallery[index].caption = caption;
-                            handleInputChange("gallery", newGallery);
-                          }}
-                          required={true}
+                      <div
+                        key={index}
+                        className="relative group aspect-square bg-gray-100 rounded-lg overflow-hidden border-2 border-gray-200 hover:border-primary/50 transition-all duration-200"
+                      >
+                        <Image
+                          src={item.url}
+                          alt={item.alt}
+                          width={200}
+                          height={200}
+                          className="w-full h-full object-cover"
                         />
+                        
+                        {/* Hover Overlay */}
+                        <div className="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 transition-opacity duration-200 flex items-center justify-center">
+                          <div className="flex gap-1">
+                            <Button
+                              type="button"
+                              size="sm"
+                              variant="secondary"
+                              className="h-7 w-7 p-0 text-xs"
+                              onClick={() => {
+                                // Create a temporary file input for replacing
+                                const fileInput = document.createElement('input');
+                                fileInput.type = 'file';
+                                fileInput.accept = 'image/*';
+                                fileInput.onchange = async (e) => {
+                                  const file = (e.target as HTMLInputElement).files?.[0];
+                                  if (!file) return;
+
+                                  // Validate file size
+                                  if (file.size > 10 * 1024 * 1024) {
+                                    alert('File size must be less than 10MB');
+                                    return;
+                                  }
+
+                                  try {
+                                    const formData = new FormData();
+                                    formData.append("file", file);
+                                    formData.append("folder", "events");
+
+                                    const response = await fetch("/api/admin/upload", {
+                                      method: "POST",
+                                      body: formData,
+                                    });
+
+                                    if (!response.ok) {
+                                      throw new Error("Failed to upload");
+                                    }
+
+                                    const result = await response.json();
+                                    const newAlt = prompt("Enter alt text for the new image:", item.alt) || item.alt;
+                                    const newCaption = prompt("Enter caption (optional):", item.caption || "") || item.caption;
+                                    
+                                    if (newAlt.trim()) {
+                                      replaceGalleryItem(index, result.url, newAlt, newCaption);
+                                    } else {
+                                      alert("Alt text is required for accessibility");
+                                    }
+                                  } catch {
+                                    alert("Failed to upload replacement image");
+                                  }
+                                };
+                                fileInput.click();
+                              }}
+                              title="Replace image"
+                            >
+                              <Replace className="h-3 w-3" />
+                            </Button>
+                            <Button
+                              type="button"
+                              size="sm"
+                              variant="secondary"
+                              className="h-7 w-7 p-0"
+                              onClick={() => {
+                                const newAlt = prompt("Edit alt text:", item.alt);
+                                if (newAlt !== null && newAlt.trim()) {
+                                  const newCaption = prompt("Edit caption (optional):", item.caption || "");
+                                  const newGallery = [...formData.gallery];
+                                  newGallery[index].alt = newAlt.trim();
+                                  newGallery[index].caption = newCaption?.trim() || undefined;
+                                  setFormData(prev => ({ ...prev, gallery: newGallery }));
+                                }
+                              }}
+                              title="Edit details"
+                            >
+                              <Edit className="h-3 w-3" />
+                            </Button>
+                            <Button
+                              type="button"
+                              size="sm"
+                              variant="destructive"
+                              className="h-7 w-7 p-0"
+                              onClick={() => removeGalleryItem(index)}
+                              title="Remove image"
+                            >
+                              <X className="h-3 w-3" />
+                            </Button>
+                          </div>
+                        </div>
+                        
+                        {/* Image Counter */}
+                        <div className="absolute top-1 left-1 bg-black/70 text-white text-xs px-1.5 py-0.5 rounded">
+                          {index + 1}
+                        </div>
                       </div>
                     ))}
+
+                    {/* Add New Image Slot */}
+                    {formData.gallery.length < 10 && (
+                      <div className="aspect-square border-2 border-dashed border-gray-300 rounded-lg flex flex-col items-center justify-center hover:border-primary/50 transition-colors bg-gray-50 hover:bg-gray-100">
+                        <SimpleImageUpload
+                          onImageUploaded={(url) => {
+                            const alt = prompt("Enter alt text for this image (required for accessibility):");
+                            if (alt && alt.trim()) {
+                              const caption = prompt("Enter a caption for this image (optional):") || "";
+                              addGalleryItem(url, alt.trim(), caption.trim());
+                            } else {
+                              alert("Alt text is required for accessibility. Image not added.");
+                            }
+                          }}
+                          disabled={isSaving}
+                          compact={true}
+                        />
+                      </div>
+                    )}
                   </div>
 
-                  <div className="border-2 border-dashed border-gray-300 rounded-lg p-4 space-y-4">
-                    <h4 className="font-medium">Add New Image</h4>
-                    <ImageUpload
-                      label="Upload New Gallery Image"
-                      currentImageUrl={newGalleryItem.url}
-                      onImageUploaded={(url) => setNewGalleryItem(prev => ({ ...prev, url }))}
-                      onImageRemoved={() => setNewGalleryItem(prev => ({ ...prev, url: "" }))}
-                      showAltText={true}
-                      altText={newGalleryItem.alt}
-                      onAltTextChange={(altText) => setNewGalleryItem(prev => ({ ...prev, alt: altText }))}
-                      showCaption={true}
-                      caption={newGalleryItem.caption}
-                      onCaptionChange={(caption) => setNewGalleryItem(prev => ({ ...prev, caption }))}
-                      required={true}
-                    />
-                    <Button
-                      type="button"
-                      onClick={addGalleryItem}
-                      disabled={!newGalleryItem.url || !newGalleryItem.alt}
-                    >
-                      <Plus className="h-4 w-4 mr-2" />
-                      Add Image
-                    </Button>
+                  {/* Gallery Info */}
+                  <div className="flex items-center justify-between text-sm">
+                    <span className="text-muted-foreground">
+                      {formData.gallery.length} of 10 images
+                    </span>
+                    {formData.gallery.length >= 10 && (
+                      <span className="text-amber-600 font-medium">
+                        Gallery is full - remove an image to add more
+                      </span>
+                    )}
                   </div>
                 </CardContent>
               </Card>

@@ -76,13 +76,21 @@ export default function EditEvent({ params }: PageProps) {
   const fetchEvent = async () => {
     try {
       setIsLoading(true);
+      console.log("Fetching event with ID:", eventId);
+      
       const response = await fetch(`/api/admin/events/${eventId}`);
+      console.log("Fetch response status:", response.status);
+      console.log("Fetch response ok:", response.ok);
       
       if (!response.ok) {
-        throw new Error("Failed to fetch event");
+        const errorText = await response.text();
+        console.error("Fetch error:", errorText);
+        throw new Error(`Failed to fetch event: ${response.status}`);
       }
 
       const eventData = await response.json();
+      console.log("Fetched event data:", eventData);
+      
       setEvent(eventData);
       setFormData({
         title: eventData.title || "",
@@ -110,6 +118,42 @@ export default function EditEvent({ params }: PageProps) {
     e.preventDefault();
     setIsSaving(true);
 
+    console.log("Form submission started");
+    console.log("Form data:", formData);
+    console.log("Event ID:", eventId);
+
+    // Validate required fields
+    if (!formData.title.trim()) {
+      alert("Event title is required");
+      setIsSaving(false);
+      return;
+    }
+    if (!formData.description.trim()) {
+      alert("Event description is required");
+      setIsSaving(false);
+      return;
+    }
+    if (!formData.date.trim()) {
+      alert("Event date is required");
+      setIsSaving(false);
+      return;
+    }
+    if (!formData.location.trim()) {
+      alert("Event location is required");
+      setIsSaving(false);
+      return;
+    }
+    if (!formData.organizer.trim()) {
+      alert("Event organizer is required");
+      setIsSaving(false);
+      return;
+    }
+    if (!formData.category.trim()) {
+      alert("Event category is required");
+      setIsSaving(false);
+      return;
+    }
+
     try {
       const response = await fetch(`/api/admin/events/${eventId}`, {
         method: "PUT",
@@ -119,15 +163,22 @@ export default function EditEvent({ params }: PageProps) {
         body: JSON.stringify(formData),
       });
 
+      console.log("Response status:", response.status);
+      console.log("Response ok:", response.ok);
+
       if (!response.ok) {
-        throw new Error("Failed to update event");
+        const errorData = await response.text();
+        console.error("Response error:", errorData);
+        throw new Error(`Failed to update event: ${response.status} ${errorData}`);
       }
 
+      const result = await response.json();
+      console.log("Update successful:", result);
       alert("Event updated successfully!");
       router.push("/admin/events");
     } catch (error) {
       console.error("Error updating event:", error);
-      alert("Failed to update event");
+      alert(`Failed to update event: ${error instanceof Error ? error.message : 'Unknown error'}`);
     } finally {
       setIsSaving(false);
     }

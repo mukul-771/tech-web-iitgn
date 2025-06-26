@@ -4,17 +4,20 @@ import { useState } from "react";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { LoadingSpinner } from "@/components/ui/loading-spinner";
+import { Plus } from "lucide-react";
 
 interface SimpleImageUploadProps {
   onImageUploaded: (url: string) => void;
   disabled?: boolean;
   className?: string;
+  compact?: boolean;
 }
 
 export function SimpleImageUpload({ 
   onImageUploaded, 
   disabled = false, 
-  className = "" 
+  className = "",
+  compact = false
 }: SimpleImageUploadProps) {
   const [isUploading, setIsUploading] = useState(false);
 
@@ -64,25 +67,55 @@ export function SimpleImageUpload({
 
   return (
     <div className={className}>
-      <Label className="text-sm font-medium">Upload Image to Vercel Blob</Label>
-      <div className="flex items-center gap-2 mt-1">
-        <Input
-          type="file"
-          accept="image/*"
-          onChange={handleFileSelect}
-          disabled={disabled || isUploading}
-          className="file:mr-4 file:py-1 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-semibold file:bg-primary/10 file:text-primary hover:file:bg-primary/20"
-        />
-        {isUploading && (
-          <div className="flex items-center gap-2">
-            <LoadingSpinner />
-            <span className="text-sm text-muted-foreground">Uploading...</span>
+      {!compact && (
+        <>
+          <Label className="text-sm font-medium">Upload Image to Vercel Blob</Label>
+          <div className="flex items-center gap-2 mt-1">
+            <Input
+              type="file"
+              accept="image/*"
+              onChange={handleFileSelect}
+              disabled={disabled || isUploading}
+              className="file:mr-4 file:py-1 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-semibold file:bg-primary/10 file:text-primary hover:file:bg-primary/20"
+            />
+            {isUploading && (
+              <div className="flex items-center gap-2">
+                <LoadingSpinner />
+                <span className="text-sm text-muted-foreground">Uploading...</span>
+              </div>
+            )}
           </div>
-        )}
-      </div>
-      <p className="text-xs text-muted-foreground mt-1">
-        Supported: JPEG, PNG, WebP. Max size: 10MB
-      </p>
+          <p className="text-xs text-muted-foreground mt-1">
+            Supported: JPEG, PNG, WebP. Max size: 10MB
+          </p>
+        </>
+      )}
+      
+      {compact && (
+        <div className="w-full h-full flex flex-col items-center justify-center">
+          <input
+            type="file"
+            accept="image/*"
+            onChange={handleFileSelect}
+            disabled={disabled || isUploading}
+            className="hidden"
+            id={`compact-upload-${Math.random()}`}
+          />
+          <Label 
+            htmlFor={`compact-upload-${Math.random()}`}
+            className="w-full h-full flex flex-col items-center justify-center cursor-pointer text-center hover:bg-gray-100 transition-colors rounded-lg"
+          >
+            {isUploading ? (
+              <LoadingSpinner />
+            ) : (
+              <>
+                <Plus className="h-8 w-8 text-muted-foreground mb-2" />
+                <span className="text-xs text-muted-foreground font-medium">Add Image</span>
+              </>
+            )}
+          </Label>
+        </div>
+      )}
     </div>
   );
 }

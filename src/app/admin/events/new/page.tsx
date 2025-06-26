@@ -3,6 +3,7 @@
 import { useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
+import Image from "next/image";
 import { AdminLayout } from "@/components/admin/admin-layout";
 import { LoadingSpinner } from "@/components/ui/loading-spinner";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -16,7 +17,8 @@ import {
   ArrowLeft,
   X,
   Plus,
-  Image as ImageIcon
+  Edit,
+  Replace
 } from "lucide-react";
 import {
   Select,
@@ -101,6 +103,12 @@ export default function NewEvent() {
       newErrors.category = "Category is required";
     }
 
+    // Validate gallery images have alt text
+    const invalidImages = formData.gallery.filter(img => !img.alt || !img.alt.trim());
+    if (invalidImages.length > 0) {
+      newErrors.gallery = "All images must have alt text for accessibility";
+    }
+
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   };
@@ -178,6 +186,12 @@ export default function NewEvent() {
   };
 
   const addGalleryItem = (url: string, alt: string, caption?: string) => {
+    // Check if we've reached the maximum limit
+    if (formData.gallery.length >= 10) {
+      setErrors(prev => ({ ...prev, gallery: "Maximum 10 images allowed per event" }));
+      return;
+    }
+
     const newItem = {
       id: Date.now().toString(),
       url: url.trim(),
@@ -189,10 +203,34 @@ export default function NewEvent() {
       ...prev,
       gallery: [...prev.gallery, newItem]
     }));
+
+    // Clear gallery error if it exists
+    if (errors.gallery) {
+      setErrors(prev => ({ ...prev, gallery: undefined }));
+    }
   };
 
   const removeGalleryItem = (index: number) => {
     const newGallery = formData.gallery.filter((_, i) => i !== index);
+    setFormData(prev => ({
+      ...prev,
+      gallery: newGallery
+    }));
+
+    // Clear gallery error if it exists
+    if (errors.gallery) {
+      setErrors(prev => ({ ...prev, gallery: undefined }));
+    }
+  };
+
+  const replaceGalleryItem = (index: number, url: string, alt: string, caption?: string) => {
+    const newGallery = [...formData.gallery];
+    newGallery[index] = {
+      id: Date.now().toString(),
+      url: url.trim(),
+      alt: alt.trim(),
+      caption: caption?.trim() || undefined
+    };
     setFormData(prev => ({
       ...prev,
       gallery: newGallery
@@ -423,98 +461,156 @@ export default function NewEvent() {
                 <CardHeader>
                   <CardTitle>Event Gallery</CardTitle>
                   <p className="text-sm text-muted-foreground">
-                    Upload images to showcase the event (stored securely on Vercel Blob)
+                    Upload up to 10 images to showcase the event
                   </p>
                 </CardHeader>
-                <CardContent className="space-y-4">
+                <CardContent className="space-y-6">
                   {errors.gallery && (
                     <div className="bg-red-50 border border-red-200 rounded-md p-3">
                       <p className="text-sm text-red-600">{errors.gallery}</p>
                     </div>
                   )}
 
-                  <div className="space-y-4">
+                  {/* Gallery Grid */}
+                  <div className="grid grid-cols-5 gap-3">
                     {formData.gallery.map((item, index) => (
-                      <div key={index} className="border rounded-lg p-4 space-y-3">
-                        <div className="flex items-center justify-between">
-                          <h4 className="font-medium">Image {index + 1}</h4>
-                          <Button
-                            type="button"
-                            variant="outline"
-                            size="sm"
-                            onClick={() => removeGalleryItem(index)}
-                          >
-                            <X className="h-4 w-4" />
-                          </Button>
-                        </div>
+                      <div
+                        key={index}
+                        className="relative group aspect-square bg-gray-100 rounded-lg overflow-hidden border-2 border-gray-200 hover:border-primary/50 transition-all duration-200"
+                      >
+                        <Image
+                          src={item.url}
+                          alt={item.alt}
+                          width={200}
+                          height={200}
+                          className="w-full h-full object-cover"
+                        />
+                        
+                        {/* Hover Overlay */}
+                        <div className="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 transition-opacity duration-200 flex items-center justify-center">
+                          <div className="flex gap-1">
+                            <Button
+                              type="button"
+                              size="sm"
+                              variant="secondary"
+                              className="h-7 w-7 p-0 text-xs"
+                              onClick={() => {
+                                // Create a temporary file input for replacing
+                                const fileInput = document.createElement('input');
+                                fileInput.type = 'file';
+                                fileInput.accept = 'image/*';
+                                fileInput.onchange = async (e) => {
+                                  const file = (e.target as HTMLInputElement).files?.[0];
+                                  if (!file) return;
 
-                        <div className="grid gap-3">
-                          <div>
-                            <Label>Image URL</Label>
-                            <Input
-                              value={item.url}
-                              readOnly
-                              className="bg-gray-50"
-                              placeholder="Image will be uploaded to Vercel Blob"
-                            />
-                            <p className="text-xs text-muted-foreground mt-1">
-                              Stored securely on Vercel Blob
-                            </p>
-                          </div>
-                          <div>
-                            <Label>Alt Text *</Label>
-                            <Input
-                              value={item.alt}
-                              onChange={(e) => {
-                                const newGallery = [...formData.gallery];
-                                newGallery[index].alt = e.target.value;
-                                setFormData(prev => ({ ...prev, gallery: newGallery }));
+                                  // Validate file size
+                                  if (file.size > 10 * 1024 * 1024) {
+                                    alert('File size must be less than 10MB');
+                                    return;
+                                  }
+
+                                  try {
+                                    const formData = new FormData();
+                                    formData.append("file", file);
+                                    formData.append("folder", "events");
+
+                                    const response = await fetch("/api/admin/upload", {
+                                      method: "POST",
+                                      body: formData,
+                                    });
+
+                                    if (!response.ok) {
+                                      throw new Error("Failed to upload");
+                                    }
+
+                                    const result = await response.json();
+                                    const newAlt = prompt("Enter alt text for the new image:", item.alt) || item.alt;
+                                    const newCaption = prompt("Enter caption (optional):", item.caption || "") || item.caption;
+                                    
+                                    if (newAlt.trim()) {
+                                      replaceGalleryItem(index, result.url, newAlt, newCaption);
+                                    } else {
+                                      alert("Alt text is required for accessibility");
+                                    }
+                                  } catch {
+                                    alert("Failed to upload replacement image");
+                                  }
+                                };
+                                fileInput.click();
                               }}
-                              placeholder="Describe the image for accessibility"
-                            />
-                          </div>
-                          <div>
-                            <Label>Caption (Optional)</Label>
-                            <Input
-                              value={item.caption || ""}
-                              onChange={(e) => {
-                                const newGallery = [...formData.gallery];
-                                newGallery[index].caption = e.target.value;
-                                setFormData(prev => ({ ...prev, gallery: newGallery }));
+                              title="Replace image"
+                            >
+                              <Replace className="h-3 w-3" />
+                            </Button>
+                            <Button
+                              type="button"
+                              size="sm"
+                              variant="secondary"
+                              className="h-7 w-7 p-0"
+                              onClick={() => {
+                                const newAlt = prompt("Edit alt text:", item.alt);
+                                if (newAlt !== null && newAlt.trim()) {
+                                  const newCaption = prompt("Edit caption (optional):", item.caption || "");
+                                  const newGallery = [...formData.gallery];
+                                  newGallery[index].alt = newAlt.trim();
+                                  newGallery[index].caption = newCaption?.trim() || undefined;
+                                  setFormData(prev => ({ ...prev, gallery: newGallery }));
+                                }
                               }}
-                              placeholder="Image caption"
-                            />
+                              title="Edit details"
+                            >
+                              <Edit className="h-3 w-3" />
+                            </Button>
+                            <Button
+                              type="button"
+                              size="sm"
+                              variant="destructive"
+                              className="h-7 w-7 p-0"
+                              onClick={() => removeGalleryItem(index)}
+                              title="Remove image"
+                            >
+                              <X className="h-3 w-3" />
+                            </Button>
                           </div>
+                        </div>
+                        
+                        {/* Image Counter */}
+                        <div className="absolute top-1 left-1 bg-black/70 text-white text-xs px-1.5 py-0.5 rounded">
+                          {index + 1}
                         </div>
                       </div>
                     ))}
+
+                    {/* Add New Image Slot */}
+                    {formData.gallery.length < 10 && (
+                      <div className="aspect-square border-2 border-dashed border-gray-300 rounded-lg flex flex-col items-center justify-center hover:border-primary/50 transition-colors bg-gray-50 hover:bg-gray-100">
+                        <SimpleImageUpload
+                          onImageUploaded={(url) => {
+                            const alt = prompt("Enter alt text for this image (required for accessibility):");
+                            if (alt && alt.trim()) {
+                              const caption = prompt("Enter a caption for this image (optional):") || "";
+                              addGalleryItem(url, alt.trim(), caption.trim());
+                            } else {
+                              alert("Alt text is required for accessibility. Image not added.");
+                            }
+                          }}
+                          disabled={isLoading}
+                          compact={true}
+                        />
+                      </div>
+                    )}
                   </div>
 
-                  {/* Add New Image */}
-                  <div className="border-2 border-dashed border-gray-300 rounded-lg p-6 space-y-4">
-                    <div className="flex items-center gap-2">
-                      <ImageIcon className="h-5 w-5 text-muted-foreground" />
-                      <h4 className="font-medium">Upload New Image</h4>
-                    </div>
-                    
-                    <SimpleImageUpload
-                      onImageUploaded={(url) => {
-                        // Prompt for alt text
-                        const alt = prompt("Enter alt text for this image (required for accessibility):");
-                        if (alt && alt.trim()) {
-                          const caption = prompt("Enter a caption for this image (optional):") || "";
-                          addGalleryItem(url, alt.trim(), caption.trim());
-                        } else {
-                          alert("Alt text is required for accessibility. Image not added.");
-                        }
-                      }}
-                      disabled={isLoading}
-                      className="w-full"
-                    />
-                    
-                    <p className="text-sm text-muted-foreground text-center">
-                      Images are automatically uploaded to secure Vercel Blob storage
-                    </p>
+                  {/* Gallery Info */}
+                  <div className="flex items-center justify-between text-sm">
+                    <span className="text-muted-foreground">
+                      {formData.gallery.length} of 10 images
+                    </span>
+                    {formData.gallery.length >= 10 && (
+                      <span className="text-amber-600 font-medium">
+                        Gallery is full - remove an image to add more
+                      </span>
+                    )}
                   </div>
                 </CardContent>
               </Card>

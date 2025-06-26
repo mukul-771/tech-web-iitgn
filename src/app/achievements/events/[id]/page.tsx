@@ -4,6 +4,7 @@ import Link from "next/link"
 import Image from "next/image"
 import { ArrowLeft, Calendar, Users, MapPin, Clock } from "lucide-react"
 import { Button } from "@/components/ui/button"
+import { ImageSlider } from "@/components/ui/image-slider"
 import { getEventById } from "@/lib/events-storage"
 
 // Fallback event data for development
@@ -305,33 +306,8 @@ export default async function EventDetailPage({ params }: PageProps) {
               </p>
             </div>
 
-            <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-              {event.gallery.map((image: string | { url: string; alt: string; caption?: string }, index: number) => {
-                // Handle both old string format and new object format
-                const imageUrl = typeof image === 'string' ? image : image.url;
-                const imageAlt = typeof image === 'string' ? `${event.title} - Photo ${index + 1}` : image.alt;
-                const imageCaption = typeof image === 'object' ? image.caption : null;
-
-                return (
-                  <div key={index} className="glass rounded-xl overflow-hidden transition-all duration-300 hover:scale-105 hover:shadow-lg">
-                    <div className="aspect-square bg-gradient-to-br from-blue-600/20 to-purple-600/20 flex items-center justify-center relative group">
-                      <Image
-                        src={imageUrl}
-                        alt={imageAlt}
-                        width={300}
-                        height={300}
-                        className="w-full h-full object-cover"
-                      />
-                      <div className="absolute inset-0 bg-black/0 group-hover:bg-black/10 transition-colors duration-300" />
-                      {imageCaption && (
-                        <div className="absolute bottom-0 left-0 right-0 bg-black/70 text-white p-2 text-sm opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-                          {imageCaption}
-                        </div>
-                      )}
-                    </div>
-                  </div>
-                );
-              })}
+            <div className="group">
+              <ImageSlider images={event.gallery} eventTitle={event.title} />
             </div>
           </div>
         </div>

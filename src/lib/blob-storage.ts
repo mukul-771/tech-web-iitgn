@@ -25,12 +25,15 @@ function ensureDataDir() {
   }
 }
 
+// In-memory storage for production environments
+let productionBlobSettings: BlobSettings = { ...DEFAULT_BLOB_SETTINGS }
+
 // Get blob settings
 export function getBlobSettings(): BlobSettings {
   try {
     if (!isDevelopment) {
-      // In production, return defaults since we can't write to filesystem
-      return DEFAULT_BLOB_SETTINGS
+      // In production, return in-memory settings
+      return productionBlobSettings
     }
 
     ensureDataDir()
@@ -78,9 +81,11 @@ export function updateBlobSettings(newSettings: Partial<BlobSettings>): BlobSett
       const tempFile = BLOB_FILE + '.tmp'
       fs.writeFileSync(tempFile, JSON.stringify(updatedSettings, null, 2))
       fs.renameSync(tempFile, BLOB_FILE)
+    } else {
+      // In production, update in-memory storage
+      productionBlobSettings = updatedSettings
     }
     
-    // In production, we can't write to filesystem, but return the updated settings anyway
     return updatedSettings
   } catch (error) {
     console.error('Error updating blob settings:', error)
@@ -94,9 +99,11 @@ export function resetBlobSettings(): BlobSettings {
     if (isDevelopment) {
       ensureDataDir()
       fs.writeFileSync(BLOB_FILE, JSON.stringify(DEFAULT_BLOB_SETTINGS, null, 2))
+    } else {
+      // In production, reset in-memory storage
+      productionBlobSettings = { ...DEFAULT_BLOB_SETTINGS }
     }
     
-    // In production, just return defaults
     return DEFAULT_BLOB_SETTINGS
   } catch (error) {
     console.error('Error resetting blob settings:', error)

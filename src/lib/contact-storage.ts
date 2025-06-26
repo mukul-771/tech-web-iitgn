@@ -44,17 +44,30 @@ const DEFAULT_CONTACT: ContactInfo = {
   modifiedBy: "System"
 };
 
+// In-memory storage for production environments where filesystem is read-only
+let productionContactInfo: ContactInfo = { ...DEFAULT_CONTACT };
+
+// Check if we're in development mode
+const isDevelopment = process.env.NODE_ENV === 'development';
+
 // Ensure data directory exists
 function ensureDataDirectory() {
-  const dataDir = path.dirname(CONTACT_FILE);
-  if (!fs.existsSync(dataDir)) {
-    fs.mkdirSync(dataDir, { recursive: true });
+  if (isDevelopment) {
+    const dataDir = path.dirname(CONTACT_FILE);
+    if (!fs.existsSync(dataDir)) {
+      fs.mkdirSync(dataDir, { recursive: true });
+    }
   }
 }
 
 // Get contact information
 export async function getContactInfo(): Promise<ContactInfo> {
   try {
+    if (!isDevelopment) {
+      // In production, return in-memory contact info
+      return productionContactInfo;
+    }
+
     ensureDataDirectory();
     
     if (!fs.existsSync(CONTACT_FILE)) {
@@ -88,17 +101,22 @@ export async function getContactInfo(): Promise<ContactInfo> {
 // Save contact information with atomic write
 export async function saveContactInfo(contactInfo: ContactInfo): Promise<ContactInfo> {
   try {
-    ensureDataDirectory();
-    
     const updatedContact = {
       ...contactInfo,
       lastModified: new Date().toISOString()
     };
 
-    // Atomic write operation
-    const tempFile = `${CONTACT_FILE}.tmp`;
-    fs.writeFileSync(tempFile, JSON.stringify(updatedContact, null, 2));
-    fs.renameSync(tempFile, CONTACT_FILE);
+    if (isDevelopment) {
+      ensureDataDirectory();
+      
+      // Atomic write operation
+      const tempFile = `${CONTACT_FILE}.tmp`;
+      fs.writeFileSync(tempFile, JSON.stringify(updatedContact, null, 2));
+      fs.renameSync(tempFile, CONTACT_FILE);
+    } else {
+      // In production, update in-memory storage
+      productionContactInfo = updatedContact;
+    }
 
     return updatedContact;
   } catch (error) {
@@ -108,7 +126,7 @@ export async function saveContactInfo(contactInfo: ContactInfo): Promise<Contact
 }
 
 // Update specific contact field
-export async function updateContactField(field: string, value: any, modifiedBy: string): Promise<ContactInfo> {
+export async function updateContactField(field: string, value: unknown, modifiedBy: string): Promise<ContactInfo> {
   try {
     const currentContact = await getContactInfo();
     
@@ -117,14 +135,22 @@ export async function updateContactField(field: string, value: any, modifiedBy: 
     
     if (field.includes('.')) {
       const [parent, child] = field.split('.');
-      if (parent === 'address' || parent === 'socialMedia') {
-        updatedContact[parent as keyof ContactInfo] = {
-          ...(updatedContact[parent as keyof ContactInfo] as any),
-          [child]: value
+      if (parent === 'address') {
+        updatedContact.address = {
+          ...updatedContact.address,
+          [child]: value as string
+        };
+      } else if (parent === 'socialMedia') {
+        updatedContact.socialMedia = {
+          ...updatedContact.socialMedia,
+          [child]: value as string
         };
       }
     } else {
-      (updatedContact as any)[field] = value;
+      // For top-level fields, we need to cast appropriately
+      if (field === 'phone' || field === 'email') {
+        (updatedContact as Record<string, unknown>)[field] = value;
+      }
     }
     
     updatedContact.modifiedBy = modifiedBy;

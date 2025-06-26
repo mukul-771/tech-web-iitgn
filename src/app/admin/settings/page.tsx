@@ -190,14 +190,21 @@ export default function SettingsPage() {
       if (response.ok) {
         const updatedSettings = await response.json();
         setBlobSettings(updatedSettings.settings);
-        alert("Blob color updated successfully!");
+        alert("Blob color updated successfully! The 3D blob will update within 5 seconds.");
       } else {
-        const error = await response.json();
-        throw new Error(error.error || "Failed to update blob color");
+        const errorText = await response.text();
+        let errorMessage;
+        try {
+          const errorJson = JSON.parse(errorText);
+          errorMessage = errorJson.error || "Failed to update blob color";
+        } catch {
+          errorMessage = `Server error: ${response.status}`;
+        }
+        throw new Error(errorMessage);
       }
     } catch (error) {
       console.error("Error updating blob color:", error);
-      alert("Failed to update blob color. Please try again.");
+      alert(`Failed to update blob color: ${error instanceof Error ? error.message : 'Unknown error'}`);
     }
   };
 
@@ -222,6 +229,12 @@ export default function SettingsPage() {
 
   const handleContactInfoUpdate = async () => {
     try {
+      // Validate required fields
+      if (!contactInfo.email || !contactInfo.phone) {
+        alert("Email and phone are required fields.");
+        return;
+      }
+
       const response = await fetch("/api/admin/contact-info", {
         method: "PUT",
         headers: {
@@ -235,12 +248,19 @@ export default function SettingsPage() {
         setContactInfo(result.contactInfo);
         alert("Contact information updated successfully!");
       } else {
-        const error = await response.json();
-        throw new Error(error.error || "Failed to update contact information");
+        const errorText = await response.text();
+        let errorMessage;
+        try {
+          const errorJson = JSON.parse(errorText);
+          errorMessage = errorJson.error || "Failed to update contact information";
+        } catch {
+          errorMessage = `Server error: ${response.status}`;
+        }
+        throw new Error(errorMessage);
       }
     } catch (error) {
       console.error("Error updating contact info:", error);
-      alert("Failed to update contact information. Please try again.");
+      alert(`Failed to update contact information: ${error instanceof Error ? error.message : 'Unknown error'}`);
     }
   };
 

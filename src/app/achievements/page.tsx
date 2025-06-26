@@ -1,13 +1,12 @@
-import { Metadata } from "next"
+"use client";
+
 import Link from "next/link"
 import Image from "next/image"
 import { Trophy, Medal, Award, Calendar, Users, Camera, ArrowRight } from "lucide-react"
 import { Event } from "@/lib/events-data"
+import { useEffect, useState } from "react"
 
-// Force dynamic rendering to ensure fresh data
-export const dynamic = 'force-dynamic'
-export const revalidate = 0
-export const runtime = 'nodejs'
+// Client-side rendering for dynamic data
 
 interface TeamMember {
   name: string;
@@ -37,10 +36,7 @@ interface Achievement {
   teamMembers: TeamMember[];
 }
 
-export const metadata: Metadata = {
-  title: "Achievements - Technical Council IITGN",
-  description: "Explore the achievements and victories of Technical Council clubs in Inter-IIT Tech Meet, hackathons, and competitions.",
-}
+// Metadata handled by layout since this is a client component
 
 interface UIAchievement {
   year: string;
@@ -173,9 +169,39 @@ async function getEventGallery(): Promise<Event[]> {
   }
 }
 
-export default async function AchievementsPage() {
-  const eventGallery = await getEventGallery();
-  const interIITAchievements: UIAchievement[] = await getInterIITAchievements();
+export default function AchievementsPage() {
+  const [eventGallery, setEventGallery] = useState<Event[]>([]);
+  const [interIITAchievements, setInterIITAchievements] = useState<UIAchievement[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    async function fetchData() {
+      try {
+        const [eventsData, achievementsData] = await Promise.all([
+          getEventGallery(),
+          getInterIITAchievements()
+        ]);
+        setEventGallery(eventsData);
+        setInterIITAchievements(achievementsData);
+      } catch (error) {
+        console.error('Error fetching data:', error);
+      } finally {
+        setLoading(false);
+      }
+    }
+    fetchData();
+  }, []);
+
+  if (loading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-primary mx-auto"></div>
+          <p className="mt-4 text-lg text-muted-foreground">Loading achievements...</p>
+        </div>
+      </div>
+    );
+  }
 
   // Calculate dynamic stats
   const stats = {

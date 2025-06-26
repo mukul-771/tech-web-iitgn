@@ -7,156 +7,6 @@ import { Button } from "@/components/ui/button"
 import { ImageSlider } from "@/components/ui/image-slider"
 import { getEventById } from "@/lib/events-storage"
 
-// Fallback event data for development
-const fallbackEventsData: Record<string, unknown> = {
-  "tech-symposium-2023": {
-    title: "Annual Tech Symposium 2023",
-    description: "A grand showcase of innovation featuring project exhibitions, tech talks, and networking sessions with industry leaders.",
-    longDescription: "The Annual Tech Symposium 2023 was a landmark event that brought together students, faculty, and industry professionals to celebrate innovation and technological advancement. The event featured cutting-edge project exhibitions, inspiring keynote speeches, and valuable networking opportunities. Participants had the chance to showcase their research, learn from industry experts, and connect with like-minded individuals passionate about technology.",
-    organizer: "Technical Council",
-    date: "March 15-17, 2023",
-    location: "IIT Gandhinagar Campus",
-    duration: "3 Days",
-    participants: "500+",
-    category: "Symposium",
-    highlights: [
-      "50+ Project Exhibitions",
-      "10 Industry Expert Talks",
-      "Networking Sessions",
-      "Innovation Awards",
-      "Student Research Presentations"
-    ],
-    gallery: [
-      "/events/placeholder-1.svg",
-      "/events/placeholder-2.svg",
-      "/events/placeholder-3.svg",
-      "/events/placeholder-1.svg",
-      "/events/placeholder-2.svg",
-      "/events/placeholder-3.svg"
-    ]
-  },
-  "robotics-workshop-2023": {
-    title: "Robotics Workshop Series",
-    description: "Hands-on workshop series covering autonomous navigation, computer vision, and machine learning in robotics.",
-    longDescription: "The Robotics Workshop Series 2023 was an intensive hands-on program designed to introduce students to the fascinating world of robotics. The workshop covered fundamental concepts in autonomous navigation, computer vision applications, and machine learning integration in robotic systems. Participants worked with real robots and learned practical skills in programming, sensor integration, and AI implementation.",
-    organizer: "Robotics Club",
-    date: "September 10-24, 2023",
-    location: "Robotics Lab, IIT Gandhinagar",
-    duration: "2 Weeks",
-    participants: "80+",
-    category: "Workshop",
-    highlights: [
-      "Autonomous Navigation Programming",
-      "Computer Vision Implementation",
-      "Machine Learning in Robotics",
-      "Hands-on Robot Building",
-      "Competition and Showcase"
-    ],
-    gallery: [
-      "/events/placeholder-3.svg",
-      "/events/placeholder-1.svg",
-      "/events/placeholder-2.svg",
-      "/events/placeholder-3.svg"
-    ]
-  },
-  "hackathon-2023": {
-    title: "IITGNHacks 2023",
-    description: "48-hour hackathon bringing together brilliant minds to solve real-world problems using cutting-edge technology.",
-    longDescription: "IITGNHacks 2023 was an exhilarating 48-hour hackathon that challenged participants to develop innovative solutions to real-world problems. Teams worked around the clock to create applications, websites, and software solutions that could make a meaningful impact. The event fostered creativity, collaboration, and technical excellence among participants from various backgrounds.",
-    organizer: "Programming Club",
-    date: "November 18-20, 2023",
-    location: "Academic Block, IIT Gandhinagar",
-    duration: "48 Hours",
-    participants: "200+",
-    category: "Hackathon",
-    highlights: [
-      "48-Hour Coding Marathon",
-      "Real-world Problem Solving",
-      "Mentorship from Industry Experts",
-      "Prize Pool of ₹1,00,000",
-      "Networking and Learning"
-    ],
-    gallery: [
-      "/events/placeholder-2.svg",
-      "/events/placeholder-1.svg",
-      "/events/placeholder-3.svg",
-      "/events/placeholder-2.svg",
-      "/events/placeholder-1.svg"
-    ]
-  },
-  "ai-ml-conference-2023": {
-    title: "AI/ML Conference 2023",
-    description: "Conference featuring research presentations, industry insights, and hands-on sessions on artificial intelligence and machine learning.",
-    longDescription: "The AI/ML Conference 2023 was a comprehensive event that brought together researchers, students, and industry professionals to explore the latest developments in artificial intelligence and machine learning. The conference featured research paper presentations, industry case studies, and hands-on workshops that provided participants with both theoretical knowledge and practical skills.",
-    organizer: "AI/ML Club",
-    date: "February 25-26, 2023",
-    location: "Convention Center, IIT Gandhinagar",
-    duration: "2 Days",
-    participants: "300+",
-    category: "Conference",
-    highlights: [
-      "Research Paper Presentations",
-      "Industry Case Studies",
-      "Hands-on ML Workshops",
-      "AI Ethics Panel Discussion",
-      "Networking with Researchers"
-    ],
-    gallery: [
-      "/events/placeholder-1.svg",
-      "/events/placeholder-3.svg",
-      "/events/placeholder-2.svg",
-      "/events/placeholder-1.svg"
-    ]
-  },
-  "cybersecurity-bootcamp-2023": {
-    title: "Cybersecurity Bootcamp",
-    description: "Intensive bootcamp covering ethical hacking, penetration testing, and cybersecurity best practices.",
-    longDescription: "The Cybersecurity Bootcamp 2023 was an intensive training program designed to equip participants with essential cybersecurity skills. The bootcamp covered ethical hacking techniques, penetration testing methodologies, and cybersecurity best practices. Participants gained hands-on experience with security tools and learned how to identify and mitigate various security threats.",
-    organizer: "Cybersecurity Club",
-    date: "August 5-12, 2023",
-    location: "Computer Lab, IIT Gandhinagar",
-    duration: "1 Week",
-    participants: "60+",
-    category: "Bootcamp",
-    highlights: [
-      "Ethical Hacking Techniques",
-      "Penetration Testing Labs",
-      "Security Tools Training",
-      "Capture The Flag Competition",
-      "Industry Expert Sessions"
-    ],
-    gallery: [
-      "/events/placeholder-2.svg",
-      "/events/placeholder-3.svg",
-      "/events/placeholder-1.svg"
-    ]
-  },
-  "web-dev-workshop-2023": {
-    title: "Full-Stack Development Workshop",
-    description: "Comprehensive workshop series on modern web development technologies including React, Node.js, and cloud deployment.",
-    longDescription: "The Full-Stack Development Workshop 2023 was a comprehensive program that covered modern web development from frontend to backend. Participants learned to build complete web applications using React for the frontend, Node.js for the backend, and various cloud platforms for deployment. The workshop emphasized practical, project-based learning.",
-    organizer: "Web Development Club",
-    date: "October 8-22, 2023",
-    location: "Computer Center, IIT Gandhinagar",
-    duration: "2 Weeks",
-    participants: "120+",
-    category: "Workshop",
-    highlights: [
-      "React Frontend Development",
-      "Node.js Backend Programming",
-      "Database Integration",
-      "Cloud Deployment",
-      "Project Showcase"
-    ],
-    gallery: [
-      "/events/placeholder-3.svg",
-      "/events/placeholder-2.svg",
-      "/events/placeholder-1.svg",
-      "/events/placeholder-3.svg"
-    ]
-  }
-}
-
 interface PageProps {
   params: Promise<{
     id: string
@@ -165,11 +15,13 @@ interface PageProps {
 
 export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
   const resolvedParams = await params;
-  let event: any;
+  let event;
   try {
     event = await getEventById(resolvedParams.id);
   } catch {
-    event = fallbackEventsData[resolvedParams.id];
+    return {
+      title: "Event Not Found",
+    }
   }
 
   if (!event) {
@@ -186,11 +38,12 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
 
 export default async function EventDetailPage({ params }: PageProps) {
   const resolvedParams = await params;
-  let event: any;
+  let event;
   try {
     event = await getEventById(resolvedParams.id);
   } catch {
-    event = fallbackEventsData[resolvedParams.id];
+    // No fallback data - return not found if event doesn't exist
+    notFound();
   }
 
   if (!event) {
@@ -274,7 +127,7 @@ export default async function EventDetailPage({ params }: PageProps) {
                 About the Event
               </h2>
               <p className="text-muted-foreground leading-relaxed">
-                {event.longDescription}
+                {event.description}
               </p>
             </div>
 

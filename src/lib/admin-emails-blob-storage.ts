@@ -67,11 +67,6 @@ export async function getAdminEmails(): Promise<AdminEmailsData> {
     }
 
     // Production: use blob storage
-    if (!process.env.BLOB_READ_WRITE_TOKEN) {
-      console.warn('BLOB_READ_WRITE_TOKEN not found, using default admin emails')
-      return defaultAdminEmails
-    }
-
     try {
       const response = await fetch(`https://b7ajqrsrmgst9onj.public.blob.vercel-storage.com/${BLOB_FILENAME}`)
       if (response.ok) {
@@ -83,6 +78,7 @@ export async function getAdminEmails(): Promise<AdminEmailsData> {
     }
 
     // If blob doesn't exist or fetch fails, return defaults
+    console.warn('Using default admin emails as fallback')
     return defaultAdminEmails
   } catch (error) {
     console.error('Error getting admin emails:', error)

@@ -73,7 +73,7 @@ export async function getAdminEmails(): Promise<AdminEmailsData> {
     }
 
     try {
-      const response = await fetch(`https://nqifdgxm4vrkihns.public.blob.vercel-storage.com/${BLOB_FILENAME}`)
+      const response = await fetch(`https://b7ajqrsrmgst9onj.public.blob.vercel-storage.com/${BLOB_FILENAME}`)
       if (response.ok) {
         const data = await response.json()
         return data

@@ -126,7 +126,7 @@ export default function AdminStatusPage() {
                 icon={CheckCircle}
                 title="NextAuth URL"
                 status="success"
-                description="NEXTAUTH_URL is configured for https://tech-web-iitgn.vercel.app/"
+                description="NEXTAUTH_URL is configured for https://technical-council.iitgn.tech/"
               />
               
               <StatusItem
@@ -207,6 +207,11 @@ export default function AdminStatusPage() {
               <div className="flex items-center gap-2">
                 <Shield className="h-4 w-4 text-blue-600" />
                 <span className="font-mono text-sm">technical.secretary@iitgn.ac.in</span>
+                <Badge variant="outline">Admin</Badge>
+              </div>
+              <div className="flex items-center gap-2">
+                <Shield className="h-4 w-4 text-blue-600" />
+                <span className="font-mono text-sm">mukulmee771@gmail.com</span>
                 <Badge variant="outline">Admin</Badge>
               </div>
             </div>

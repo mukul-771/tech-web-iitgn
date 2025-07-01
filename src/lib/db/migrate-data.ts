@@ -2,6 +2,8 @@ import { getAllInterIITAchievements as getBlobAchievements } from '@/lib/inter-i
 import { getAllEvents as getBlobEvents } from '@/lib/events-blob-storage';
 import { createInterIITAchievement } from '@/lib/db/achievements';
 import { createEvent } from '@/lib/db/events';
+import { getAllTeamMembers as getBlobTeamMembers } from '@/lib/team-storage-blob';
+import { bulkCreateTeamMembers } from '@/lib/db/team';
 
 export async function migrateAchievementsToDatabase() {
   try {
@@ -107,13 +109,58 @@ export async function migrateEventsToDatabase() {
   }
 }
 
+// Add team migration functions
+export async function migrateTeamToDatabase() {
+  try {
+    console.log('Starting team data migration...');
+    
+    // Get team data from blob storage
+    const blobTeamData = await getBlobTeamMembers();
+    const teamArray = Object.values(blobTeamData);
+    
+    console.log(`Found ${teamArray.length} team members to migrate`);
+    
+    // Transform data for database
+    const teamForDB = teamArray.map(member => ({
+      id: member.id,
+      name: member.name,
+      position: member.position,
+      email: member.email,
+      initials: member.initials,
+      gradientFrom: member.gradientFrom,
+      gradientTo: member.gradientTo,
+      category: member.category,
+      photoPath: member.photoPath || null,
+      isSecretary: member.isSecretary,
+      isCoordinator: member.isCoordinator,
+    }));
+    
+    // Bulk insert to database
+    const migratedMembers = await bulkCreateTeamMembers(teamForDB);
+    
+    console.log(`✅ Successfully migrated ${migratedMembers.length} team members to database`);
+    
+    return {
+      success: true,
+      migratedCount: migratedMembers.length,
+      members: migratedMembers
+    };
+    
+  } catch (error) {
+    console.error('Team migration failed:', error);
+    throw new Error(`Team migration failed: ${error instanceof Error ? error.message : 'Unknown error'}`);
+  }
+}
+
 // Migration API endpoint functionality
 export async function runMigration() {
   const achievementsResult = await migrateAchievementsToDatabase();
   const eventsResult = await migrateEventsToDatabase();
+  const teamResult = await migrateTeamToDatabase();
   
   return {
     achievements: achievementsResult,
-    events: eventsResult
+    events: eventsResult,
+    team: teamResult
   };
 }

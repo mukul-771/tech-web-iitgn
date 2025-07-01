@@ -2,10 +2,11 @@ import { Metadata } from "next"
 import { Target, Eye, MapPin, BookOpen } from "lucide-react"
 import Link from "next/link"
 import { Button } from "@/components/ui/button"
-import { defaultTeamData, TeamMember } from "@/lib/team-data"
+import { defaultTeamData } from "@/lib/team-data"
 import { TechCube3D } from "@/components/ui/tech-cube-3d"
 import { TeamMemberImage } from "@/components/ui/team-member-image";
-import { getAllTeamMembers } from "@/lib/team-storage";
+import { getAllTeamMembers } from "@/lib/db/team";
+import { type TeamMemberDB } from "@/lib/db";
 
 export const metadata: Metadata = {
   title: "About Us - Technical Council IITGN",
@@ -17,16 +18,19 @@ export const dynamic = 'force-dynamic'
 export const revalidate = 0
 
 export default async function AboutPage() {
-  // Get team data from Blob storage (same source as admin panel)
-  let teamMembers: TeamMember[] = [];
+  // Get team data from Neon database
+  let teamMembers: TeamMemberDB[] = [];
   try {
-    const teamData = await getAllTeamMembers();
-    teamMembers = Object.values(teamData) as TeamMember[];
-    console.log('About page: Loaded team members from storage:', teamMembers.length);
+    teamMembers = await getAllTeamMembers();
+    console.log('About page: Loaded team members from database:', teamMembers.length);
   } catch (error) {
-    console.error('Error loading team data from storage:', error);
-    // Fallback to default data
-    teamMembers = Object.values(defaultTeamData) as TeamMember[];
+    console.error('Error loading team data from database:', error);
+    // Fallback to default data if needed
+    teamMembers = Object.values(defaultTeamData).map(member => ({
+      ...member,
+      createdAt: new Date(),
+      updatedAt: new Date()
+    })) as TeamMemberDB[];
   }
 
   // Get leadership team (secretary)

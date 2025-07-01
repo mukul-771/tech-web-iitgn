@@ -1,9 +1,9 @@
 import { NextResponse } from "next/server";
-import { getAllTeamMembers } from '@/lib/team-storage';
+import { getAllTeamMembers } from '@/lib/db/team';
 
 export async function GET() {
   try {
-    // Load team data from KV storage
+    // Load team data from Neon database
     const teamData = await getAllTeamMembers();
     return NextResponse.json(teamData);
   } catch (error) {

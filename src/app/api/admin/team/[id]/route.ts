@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getServerSession } from 'next-auth';
 import { authOptions } from '@/lib/auth';
-import { updateTeamMember, deleteTeamMember } from '@/lib/team-storage';
+import { updateTeamMember, deleteTeamMember } from '@/lib/db/team';
 
 export async function PUT(
   request: NextRequest,

@@ -40,6 +40,23 @@ export const events = pgTable('events', {
   updatedAt: timestamp('updated_at').defaultNow().notNull(),
 });
 
+// Team Members Table
+export const teamMembers = pgTable('team_members', {
+  id: text('id').primaryKey(),
+  name: text('name').notNull(),
+  position: text('position').notNull(),
+  email: text('email').notNull().unique(),
+  initials: text('initials').notNull(),
+  gradientFrom: text('gradient_from').notNull(),
+  gradientTo: text('gradient_to').notNull(),
+  category: text('category').notNull(),
+  photoPath: text('photo_path'),
+  isSecretary: boolean('is_secretary').default(false).notNull(),
+  isCoordinator: boolean('is_coordinator').default(false).notNull(),
+  createdAt: timestamp('created_at').defaultNow().notNull(),
+  updatedAt: timestamp('updated_at').defaultNow().notNull(),
+});
+
 // Types for TypeScript
 export type TeamMember = {
   name: string;
@@ -71,3 +88,6 @@ export type NewInterIITAchievement = typeof interIITAchievements.$inferInsert;
 
 export type Event = typeof events.$inferSelect;
 export type NewEvent = typeof events.$inferInsert;
+
+export type TeamMemberDB = typeof teamMembers.$inferSelect;
+export type NewTeamMemberDB = typeof teamMembers.$inferInsert;

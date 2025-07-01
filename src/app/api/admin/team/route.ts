@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getServerSession } from 'next-auth';
 import { authOptions } from '@/lib/auth';
-import { getAllTeamMembers, createTeamMember, migrateTeamDataToKV } from '@/lib/team-storage';
+import { getAllTeamMembers, createTeamMember } from '@/lib/db/team';
 
 export async function GET() {
   try {
@@ -18,10 +18,7 @@ export async function GET() {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
-    // Ensure data is migrated to KV
-    await migrateTeamDataToKV();
-
-    // Load team data from KV storage
+    // Load team data from Neon database
     const teamData = await getAllTeamMembers();
     return NextResponse.json(teamData);
   } catch (error) {
@@ -46,12 +43,10 @@ export async function POST(request: NextRequest) {
     }
 
     const data = await request.json();
-
-    // Ensure data is migrated to KV
-    await migrateTeamDataToKV();
     
-    // Create team member in KV storage
+    // Create team member in Neon database
     const newMember = await createTeamMember({
+      id: `team-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
       name: data.name,
       position: data.position,
       email: data.email,
@@ -59,7 +54,7 @@ export async function POST(request: NextRequest) {
       gradientFrom: data.gradientFrom || 'from-blue-600',
       gradientTo: data.gradientTo || 'to-purple-600',
       category: data.category,
-      photoPath: data.photoPath || '',
+      photoPath: data.photoPath || null,
       isSecretary: data.category === 'leadership' && data.position.toLowerCase().includes('secretary'),
       isCoordinator: data.category === 'coordinator'
     });

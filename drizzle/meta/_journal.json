@@ -8,6 +8,13 @@
       "when": 1750914842619,
       "tag": "0000_colorful_stranger",
       "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "7",
+      "when": 1751333576029,
+      "tag": "0001_tranquil_the_leader",
+      "breakpoints": true
     }
   ]
 }

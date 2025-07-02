@@ -169,9 +169,10 @@ export async function DELETE(
     const cleanClubId = resolvedParams.id.split(':')[0];
     console.log('DELETE Club request:', { originalId: resolvedParams.id, cleanId: cleanClubId });
     
-    const success = await deleteClub(cleanClubId);
-
-    if (!success) {
+    try {
+      await deleteClub(cleanClubId);
+    } catch (error) {
+      console.error('Error deleting club:', error);
       return NextResponse.json({ error: "Club not found" }, { status: 404 });
     }
 

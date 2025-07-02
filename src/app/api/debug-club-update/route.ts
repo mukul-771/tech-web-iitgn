@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { updateClub } from "@/lib/clubs-blob-storage";
+import { updateClub } from "@/lib/db/clubs";
 
 // Debug endpoint to test club updates without authentication
 export async function PUT(request: NextRequest) {

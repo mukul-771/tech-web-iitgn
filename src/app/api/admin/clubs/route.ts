@@ -1,8 +1,8 @@
-import { NextRequest, NextResponse } from "next/server";
-import { getServerSession } from "next-auth";
-import { authOptions } from "@/lib/auth";
-import { getAllClubs, createClub } from "@/lib/clubs-blob-storage";
-import { z } from "zod";
+import { NextRequest, NextResponse } from 'next/server';
+import { getServerSession } from 'next-auth';
+import { authOptions } from '@/lib/auth';
+import { getAllClubs, createClub } from '@/lib/db/clubs';
+import { z } from 'zod';
 
 // Validation schema for club creation
 const createClubSchema = z.object({
@@ -70,8 +70,16 @@ export async function POST(request: NextRequest) {
     // Validate request body
     const validatedData = createClubSchema.parse(body);
 
-    // Create club
-    const newClub = await createClub(validatedData);
+    // Generate ID from name
+    const id = validatedData.name.toLowerCase()
+      .replace(/[^a-z0-9]+/g, '-')
+      .replace(/^-+|-+$/g, '');
+
+    // Create club with ID
+    const newClub = await createClub({
+      id,
+      ...validatedData
+    });
 
     return NextResponse.json(newClub, { status: 201 });
   } catch (error) {

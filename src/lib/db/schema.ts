@@ -57,6 +57,25 @@ export const teamMembers = pgTable('team_members', {
   updatedAt: timestamp('updated_at').defaultNow().notNull(),
 });
 
+// Clubs Table
+export const clubs = pgTable('clubs', {
+  id: text('id').primaryKey(),
+  name: text('name').notNull(),
+  description: text('description').notNull(),
+  longDescription: text('long_description').notNull(),
+  type: text('type').notNull(), // 'club' or 'hobby-group'
+  category: text('category').notNull(),
+  members: text('members').notNull(),
+  established: text('established').notNull(),
+  email: text('email').notNull(),
+  achievements: jsonb('achievements').notNull().$type<string[]>(),
+  projects: jsonb('projects').notNull().$type<string[]>(),
+  team: jsonb('team').notNull().$type<ClubTeamMember[]>(),
+  logoPath: text('logo_path'),
+  createdAt: timestamp('created_at').defaultNow().notNull(),
+  updatedAt: timestamp('updated_at').defaultNow().notNull(),
+});
+
 // Types for TypeScript
 export type TeamMember = {
   name: string;
@@ -91,3 +110,12 @@ export type NewEvent = typeof events.$inferInsert;
 
 export type TeamMemberDB = typeof teamMembers.$inferSelect;
 export type NewTeamMemberDB = typeof teamMembers.$inferInsert;
+
+export type ClubTeamMember = {
+  name: string;
+  role: string;
+  email: string;
+};
+
+export type Club = typeof clubs.$inferSelect;
+export type NewClub = typeof clubs.$inferInsert;

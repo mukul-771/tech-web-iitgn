@@ -15,6 +15,13 @@
       "when": 1751333576029,
       "tag": "0001_tranquil_the_leader",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1751433702841,
+      "tag": "0002_secret_captain_stacy",
+      "breakpoints": true
     }
   ]
 }

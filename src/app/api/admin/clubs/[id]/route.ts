@@ -1,7 +1,7 @@
-import { NextRequest, NextResponse } from "next/server";
-import { getServerSession } from "next-auth";
-import { authOptions } from "@/lib/auth";
-import { getClubById, updateClub, deleteClub } from "@/lib/clubs-blob-storage";
+import { NextRequest, NextResponse } from 'next/server';
+import { getServerSession } from 'next-auth';
+import { authOptions } from '@/lib/auth';
+import { getClubById, updateClub, deleteClub } from '@/lib/db/clubs';
 import { z } from "zod";
 import { revalidatePath } from "next/cache";
 

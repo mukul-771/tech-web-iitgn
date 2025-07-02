@@ -14,10 +14,9 @@ export default function CouncilMembersPage() {
       try {
         const response = await fetch('/api/team');
         if (response.ok) {
-          const data = await response.json();
-          const members = Object.values(data) as TeamMember[];
+          const members = await response.json();
           // Filter to show only general members, design team, and social media team
-          const councilMembers = members.filter(member =>
+          const councilMembers = members.filter((member: TeamMember) =>
             member.category === 'general' ||
             member.category === 'design' ||
             member.category === 'social'

@@ -85,15 +85,16 @@ export default function EditTeamMemberPage({ params }: { params: Promise<{ id: s
   const fetchMember = async () => {
     try {
       setIsLoading(true);
-      // Load team data from API
-      const response = await fetch('/api/team');
+      // Load individual team member from API using new database endpoint
+      const response = await fetch(`/api/team/${memberId}`);
       if (!response.ok) {
-        throw new Error('Failed to fetch team data');
+        if (response.status === 404) {
+          throw new Error("Team member not found");
+        }
+        throw new Error('Failed to fetch team member');
       }
-      const allMembers = await response.json();
-      const memberData = allMembers[memberId];
+      const memberData = await response.json();
       
-      if (!memberData) throw new Error("Team member not found");
       setMember(memberData);
       setFormData({
         name: memberData.name || "",

@@ -4,11 +4,19 @@ import { eq } from 'drizzle-orm';
 // Get all team members
 export async function getAllTeamMembers(): Promise<TeamMemberDB[]> {
   try {
+    console.log('🔍 Fetching all team members from Neon database...');
     const members = await db.select().from(teamMembers);
+    console.log(`✅ Successfully fetched ${members.length} team members from database`);
     return members;
   } catch (error) {
-    console.error('Error fetching team members:', error);
-    throw new Error('Failed to fetch team members');
+    console.error('❌ Error fetching team members from database:', error);
+    console.error('Database URL available:', !!process.env.DATABASE_URL);
+    console.error('Error details:', {
+      message: error instanceof Error ? error.message : 'Unknown error',
+      name: error instanceof Error ? error.name : 'Unknown',
+      stack: error instanceof Error ? error.stack : 'No stack trace'
+    });
+    throw new Error(`Failed to fetch team members: ${error instanceof Error ? error.message : 'Unknown error'}`);
   }
 }
 
@@ -29,15 +37,24 @@ export async function getTeamMembersByCategory(category: string): Promise<TeamMe
 // Get team member by ID
 export async function getTeamMemberById(id: string): Promise<TeamMemberDB | null> {
   try {
+    console.log(`🔍 Fetching team member by ID: ${id}`);
     const [member] = await db
       .select()
       .from(teamMembers)
       .where(eq(teamMembers.id, id))
       .limit(1);
+    
+    if (member) {
+      console.log(`✅ Found team member: ${member.name}`);
+    } else {
+      console.log(`⚠️ No team member found with ID: ${id}`);
+    }
+    
     return member || null;
   } catch (error) {
-    console.error('Error fetching team member by ID:', error);
-    throw new Error('Failed to fetch team member');
+    console.error(`❌ Error fetching team member by ID (${id}):`, error);
+    console.error('Database URL available:', !!process.env.DATABASE_URL);
+    throw new Error(`Failed to fetch team member: ${error instanceof Error ? error.message : 'Unknown error'}`);
   }
 }
 

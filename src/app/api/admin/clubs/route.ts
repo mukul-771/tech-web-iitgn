@@ -19,7 +19,8 @@ const createClubSchema = z.object({
   team: z.array(z.object({
     name: z.string(),
     role: z.string(),
-    email: z.string().email()
+    email: z.string().email(),
+    phone: z.string().optional()
   })).default([]),
   logoPath: z.string().optional()
 });

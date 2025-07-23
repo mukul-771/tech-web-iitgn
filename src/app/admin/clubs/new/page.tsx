@@ -17,6 +17,7 @@ interface TeamMember {
   name: string;
   role: string;
   email: string;
+  phone?: string;
 }
 
 function NewClubPageContent() {
@@ -41,7 +42,7 @@ function NewClubPageContent() {
   });
   const [achievements, setAchievements] = useState<string[]>([""]);
   const [projects, setProjects] = useState<string[]>([""]);
-  const [team, setTeam] = useState<TeamMember[]>([{ name: "", role: "", email: "" }]);
+  const [team, setTeam] = useState<TeamMember[]>([{ name: "", role: "", email: "", phone: "" }]);
 
   // Update form type when URL parameter changes
   useEffect(() => {
@@ -90,7 +91,7 @@ function NewClubPageContent() {
   };
 
   const addTeamMember = () => {
-    setTeam([...team, { name: "", role: "", email: "" }]);
+    setTeam([...team, { name: "", role: "", email: "", phone: "" }]);
   };
 
   const removeTeamMember = (index: number) => {
@@ -401,7 +402,7 @@ function NewClubPageContent() {
             </CardHeader>
             <CardContent className="space-y-4">
               {team.map((member, index) => (
-                <div key={index} className="grid gap-4 md:grid-cols-4 p-4 border rounded-lg">
+                <div key={index} className="grid gap-4 md:grid-cols-5 p-4 border rounded-lg">
                   <Input
                     value={member.name}
                     onChange={(e) => handleTeamChange(index, "name", e.target.value)}
@@ -424,6 +425,12 @@ function NewClubPageContent() {
                     value={member.email}
                     onChange={(e) => handleTeamChange(index, "email", e.target.value)}
                     placeholder="Email"
+                  />
+                  <Input
+                    type="tel"
+                    value={member.phone || ""}
+                    onChange={(e) => handleTeamChange(index, "phone", e.target.value)}
+                    placeholder="Phone Number"
                   />
                   <Button
                     type="button"

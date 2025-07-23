@@ -115,6 +115,7 @@ export type ClubTeamMember = {
   name: string;
   role: string;
   email: string;
+  phone?: string;
 };
 
 export type Club = typeof clubs.$inferSelect;

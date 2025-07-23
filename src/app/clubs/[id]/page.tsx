@@ -5,7 +5,7 @@ import { useParams } from "next/navigation"
 import { notFound } from "next/navigation"
 import Link from "next/link"
 import Image from "next/image"
-import { ArrowLeft, Mail, Users, Award, Loader2, AlertCircle, RefreshCw } from "lucide-react"
+import { ArrowLeft, Mail, Users, Award, Loader2, AlertCircle, RefreshCw, Phone } from "lucide-react"
 import { Button } from "@/components/ui/button"
 
 interface Club {
@@ -24,6 +24,7 @@ interface Club {
     name: string;
     role: string;
     email: string;
+    phone?: string;
   }>;
   logoPath?: string;
   createdAt: string;
@@ -255,12 +256,22 @@ export default function ClubDetailPage() {
                   </div>
                   <h4 className="font-semibold">{member.name}</h4>
                   <p className="text-sm text-muted-foreground mb-3">{member.role}</p>
-                  <Button asChild variant="outline" size="sm">
-                    <a href={`mailto:${member.email}`}>
-                      <Mail className="mr-2 h-3 w-3" />
-                      Contact
-                    </a>
-                  </Button>
+                  <div className="flex gap-2 justify-center">
+                    <Button asChild variant="outline" size="sm">
+                      <a href={`mailto:${member.email}`}>
+                        <Mail className="mr-2 h-3 w-3" />
+                        Email
+                      </a>
+                    </Button>
+                    {member.phone && (
+                      <Button asChild variant="outline" size="sm">
+                        <a href={`tel:${member.phone}`}>
+                          <Phone className="mr-2 h-3 w-3" />
+                          Call
+                        </a>
+                      </Button>
+                    )}
+                  </div>
                 </div>
               ))}
             </div>

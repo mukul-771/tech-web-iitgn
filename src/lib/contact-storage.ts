@@ -32,7 +32,7 @@ const DEFAULT_CONTACT: ContactInfo = {
     postalCode: "382355",
     country: "India"
   },
-  phone: "+91-79-2395-2001",
+  phone: "+91 6376471802",
   email: "technical.secretary@iitgn.ac.in",
   socialMedia: {
     instagram: "https://www.instagram.com/tech_iitgn?utm_source=ig_web_button_share_sheet&igsh=ZDNlZDc0MzIxNw==",

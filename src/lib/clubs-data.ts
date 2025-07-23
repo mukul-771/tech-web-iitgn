@@ -20,6 +20,7 @@ export interface TeamMember {
   name: string;
   role: string;
   email: string;
+  phone?: string;
 }
 
 // Default clubs data
@@ -47,10 +48,10 @@ export const defaultClubsData: Record<string, Club> = {
       "Mobile App for Campus Services"
     ],
     team: [
-      { name: "Aryan Sharma", role: "Club President", email: "aryan@iitgn.ac.in" },
-      { name: "Priya Singh", role: "Technical Lead", email: "priya.singh@iitgn.ac.in" },
+      { name: "Aryan Sharma", role: "Club President", email: "aryan@iitgn.ac.in", phone: "+91 98765 43210" },
+      { name: "Priya Singh", role: "Technical Lead", email: "priya.singh@iitgn.ac.in", phone: "+91 87654 32109" },
       { name: "Rohit Gupta", role: "Open Source Coordinator", email: "rohit.gupta@iitgn.ac.in" },
-      { name: "Sneha Patel", role: "Project Manager", email: "sneha.patel@iitgn.ac.in" }
+      { name: "Sneha Patel", role: "Project Manager", email: "sneha.patel@iitgn.ac.in", phone: "+91 76543 21098" }
     ],
     createdAt: "2023-01-01T00:00:00Z",
     updatedAt: "2023-01-01T00:00:00Z"
